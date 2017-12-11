@@ -1,0 +1,13 @@
+bin/
+obj/
+*.user
+.vs/
+project.lock.json
+.idea/
+launchSettings.json
+launch.json
+tasks.json
+.scannerwork
+.sonarqube
+packages/
+.DS_Store

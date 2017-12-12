@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using web_fnol_tool.Models;
+using FnolTools;
+using Microsoft.AspNetCore.Http;
 
 namespace web_fnol_tool.Controllers
 {
@@ -15,23 +14,19 @@ namespace web_fnol_tool.Controllers
             return View();
         }
 
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromForm] IFormCollection formBody)
+        {
+            var fnol = new FnolTool();
+            await fnol.CreateAssignment((string) formBody["claim-number"]);
+
+            TempData["Success"] = "Added Successfully!";
+            return RedirectToAction(nameof(Index));
         }
     }
 }

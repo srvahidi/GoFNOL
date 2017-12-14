@@ -23,9 +23,12 @@ namespace web_fnol_tool.Controllers
         public async Task<IActionResult> Create([FromForm] IFormCollection formBody)
         {
             var fnol = new FnolTool();
-            await fnol.CreateAssignment((string) formBody["claim-number"]);
+            var claimNum = (string) formBody["claim-number"];
+            await fnol.CreateAssignment(claimNum);
 
-            TempData["Success"] = "Added Successfully!";
+            var workAssignmentId = fnol.Claim.WorkAssignmentId;
+
+            TempData["Success"] = $"Work Assignment ID: '{workAssignmentId}' added successfully! For claim: '{claimNum}'.";
             return RedirectToAction(nameof(Index));
         }
     }

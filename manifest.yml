@@ -1,0 +1,5 @@
+---
+applications:
+- name: web-fnol-tool
+  instances: 1
+  buildpack: dotnet_core_buildpack_latest

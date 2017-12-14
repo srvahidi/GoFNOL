@@ -2,7 +2,7 @@
 
 set -e
 
-
- cp ${PWD}/manifest.yml ${PWD}/web-fnol-tool/bin/Debug/netcoreapp2.0/publish
- cd ${PWD}/web-fnol-tool/bin/Debug/netcoreapp2.0/publish
- cf push
+dotnet publish web-fnol-tool/web-fnol-tool.csproj -c release -o ../app
+cf target -o gotimedriver_a2e -s digital-garage-claims
+cf push -f app/manifest.yml  -p app
+rm -r app

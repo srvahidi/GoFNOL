@@ -11,10 +11,12 @@ namespace web_fnol_tool.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly string magicGuid = Encoding.ASCII.GetString(Convert.FromBase64String("NjdlNGQyZWMwZTZjNGRjZTgxYWNkYWYyMGM0NzQ2NTc="));
+
         [Route("{guid}")]
         public IActionResult Index([FromRoute] string guid)
         {
-            if (guid == Encoding.ASCII.GetString(Convert.FromBase64String("NjdlNGQyZWMwZTZjNGRjZTgxYWNkYWYyMGM0NzQ2NTc=")))
+            if (guid == magicGuid)
             {
                 return View();
             }
@@ -38,7 +40,7 @@ namespace web_fnol_tool.Controllers
             TempData["result"] = $"Work Assignment ID: '{workAssignmentId}' added successfully!";
             TempData["claim"] = $"Claim: '{claimNum}'.";
             TempData["responseTime"] = $"It took {(int) sw.Elapsed.TotalSeconds} seconds";
-            return RedirectToAction(nameof(Index));
+            return Redirect(magicGuid);
         }
     }
 }

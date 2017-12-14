@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using web_fnol_tool.Models;
@@ -9,9 +11,15 @@ namespace web_fnol_tool.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        [Route("{guid}")]
+        public IActionResult Index([FromRoute] string guid)
         {
-            return View();
+            if (guid == Encoding.ASCII.GetString(Convert.FromBase64String("NjdlNGQyZWMwZTZjNGRjZTgxYWNkYWYyMGM0NzQ2NTc=")))
+            {
+                return View();
+            }
+
+            return NotFound();
         }
 
         public IActionResult Error()
@@ -24,11 +32,12 @@ namespace web_fnol_tool.Controllers
         {
             var fnol = new FnolTool();
             var claimNum = (string) formBody["claim-number"];
+            var sw = Stopwatch.StartNew();
             await fnol.CreateAssignment(claimNum);
-
             var workAssignmentId = fnol.Claim.WorkAssignmentId;
-
-            TempData["Success"] = $"Work Assignment ID: '{workAssignmentId}' added successfully! For claim: '{claimNum}'.";
+            TempData["result"] = $"Work Assignment ID: '{workAssignmentId}' added successfully!";
+            TempData["claim"] = $"Claim: '{claimNum}'.";
+            TempData["responseTime"] = $"It took {(int) sw.Elapsed.TotalSeconds} seconds";
             return RedirectToAction(nameof(Index));
         }
     }

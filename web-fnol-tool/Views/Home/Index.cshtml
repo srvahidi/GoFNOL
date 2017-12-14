@@ -3,15 +3,38 @@
 }
 
 <h2>Create Claim</h2>
-<form method="post" action="create" class="claim-form">
+<form method="post" action="create" onsubmit="submitForm()">
     <fieldset>
         <label for="claim-number">New Claim Number:</label>
         <input type="text" name="claim-number" id="claim-number"/>
         <br/>
         <input type="submit" value="Create"/>
+        <div id="progress-indicator"></div>
     </fieldset>
 </form>
-@if (TempData["Success"] != null)
+@if (TempData["result"] != null)
 {
-    <p class="alert alert-success" id="successMessage">@TempData["Success"]</p>
+    <p>@TempData["result"]</p>
+    <p>@TempData["claim"]</p>
+    <p>@TempData["responseTime"]</p>
 }
+<script>
+    function submitForm() {
+        setTimeout(showProgress, 0);
+        return true;
+    }
+
+    function showProgress() {
+        document.forms[0].children[0].setAttribute('disabled', 'disabled');
+        var indicator = document.getElementById('progress-indicator');
+        var count = 1;
+
+        function updateProgressIndicator() {
+            indicator.textContent = `${count} seconds elapsed. usually it takes about 15-20 seconds...`;
+            count++;
+        }
+
+        updateProgressIndicator();
+        setInterval(updateProgressIndicator, 1000);
+    }
+</script>

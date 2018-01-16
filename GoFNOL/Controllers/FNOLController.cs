@@ -2,14 +2,14 @@
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using web_fnol_tool.Models;
-using FnolTools;
+using GoFNOL.Models;
+using GoFNOL.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace web_fnol_tool.Controllers
+namespace GoFNOL.Controllers
 {
-    public class HomeController : Controller
+    public class FNOLController : Controller
     {
         private readonly string magicGuid = Encoding.ASCII.GetString(Convert.FromBase64String("NjdlNGQyZWMwZTZjNGRjZTgxYWNkYWYyMGM0NzQ2NTc="));
 
@@ -51,7 +51,7 @@ namespace web_fnol_tool.Controllers
                     }
                 }
             };
-            var fnol = new FnolTool();
+            var fnol = new FNOLTool();
             var sw = Stopwatch.StartNew();
             var claim = await fnol.CreateAssignment(request);
             var workAssignmentId = claim.WorkAssignmentId;

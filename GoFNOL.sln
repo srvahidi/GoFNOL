@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "web-fnol-tool", "web-fnol-tool\web-fnol-tool.csproj", "{5DE50648-E053-4CE6-980C-C5C7B80CAC26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoFNOL", "GoFNOL\GoFNOL.csproj", "{5DE50648-E053-4CE6-980C-C5C7B80CAC26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\tests.csproj", "{0C11CBB3-BFE1-4D55-A90B-83F815E009DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoFNOL.tests", "GoFNOL.tests\GoFNOL.tests.csproj", "{0C11CBB3-BFE1-4D55-A90B-83F815E009DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,4 @@
-using System;
-
-namespace web_fnol_tool.Models
+namespace GoFNOL.Models
 {
     public class ErrorViewModel
     {

@@ -7,9 +7,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using web_fnol_tool.Models;
+using GoFNOL.Models;
 
-namespace FnolTools
+namespace GoFNOL.Services
 {
     public class Claim
     {
@@ -18,11 +18,11 @@ namespace FnolTools
         public string CreatedForProfileId { get; set; }
     }
 
-    public class FnolTool
+    public class FNOLTool
     {
         private readonly HttpClient client;
 
-        public FnolTool()
+        public FNOLTool()
         {
             client = new HttpClient();
         }

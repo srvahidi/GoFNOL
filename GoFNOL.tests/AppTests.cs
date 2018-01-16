@@ -9,9 +9,9 @@ using FluentAssertions;
 using Microsoft.Net.Http.Headers;
 using Xunit;
 
-namespace tests
+namespace GoFNOL.tests
 {
-    public class Test
+    public class AppTests
     {
         [Fact]
         public async Task TestSomething()

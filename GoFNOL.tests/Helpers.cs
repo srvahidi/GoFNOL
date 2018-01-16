@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using web_fnol_tool;
 
-namespace tests
+namespace GoFNOL.tests
 {
     public static class Helpers
     {

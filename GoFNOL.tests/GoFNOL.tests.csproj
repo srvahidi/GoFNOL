@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\web-fnol-tool\web-fnol-tool.csproj" />
+    <ProjectReference Include="..\GoFNOL\GoFNOL.csproj" />
   </ItemGroup>
 
 </Project>

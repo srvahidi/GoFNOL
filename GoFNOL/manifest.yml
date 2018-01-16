@@ -1,5 +1,5 @@
 ---
 applications:
-- name: web-fnol-tool
+- name: GoFNOL
   instances: 1
   buildpack: dotnet_core_buildpack_latest

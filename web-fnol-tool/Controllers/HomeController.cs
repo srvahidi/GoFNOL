@@ -26,19 +26,37 @@ namespace web_fnol_tool.Controllers
 
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
 
-        [HttpPost("create")]
+        [HttpPost("fnol")]
         public async Task<IActionResult> Create([FromForm] IFormCollection formBody)
         {
+            var request = new FNOLRequest
+            {
+                ClaimNumber = formBody["claim-number"],
+                VIN = formBody["vin"],
+                LossType = formBody["loss-type"],
+                Deductible = formBody["deductible"],
+                Owner = new Party
+                {
+                    FirstName = formBody["first-name"],
+                    LastName = formBody["last-name"],
+                    PhoneNumber = formBody["phone-number"],
+                    Email = formBody["email"],
+                    Address = new Address
+                    {
+                        PostalCode = $"{(string) formBody["zip-code"]}-{(string) formBody["zip-addon"]}",
+                        State = formBody["state"]
+                    }
+                }
+            };
             var fnol = new FnolTool();
-            var claimNum = (string) formBody["claim-number"];
             var sw = Stopwatch.StartNew();
-            await fnol.CreateAssignment(claimNum);
-            var workAssignmentId = fnol.Claim.WorkAssignmentId;
+            var claim = await fnol.CreateAssignment(request);
+            var workAssignmentId = claim.WorkAssignmentId;
             TempData["result"] = $"Work Assignment ID: '{workAssignmentId}' added successfully!";
-            TempData["claim"] = $"Claim: '{claimNum}'.";
+            TempData["claim"] = $"Claim: '{request.ClaimNumber}'.";
             TempData["responseTime"] = $"It took {(int) sw.Elapsed.TotalSeconds} seconds";
             return Redirect(magicGuid);
         }

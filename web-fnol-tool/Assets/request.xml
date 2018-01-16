@@ -1,0 +1,15 @@
+﻿<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://sys-arch-svr12.pdlab.adp.com/wsproxy/">
+<soapenv:Header>
+    <SOAPHeader xmlns="http://csg.adp.com">
+        <Client>477Appraiser2</Client>
+        <Passphrase>password</Passphrase>
+        <Service>EAIFNOLWebService</Service>
+        <Method>SubmitXml</Method>
+    </SOAPHeader>
+</soapenv:Header>
+ <soapenv:Body>
+	<Transmit xmlns="http://csg.adp.com">
+		<parameters></parameters>
+	</Transmit>
+ </soapenv:Body>
+</soapenv:Envelope>

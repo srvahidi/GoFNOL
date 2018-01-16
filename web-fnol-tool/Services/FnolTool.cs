@@ -35,7 +35,7 @@ namespace FnolTools
             {
                 ClaimNumber = request.ClaimNumber,
                 WorkAssignmentId = Regex.Match(result, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value,
-                CreatedForProfileId = "477T2PPCOMPAPP2"
+                CreatedForProfileId = "4774PE200001"
             };
         }
 

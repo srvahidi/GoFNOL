@@ -14,7 +14,7 @@ namespace tests
         public static async Task<XDocument> GetClaimDocument(string wapk)
         {
             var falconClient = new HttpClient();
-            var getClaimRequest = new StringContent($"<Request><Header><Action>OONShopGetAssignment</Action></Header><ServiceInput><CreatedForProfileId>477T2PPCOMPAPP2</CreatedForProfileId><WorkAssignmentID>{wapk}</WorkAssignmentID><GUID/></ServiceInput></Request>");
+            var getClaimRequest = new StringContent($"<Request><Header><Action>OONShopGetAssignment</Action></Header><ServiceInput><CreatedForProfileId>4774PE200001</CreatedForProfileId><WorkAssignmentID>{wapk}</WorkAssignmentID><GUID/></ServiceInput></Request>");
 
             getClaimRequest.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
             var getClaimResponse = await falconClient.PostAsync("http://dev-adxe-4.pdlab.adp.com/FalconApp/Mobile.asp", getClaimRequest);

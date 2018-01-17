@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using GoFNOL.Models;
 using GoFNOL.Services;
@@ -11,17 +9,9 @@ namespace GoFNOL.Controllers
 {
     public class FNOLController : Controller
     {
-        private readonly string magicGuid = Encoding.ASCII.GetString(Convert.FromBase64String("NjdlNGQyZWMwZTZjNGRjZTgxYWNkYWYyMGM0NzQ2NTc="));
-
-        [Route("{guid}")]
-        public IActionResult Index([FromRoute] string guid)
+        public IActionResult Index()
         {
-            if (guid == magicGuid)
-            {
-                return View();
-            }
-
-            return NotFound();
+            return View();
         }
 
         public IActionResult Error()
@@ -58,7 +48,7 @@ namespace GoFNOL.Controllers
             TempData["result"] = $"Work Assignment ID: '{workAssignmentId}' added successfully!";
             TempData["claim"] = $"Claim: '{request.ClaimNumber}'.";
             TempData["responseTime"] = $"It took {(int) sw.Elapsed.TotalSeconds} seconds";
-            return Redirect(magicGuid);
+            return Redirect("/");
         }
     }
 }

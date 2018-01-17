@@ -3,3 +3,5 @@ applications:
 - name: GoFNOL
   instances: 1
   buildpack: dotnet_core_buildpack_latest
+  routes:
+  - route: gofnol-devtest.apps-dev.gp2.axadmin.net

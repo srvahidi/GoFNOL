@@ -49,7 +49,7 @@ namespace GoFNOL.tests
 
             // Verify
             response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-            response.Headers.Location.OriginalString.Should().Be("67e4d2ec0e6c4dce81acdaf20c474657");
+            response.Headers.Location.OriginalString.Should().Be("/");
             var getRequest = new HttpRequestMessage(HttpMethod.Get, response.Headers.Location);
             if (response.Headers.TryGetValues("Set-Cookie", out var cookieHeaderValue))
             {

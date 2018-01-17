@@ -1,0 +1,48 @@
+resources:
+
+- name: GoFNOL-git
+  type: git
+  source:
+    uri: git@bitbucket.org:SoleraNA/gofnol.git
+    branch: master
+    private_key: ((private-repo-key))
+
+- name: GoFNOL-cf-qa
+  type: cf
+  source:
+    api: ((cf-preprd-api))
+    username: ((cf-preprd-username))
+    password: ((cf-preprd-password))
+    organization: automated-appraisal-engine
+    space: devtest
+    skip_cert_check: false
+
+jobs:
+  - name: build-GoFNOL
+    plan:
+      - get: GoFNOL-git
+        trigger: true
+        version: every
+      - task: build-GoFNOL
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: microsoft/dotnet
+          inputs:
+          - name: GoFNOL-git
+          outputs:
+          - name: deployables
+          run:
+            path: bash
+            args:
+            - -exc
+            - |
+              dotnet test ./GoFNOL-git/GoFNOL.tests/GoFNOL.tests.csproj
+              dotnet publish ./GoFNOL-git/GoFNOL/GoFNOL.csproj -c Release -o ../../deployables/app
+              cp ./GoFNOL-git/ci/manifest.yml ./deployables/manifest.yml
+      - put: GoFNOL-cf-qa
+        params:
+          manifest: deployables/manifest.yml
+          path: deployables/app

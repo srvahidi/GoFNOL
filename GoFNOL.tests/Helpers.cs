@@ -32,12 +32,12 @@ namespace GoFNOL.tests
         public static TestServer CreateTestServer()
         {
             var currentDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
-            while (currentDirectory.Name != "GoFNOL")
+            while (currentDirectory.Name != "GoFNOL.tests")
             {
                 currentDirectory = currentDirectory.Parent;
             }
 
-            var contentRoot = Path.Combine(currentDirectory.FullName, "GoFNOL");
+            var contentRoot = Path.Combine(currentDirectory.Parent.FullName, "GoFNOL");
             return new TestServer(new WebHostBuilder()
                 .UseContentRoot(contentRoot)
                 .UseStartup<Startup>());

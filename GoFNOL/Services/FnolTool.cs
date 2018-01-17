@@ -41,7 +41,7 @@ namespace GoFNOL.Services
 
         private XDocument SetAssignmentValues(FNOLRequest request)
         {
-            var xRequest = XDocument.Parse(ReadResoruce("web-fnol-tool.Assets.assignment.xml"));
+            var xRequest = XDocument.Parse(ReadResoruce("GoFNOL.Assets.assignment.xml"));
             xRequest.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/CLAIM_NBR").Value = request.ClaimNumber;
             xRequest.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_FIRST_NAME").Value = request.Owner.FirstName;
             xRequest.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_LAST_NAME").Value = request.Owner.LastName;
@@ -57,7 +57,7 @@ namespace GoFNOL.Services
 
         private async Task<string> ExecuteRequest(XDocument payload)
         {
-            var request = XDocument.Parse(ReadResoruce("web-fnol-tool.Assets.request.xml"));
+            var request = XDocument.Parse(ReadResoruce("GoFNOL.Assets.request.xml"));
             var soapNs = (XNamespace) "http://schemas.xmlsoap.org/soap/envelope/";
             var adpNs = (XNamespace) "http://csg.adp.com";
             request.Element(soapNs + "Envelope")

@@ -31,6 +31,7 @@ namespace GoFNOL.tests
             const string deductible = "100500";
             var formContent = new FormUrlEncodedContent(new[]
             {
+                new KeyValuePair<string, string>("mobile-flow-ind", "N"),
                 new KeyValuePair<string, string>("claim-number", claimNumber),
                 new KeyValuePair<string, string>("first-name", ownerFirstName),
                 new KeyValuePair<string, string>("last-name", ownerLastName),

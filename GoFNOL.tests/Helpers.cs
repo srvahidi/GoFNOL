@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GoFNOL.tests
 {
@@ -31,6 +33,11 @@ namespace GoFNOL.tests
 
         public static TestServer CreateTestServer()
         {
+            return CreateTestServer(collection => { });
+        }
+
+        public static TestServer CreateTestServer(Action<IServiceCollection> configureCustomServices)
+        {
             var currentDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
             while (currentDirectory.Name != "GoFNOL.tests")
             {
@@ -40,7 +47,21 @@ namespace GoFNOL.tests
             var contentRoot = Path.Combine(currentDirectory.Parent.FullName, "GoFNOL");
             return new TestServer(new WebHostBuilder()
                 .UseContentRoot(contentRoot)
+                .ConfigureServices(configureCustomServices)
                 .UseStartup<Startup>());
+        }
+
+        public static XDocument ParseAssignment(string data)
+        {
+            var xRequest = XDocument.Parse(data);
+            var soapNs = (XNamespace)"http://schemas.xmlsoap.org/soap/envelope/";
+            var adpNs = (XNamespace)"http://csg.adp.com";
+            var innerPayload = xRequest.Element(soapNs + "Envelope")
+                .Element(soapNs + "Body")
+                .Element(adpNs + "Transmit")
+                .Element(adpNs + "parameters")
+                .Value;
+            return XDocument.Parse(innerPayload);
         }
     }
 }

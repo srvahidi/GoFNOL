@@ -20,11 +20,11 @@ namespace GoFNOL.Services
 
     public class FNOLTool
     {
-        private readonly HttpClient client;
+        private readonly IHTTPService client;
 
-        public FNOLTool()
+        public FNOLTool(IHTTPService client)
         {
-            client = new HttpClient();
+            this.client = client;
         }
 
         public async Task<Claim> CreateAssignment(FNOLRequest request)
@@ -42,6 +42,7 @@ namespace GoFNOL.Services
         private XDocument SetAssignmentValues(FNOLRequest request)
         {
             var xRequest = XDocument.Parse(ReadResoruce("GoFNOL.Assets.assignment.xml"));
+            xRequest.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value = request.MobileFlowIndicator;
             xRequest.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/CLAIM_NBR").Value = request.ClaimNumber;
             xRequest.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_FIRST_NAME").Value = request.Owner.FirstName;
             xRequest.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_LAST_NAME").Value = request.Owner.LastName;

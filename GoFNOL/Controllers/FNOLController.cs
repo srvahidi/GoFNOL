@@ -9,6 +9,13 @@ namespace GoFNOL.Controllers
 {
     public class FNOLController : Controller
     {
+        private readonly IHTTPService httpService;
+
+        public FNOLController(IHTTPService httpService)
+        {
+            this.httpService = httpService;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -25,6 +32,7 @@ namespace GoFNOL.Controllers
             var request = new FNOLRequest
             {
                 ClaimNumber = formBody["claim-number"],
+                MobileFlowIndicator = formBody["mobile-flow-ind"],
                 VIN = formBody["vin"],
                 LossType = formBody["loss-type"],
                 Deductible = formBody["deductible"],
@@ -41,7 +49,7 @@ namespace GoFNOL.Controllers
                     }
                 }
             };
-            var fnol = new FNOLTool();
+            var fnol = new FNOLTool(httpService);
             var sw = Stopwatch.StartNew();
             var claim = await fnol.CreateAssignment(request);
             var workAssignmentId = claim.WorkAssignmentId;

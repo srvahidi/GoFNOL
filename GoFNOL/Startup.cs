@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using GoFNOL.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace GoFNOL
 {
@@ -18,6 +20,7 @@ namespace GoFNOL
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.TryAddSingleton<IHTTPService, HTTPService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

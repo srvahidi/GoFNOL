@@ -4,6 +4,8 @@
     {
         public string ClaimNumber { get; set; }
 
+        public string MobileFlowIndicator { get; set; }
+
         public string VIN { get; set; }
 
         public string LossType { get; set; }

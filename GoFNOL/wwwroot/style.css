@@ -1,0 +1,142 @@
+﻿html, body, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: #2e3336;
+    font-family: sans-serif;
+}
+
+.button {
+    width: 120px;
+    border-radius: .77em;
+}
+
+.button.button--primary {
+    background-color: #d9711c;
+}
+
+.list .list_item {
+    border-top: .1em solid #e1e0e0;
+    font-size: 14px;
+    padding: 1.25em 0.5em;
+}
+
+.list .list_item:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+.header {
+    background-color: #343a40;
+    padding: 1em;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.5);
+    margin-bottom: 4em;
+}
+
+.header h3 {
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 18px;
+    font-weight: lighter;
+}
+
+.content {
+    min-width: 40em;
+    width: 50%;
+    margin: 0 auto;
+}
+
+table {
+    border-spacing: 0;
+}
+
+td, th {
+    text-align: left;
+    padding: 1em;
+}
+
+tbody > tr > td {
+    border-top: 1px solid #e1e0e0;
+    margin: 0 auto;
+    min-width: 10em;
+}
+
+tbody > tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+}
+
+li + li {
+    margin: .5em 0 0 0;
+}
+
+h2 {
+    margin-bottom: .5rem;
+}
+
+h2 .subtitle {
+    display: block;
+    font-size: .66em;
+    font-weight: normal;
+    text-align: left;
+}
+
+.part-form {
+    margin: 1em 0;
+}
+
+.switch-label{
+    vertical-align: -webkit-baseline-middle;
+    display: inline-block;
+    height: 24px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: 40px;
+    height: 24px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #fff;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #f57e20;
+}
+
+input:checked + .slider:before {
+    right: 4px;
+    left: auto;
+}
+
+.download {
+    margin-left: 70%;
+    display: inline-block;
+}
+
+fieldset {
+    border: none;
+}

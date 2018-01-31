@@ -20,7 +20,12 @@ namespace GoFNOL
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            var environmentConfiguration = new EnvironmentConfiguration(Configuration);
+            services.TryAddSingleton<IEnvironmentConfiguration>(environmentConfiguration);
+
             services.TryAddSingleton<IHTTPService, HTTPService>();
+            services.TryAddSingleton<FNOLService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

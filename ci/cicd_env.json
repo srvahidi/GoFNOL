@@ -1,0 +1,14 @@
+{
+	"user-provided": [
+		{
+			"credentials": {
+				"endpoint": "http://sys-arch-svr12.pdlab.adp.com/wsproxy/ws_proxy.asmx"
+			},
+			"label": "user-provided",
+			"name": "EAI",
+			"syslog_drain_url": "",
+			"tags": [],
+			"volume_mounts": []
+		}
+	]
+}

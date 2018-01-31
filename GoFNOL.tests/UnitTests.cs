@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.XPath;
 using FluentAssertions;
 using GoFNOL.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
@@ -14,19 +16,45 @@ namespace GoFNOL.tests
     public class UnitTests
     {
         [Fact]
+        public void EnvironmentConfigurationTest()
+        {
+            // Setup
+            var environmentData = File.ReadAllText("Fixtures/env.json");
+            var mockedConfigRoot = new Mock<IConfigurationRoot>();
+            mockedConfigRoot.Setup(cr => cr["VCAP_SERVICES"]).Returns(environmentData);
+            var environmentConfiguration = new EnvironmentConfiguration(mockedConfigRoot.Object);
+
+            // Execute
+            var eaiEndpoint = environmentConfiguration.EAIEndpoint;
+
+            // Verify
+            eaiEndpoint.Should().Be("http://dummy.com");
+        }
+
+        [Fact]
         public async Task FNOLController_WhenFormIsPOSTed_ShouldFormProperFollowingRequest()
         {
             // Setup
-            var mockHTTPService = new Mock<IHTTPService>();
+            const string expectedEndpoint = "http://dum.my";
+            var mockConfig = new Mock<IEnvironmentConfiguration>();
+            mockConfig.SetupGet(c => c.EAIEndpoint).Returns(expectedEndpoint);
+
             HttpContent actualContent = null;
+            Uri actualEAIEndpoint = null;
+            var mockHTTPService = new Mock<IHTTPService>();
             mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
-                .Callback<Uri, HttpContent>((uri, content) => actualContent = content)
+                .Callback<Uri, HttpContent>((uri, content) =>
+                {
+                    actualEAIEndpoint = uri;
+                    actualContent = content;
+                })
                 .Returns(Task.FromResult(new HttpResponseMessage
                 {
                     Content = new StringContent("<ADP_TRANSACTION_ID>123</ADP_TRANSACTION_ID>")
                 }));
             var client = Helpers.CreateTestServer(collection =>
             {
+                collection.AddSingleton(mockConfig.Object);
                 collection.AddSingleton(mockHTTPService.Object);
             }).CreateClient();
             var formData = new Dictionary<string, string>
@@ -50,6 +78,7 @@ namespace GoFNOL.tests
             await client.PostAsync("/fnol", formContent);
 
             // Verify
+            actualEAIEndpoint.AbsoluteUri.TrimEnd('/').Should().Be(expectedEndpoint);
             var xAssignment = Helpers.ParseAssignment(await actualContent.ReadAsStringAsync());
             xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value.Should().Be("D");
             xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/CLAIM_NBR").Value.Should().Be("01AB");

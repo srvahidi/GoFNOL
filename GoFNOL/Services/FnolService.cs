@@ -18,13 +18,16 @@ namespace GoFNOL.Services
         public string CreatedForProfileId { get; set; }
     }
 
-    public class FNOLTool
+    public class FNOLService
     {
         private readonly IHTTPService client;
 
-        public FNOLTool(IHTTPService client)
+        private readonly IEnvironmentConfiguration environmentConfiguration;
+
+        public FNOLService(IHTTPService client, IEnvironmentConfiguration environmentConfiguration)
         {
             this.client = client;
+            this.environmentConfiguration = environmentConfiguration;
         }
 
         public async Task<Claim> CreateAssignment(FNOLRequest request)
@@ -74,7 +77,7 @@ namespace GoFNOL.Services
 
             var content = new StringContent(request.ToString(), Encoding.UTF8, "text/xml");
             content.Headers.Add("SOAPAction", "http://csg.adp.com/Transmit");
-            using (var response = await client.PostAsync(new Uri("http://sys-arch-svr12.pdlab.adp.com/wsproxy/ws_proxy.asmx"), content))
+            using (var response = await client.PostAsync(new Uri(environmentConfiguration.EAIEndpoint), content))
             {
                 return await response.Content.ReadAsStringAsync();
             }

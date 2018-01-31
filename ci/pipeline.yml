@@ -39,6 +39,7 @@ jobs:
             args:
             - -exc
             - |
+              export VCAP_SERVICES=$(cat ./GoFNOL-git/ci/cicd_env.json)
               dotnet test ./GoFNOL-git/GoFNOL.tests/GoFNOL.tests.csproj
               dotnet publish ./GoFNOL-git/GoFNOL/GoFNOL.csproj -c Release -o ../../deployables/app
               cp ./GoFNOL-git/ci/manifest.yml ./deployables/manifest.yml

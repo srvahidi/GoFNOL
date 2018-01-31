@@ -24,4 +24,10 @@
     <ProjectReference Include="..\GoFNOL\GoFNOL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Fixtures\env.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

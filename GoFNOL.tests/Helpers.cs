@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GoFNOL.tests
@@ -47,6 +48,14 @@ namespace GoFNOL.tests
             var contentRoot = Path.Combine(currentDirectory.Parent.FullName, "GoFNOL");
             return new TestServer(new WebHostBuilder()
                 .UseContentRoot(contentRoot)
+                .ConfigureAppConfiguration((context, builder) =>
+                {
+                    builder.AddEnvironmentVariables();
+                    if (context.HostingEnvironment.IsDevelopment())
+                    {
+                        builder.AddUserSecrets("GoFNOL");
+                    }
+                })
                 .ConfigureServices(configureCustomServices)
                 .UseStartup<Startup>());
         }

@@ -80,19 +80,19 @@ header h3 {
 	box-shadow: 0 2px 3px 0 rgba(150, 100, 0, 0.5);
 }
 
-.content form input[type="email"]:valid:not(:optional),
-.content form input[type="number"]:valid:not(:optional),
-.content form input[type="tel"]:valid:not(:optional),
-.content form input[type="text"]:valid:not(:optional),
-.content form select:valid:not(:optional) {
+.content form input[type="email"]:valid:not(.untouched),
+.content form input[type="number"]:valid:not(.untouched),
+.content form input[type="tel"]:valid:not(.untouched),
+.content form input[type="text"]:valid:not(.untouched),
+.content form select:valid:not(.untouched){
 	box-shadow: 0 2px 3px 0 rgba(0, 255, 0, 0.5);
 }
 
-.content form input[type="email"]:invalid,
-.content form input[type="number"]:invalid,
-.content form input[type="tel"]:invalid,
-.content form input[type="text"]:invalid,
-.content form select:invalid {
+.content form input[type="email"]:invalid:not(.untouched),
+.content form input[type="number"]:invalid:not(.untouched),
+.content form input[type="tel"]:invalid:not(.untouched),
+.content form input[type="text"]:invalid:not(.untouched),
+.content form select:invalid:not(.untouched) {
 	box-shadow: 0 4px 6px 0 rgba(255, 0, 0, 0.5);
 }
 

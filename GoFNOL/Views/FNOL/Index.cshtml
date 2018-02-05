@@ -1,75 +1,75 @@
 ﻿@{
-    ViewData["Title"] = "Create Claim";
+	ViewData["Title"] = "Create Claim";
 }
 
 <h2>Create Claim</h2>
 <form method="post" action="fnol" onsubmit="submitForm()">
 	<fieldset>
+		<legend>&nbsp;</legend>
+
 		<label for="mobile-flow-ind">Mobile flow indicator:</label>
-		<select name="mobile-flow-ind" id="mobile-flow-ind">
+		<select name="mobile-flow-ind" id="mobile-flow-ind" pattern="[DYN]" required="required">
 			<option value="D">Digital Garage Claims (D)</option>
 			<option value="Y">Pocket Estimate (Y)</option>
 			<option value="N">Not Mobile (N)</option>
 		</select>
-		<br/>
+
 		<label for="claim-number">New Claim Number:</label>
-		<input type="text" name="claim-number" id="claim-number"/>
-		<br/>
+		<input type="text" name="claim-number" id="claim-number" placeholder="Claim Number" required="required"/>
+
 		<label for="first-name">First Name:</label>
-		<input type="text" name="first-name" id="first-name"/>
-		<br/>
+		<input type="text" name="first-name" id="first-name" placeholder="First Name" required="required"/>
+
 		<label for="last-name">Last Name:</label>
-		<input type="text" name="last-name" id="last-name"/>
-		<br/>
+		<input type="text" name="last-name" id="last-name" placeholder="Last Name" required="required"/>
+
 		<label for="phone-number">Phone number:</label>
-		<input type="text" name="phone-number" id="phone-number"/>
-		<br/>
+		<input type="tel" name="phone-number" id="phone-number" placeholder="Phone Number" required="required" pattern=".{7,}"/>
+
 		<label for="zip-code">Postal Code:</label>
-		<input type="text" name="zip-code" id="zip-code"/>
-		<input type="text" name="zip-addon" id="zip-addon"/>
-		<br/>
+		<input type="number" name="zip-code" id="zip-code" placeholder="Zip Code (first 5)" required="required" min="11111" max="99999"/>
+		<input type="number" name="zip-addon" id="zip-addon" placeholder="Additional Zip (extra 4)" minlength="4" min="1111" max="9999"/>
+
 		<label for="state">State:</label>
-		<input type="text" name="state" id="state"/>
-		<br/>
+		<input type="text" name="state" id="state" placeholder="State" required="required" pattern="[A-z]{2}|[A-z]{4,}"/>
+
 		<label for="email">Email:</label>
-		<input type="text" name="email" id="email"/>
-		<br/>
+		<input type="email" name="email" id="email" placeholder="Email" required="required"/>
+
 		<label for="vin">VIN:</label>
-		<input type="text" name="vin" id="vin"/>
-		<br/>
+		<input type="text" name="vin" id="vin" placeholder="VIN" required="required"/>
+
 		<label for="loss-type">Loss Type:</label>
-		<input type="text" name="loss-type" id="loss-type" value="COLL"/>
-		<br/>
+		<input type="text" name="loss-type" id="loss-type" value="COLL" placeholder="Loss Type" required="required"/>
+
 		<label for="deductible">Deductible:</label>
-		<input type="text" name="deductible" id="deductible"/>
-		<br/>
-		<input type="submit" value="Create"/>
-		<div id="progress-indicator"></div>
+		<input type="text" name="deductible" id="deductible" placeholder="Deductible" />
 	</fieldset>
+	<div id="progress-indicator"></div>
+	<input class="button primary shadowed" type="submit" value="Create" />
 </form>
 @if (TempData["result"] != null)
 {
-    <p>@TempData["result"]</p>
-    <p>@TempData["claim"]</p>
-    <p>@TempData["responseTime"]</p>
+	<p>@TempData["result"]</p>
+	<p>@TempData["claim"]</p>
+	<p>@TempData["responseTime"]</p>
 }
 <script>
-    function submitForm() {
-        setTimeout(showProgress, 0);
-        return true;
-    }
+	const disableForm = () => document.forms[0].children[0].setAttribute('disabled', 'disabled')
 
-    function showProgress() {
-        document.forms[0].children[0].setAttribute('disabled', 'disabled');
-        var indicator = document.getElementById('progress-indicator');
-        var count = 1;
+	const showProgress = () => {
+		disableForm()
+		const indicator = document.getElementById('progress-indicator')
+		const count = 1
+		const PROGRESS_UPDATE_INTERVAL = 1000
+		const updateProgressIndicator = () => {
+			indicator.textContent = `${count} seconds elapsed. usually it takes about 15-20 seconds...`
+			count++
+		}
+		updateProgressIndicator()
+		setInterval(updateProgressIndicator, PROGRESS_UPDATE_INTERVAL)
+	}
 
-        function updateProgressIndicator() {
-            indicator.textContent = `${count} seconds elapsed. usually it takes about 15-20 seconds...`;
-            count++;
-        }
-
-        updateProgressIndicator();
-        setInterval(updateProgressIndicator, 1000);
-    }
+	// NOTE: returns boolean `true` intentionally
+	const submitForm = () => setTimeout(showProgress, 0) && true
 </script>

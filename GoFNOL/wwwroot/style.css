@@ -1,142 +1,108 @@
 ﻿html, body, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    color: #2e3336;
-    font-family: sans-serif;
+	color: #2e3336;
+	display: grid;
+	font-family: sans-serif;
+	grid-row-gap: 1em;
+	grid-template-rows: 3em auto 1em;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+footer {
+	grid-column: 1 / 4;
+}
+
+header {
+	background-color: #343a40;
+	grid-column: 1 / 4;
+}
+
+header h3 {
+	color: #fff;
+	font-size: 1.5em;
+	font-weight: lighter;
+	padding-top: .5em;
+	text-indent: 1.5em;
+	text-transform: uppercase;
+}
+
+.shadowed {
+	box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.5);
 }
 
 .button {
-    width: 120px;
-    border-radius: .77em;
+	border: none;
+	border-radius: .75em;
+	padding: .45em .45em;
+	letter-spacing: .2em;
 }
 
-.button.button--primary {
-    background-color: #d9711c;
+.button.primary {
+	background-color: #f90;
+	color: #fff;
 }
 
-.list .list_item {
-    border-top: .1em solid #e1e0e0;
-    font-size: 14px;
-    padding: 1.25em 0.5em;
-}
-
-.list .list_item:nth-child(odd) {
-    background-color: #f9f9f9;
-}
-
-.header {
-    background-color: #343a40;
-    padding: 1em;
-    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.5);
-    margin-bottom: 4em;
-}
-
-.header h3 {
-    color: #fff;
-    text-transform: uppercase;
-    font-size: 18px;
-    font-weight: lighter;
+.button.primary:hover {
+	background-color: #fff;
+	border: 1px solid #f90;
+	color: #333;
 }
 
 .content {
-    min-width: 40em;
-    width: 50%;
-    margin: 0 auto;
+	display: grid;
+	grid-column: 2 / 3;
+	grid-gap: 1em;
+	grid-template-rows: 2em auto;
 }
 
-table {
-    border-spacing: 0;
+.content form {
+	display: grid;
+	grid-column: 1 / 2;
 }
 
-td, th {
-    text-align: left;
-    padding: 1em;
+.content form fieldset {
+	border: 1px solid #333;
+	display: grid;
+	grid-auto-rows: 1.5em;
+	grid-gap: .75em;
+	grid-template-columns: 10em 1fr;
+	grid-template-rows: auto;
 }
 
-tbody > tr > td {
-    border-top: 1px solid #e1e0e0;
-    margin: 0 auto;
-    min-width: 10em;
+.content form input[type="email"],
+.content form input[type="number"],
+.content form input[type="tel"],
+.content form input[type="text"],
+.content form select {
+	grid-column: 2 / 3;
+	box-shadow: 0 2px 3px 0 rgba(150, 100, 0, 0.5);
 }
 
-tbody > tr:nth-of-type(odd) {
-    background-color: #f9f9f9;
+.content form input[type="email"]:valid:not(:optional),
+.content form input[type="number"]:valid:not(:optional),
+.content form input[type="tel"]:valid:not(:optional),
+.content form input[type="text"]:valid:not(:optional),
+.content form select:valid:not(:optional) {
+	box-shadow: 0 2px 3px 0 rgba(0, 255, 0, 0.5);
 }
 
-li + li {
-    margin: .5em 0 0 0;
+.content form input[type="email"]:invalid,
+.content form input[type="number"]:invalid,
+.content form input[type="tel"]:invalid,
+.content form input[type="text"]:invalid,
+.content form select:invalid {
+	box-shadow: 0 4px 6px 0 rgba(255, 0, 0, 0.5);
 }
 
-h2 {
-    margin-bottom: .5rem;
+.content form input[type="submit"] {
+	margin-top: 1em;
 }
 
-h2 .subtitle {
-    display: block;
-    font-size: .66em;
-    font-weight: normal;
-    text-align: left;
+.content form label {
+	grid-column: 1 / 2;
 }
 
-.part-form {
-    margin: 1em 0;
-}
-
-.switch-label{
-    vertical-align: -webkit-baseline-middle;
-    display: inline-block;
-    height: 24px;
-}
-
-.switch {
-    position: relative;
-    display: inline-block;
-    vertical-align: middle;
-    width: 40px;
-    height: 24px;
-}
-
-.switch input {
-    display: none;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    border-radius: 24px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
-    background-color: #fff;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #f57e20;
-}
-
-input:checked + .slider:before {
-    right: 4px;
-    left: auto;
-}
-
-.download {
-    margin-left: 70%;
-    display: inline-block;
-}
-
-fieldset {
-    border: none;
+.content form legend {
+	display: none;
 }

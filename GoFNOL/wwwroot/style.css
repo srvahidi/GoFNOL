@@ -61,13 +61,14 @@ header h3 {
 	grid-column: 1 / 2;
 }
 
-.content form fieldset {
+.content form .input-container {
 	border: 1px solid #333;
 	display: grid;
 	grid-auto-rows: 1.5em;
 	grid-gap: .75em;
 	grid-template-columns: 10em 1fr;
 	grid-template-rows: auto;
+	padding: 1em;
 }
 
 .content form input[type="email"],

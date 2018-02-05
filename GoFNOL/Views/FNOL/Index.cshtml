@@ -4,9 +4,7 @@
 
 <h2>Create Claim</h2>
 <form method="post" action="fnol" onsubmit="submitForm()">
-	<fieldset>
-		<legend>&nbsp;</legend>
-
+	<div class="input-container">
 		<label for="mobile-flow-ind">Mobile flow indicator:</label>
 		<select name="mobile-flow-ind" id="mobile-flow-ind" pattern="[DYN]" required="required">
 			<option value="D">Digital Garage Claims (D)</option>
@@ -44,7 +42,7 @@
 
 		<label for="deductible">Deductible:</label>
 		<input type="text" name="deductible" id="deductible" placeholder="Deductible" />
-	</fieldset>
+	</div>
 	<div id="progress-indicator"></div>
 	<input class="button primary shadowed" type="submit" value="Create" />
 </form>

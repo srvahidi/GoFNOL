@@ -212,7 +212,7 @@ label[for="loss-type"], input[name="loss-type"] {
 	grid-row: 11;
 }
 
-label[for="deductible"], input[name="deductible"] {
-	-ms-grid-row: 12;
-	grid-row: 12;
+label[for="deductible"], .deductible {
+    -ms-grid-row: 12;
+    grid-row: 12;
 }

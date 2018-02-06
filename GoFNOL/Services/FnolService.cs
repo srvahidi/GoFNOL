@@ -18,7 +18,7 @@ namespace GoFNOL.Services
         public string CreatedForProfileId { get; set; }
     }
 
-    public class FNOLService
+    public class FNOLService : IFNOLService
     {
         private readonly IHTTPService client;
 

@@ -9,12 +9,12 @@ using FluentAssertions;
 using Microsoft.Net.Http.Headers;
 using Xunit;
 
-namespace GoFNOL.tests
+namespace GoFNOL.tests.E2E
 {
     public class AppTests
     {
         [Fact]
-        public async Task TestSomething()
+        public async Task GoFNOL_WhenPOSTingForm_ShouldCallEAIAndDisplayWAID()
         {
             // Setup
             var client = Helpers.CreateTestServer().CreateClient();

@@ -41,7 +41,11 @@
 		<input type="text" name="loss-type" id="loss-type" value="COLL" placeholder="Loss Type" required="required" class="untouched" onchange="removeUntouched(event)"/>
 
 		<label for="deductible">Deductible</label>
-		<input type="text" name="deductible" id="deductible" placeholder="Deductible" class="untouched" onchange="removeUntouched(event)"/>
+		<div>
+			<label for="deductible-waived">Waive</label>	
+			<input type="checkbox" name="deductible-waived" id="deductible-waived" onchange="updateDeductibleState(event)"/>
+			<input type="text" name="deductible" id="deductible" placeholder="Deductible" class="untouched" onchange="removeUntouched(event)"/>
+		</div>
 	</div>
 	<div id="progress-indicator">&nbsp;</div>
 	<input class="button primary shadowed" type="submit" value="Create"/>
@@ -75,6 +79,12 @@
 		}
 		updateProgressIndicator()
 		setInterval(updateProgressIndicator, PROGRESS_UPDATE_INTERVAL)
+	}
+	const updateDeductibleState = (e) => {
+		if(e.target.checked)
+			document.getElementById('deductible').setAttribute('disabled', 'disabled')
+		else
+			document.getElementById('deductible').removeAttribute('disabled');
 	}
 	// NOTE: returns boolean `true` intentionally
 	const submitForm = () => setTimeout(showProgress, 0) && true

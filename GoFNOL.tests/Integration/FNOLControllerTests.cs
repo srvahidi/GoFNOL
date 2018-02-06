@@ -1,36 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.XPath;
 using FluentAssertions;
 using GoFNOL.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 
-namespace GoFNOL.tests
+namespace GoFNOL.tests.Integration
 {
-    public class UnitTests
+    public class FNOLControllerTests
     {
-        [Fact]
-        public void EnvironmentConfigurationTest()
-        {
-            // Setup
-            var environmentData = File.ReadAllText("Fixtures/env.json");
-            var mockedConfigRoot = new Mock<IConfigurationRoot>();
-            mockedConfigRoot.Setup(cr => cr["VCAP_SERVICES"]).Returns(environmentData);
-            var environmentConfiguration = new EnvironmentConfiguration(mockedConfigRoot.Object);
-
-            // Execute
-            var eaiEndpoint = environmentConfiguration.EAIEndpoint;
-
-            // Verify
-            eaiEndpoint.Should().Be("http://dummy.com");
-        }
-
         [Fact]
         public async Task FNOLController_WhenFormIsPOSTed_ShouldFormProperFollowingRequest()
         {

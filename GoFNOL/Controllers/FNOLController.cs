@@ -11,11 +11,11 @@ namespace GoFNOL.Controllers
 {
     public class FNOLController : Controller
     {
-        private readonly FNOLService fnolService;
+        private readonly IFNOLService fnolService;
 
         private readonly ILogger<FNOLController> logger;
 
-        public FNOLController(FNOLService fnolService, ILogger<FNOLController> logger)
+        public FNOLController(IFNOLService fnolService, ILogger<FNOLController> logger)
         {
             this.fnolService = fnolService;
             this.logger = logger;
@@ -42,7 +42,7 @@ namespace GoFNOL.Controllers
                     MobileFlowIndicator = formBody["mobile-flow-ind"],
                     VIN = formBody["vin"],
                     LossType = formBody["loss-type"],
-                    Deductible = formBody["deductible"],
+                    Deductible = formBody["deductible-waived"] == "on" ? "W" : (string) formBody["deductible"],
                     Owner = new Party
                     {
                         FirstName = formBody["first-name"],

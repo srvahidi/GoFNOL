@@ -29,7 +29,7 @@
 		<input type="number" name="zip-addon" id="zip-addon" placeholder="Extra Zip (extra 4)" minlength="4" min="1111" max="9999" class="untouched" onchange="removeUntouched(event)"/>
 
 		<label for="state">State</label>
-		<input type="text" name="state" id="state" placeholder="State" required="required" pattern="getStatePattern()" class="untouched" onchange="removeUntouched(event)"/>
+		<input type="text" name="state" id="state" placeholder="State" required="required" pattern="A[KLRZ]|C[AOT]|D[E]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMVY]|O[HKR]|P[AR]|RI|S[CD]|T[NX]|UT|V[AIT]|W[AIVY]" class="untouched" onchange="removeUntouched(event)"/>
 
 		<label for="email">Email</label>
 		<input type="email" name="email" id="email" placeholder="Email" required="required" class="untouched" onchange="removeUntouched(event)"/>
@@ -53,10 +53,8 @@
 	<p>@TempData["responseTime"]</p>
 }
 <script>
+	// NOTE: State abbreviation regex courtesy of http://regexlib.com/REDetails.aspx?regexp_id=1574
 	const disableForm = () => document.forms[0].children[0].setAttribute('disabled', 'disabled')
-	const getStateAbbreviations = () => ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","MD","MA","MI","MN","MS","MO","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"]
-	const getStateNames = () => ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"]
-	const getStatePattern = () => new RegExp(getStateNames().concat(getStateAbbreviations()).join('|'))
 	const removeUntouched = (e) => {
 		if (String(e.currentTarget.value).length > 0) {
 			e.currentTarget.className = e.currentTarget.className.replace(/\buntouched\b/g, '')
@@ -76,7 +74,4 @@
 	}
 	// NOTE: returns boolean `true` intentionally
 	const submitForm = () => setTimeout(showProgress, 0) && true
-
-	// NOTE: apply better state validation pattern if JS available
-	window.onload = () => document.getElementById('state').setAttribute('pattern', getStatePattern())
 </script>

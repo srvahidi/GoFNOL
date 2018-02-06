@@ -1,21 +1,35 @@
 ﻿html, body, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd {
-	color: #2e3336;
-	display: grid;
+	color: #333;
 	font-family: sans-serif;
-	grid-row-gap: 1em;
-	grid-template-rows: 3em auto 1em;
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
+body {
+	display: -ms-grid;
+	display: grid;
+	grid-row-gap: 1em;
+	grid-template-rows: 3em auto 1em;
+	-ms-grid-rows: 3em auto 1em;
+	-ms-grid-column-align: center;
+	-ms-grid-row-align: center;
+	-ms-grid-columns: 1fr 2fr 1fr;
+}
+
 footer {
 	grid-column: 1 / 4;
+	-ms-grid-row: 3;
+	grid-row: 3;
+	-ms-grid-column-span: 3;
 }
 
 header {
-	background-color: #343a40;
+	background-color: #333;
 	grid-column: 1 / 4;
+	grid-row: 1;
+	-ms-grid-row: 1;
+	-ms-grid-column-span: 3;
 }
 
 header h3 {
@@ -50,25 +64,40 @@ header h3 {
 }
 
 .content {
+	display: -ms-grid;
 	display: grid;
 	grid-column: 2 / 3;
 	grid-gap: 1em;
 	grid-template-rows: 2em auto;
+	grid-row: 2;
+	-ms-grid-column: 2;
+	-ms-grid-row: 2;
+	-ms-grid-columns: 1fr;
+	-ms-grid-rows: 2em auto;
 }
 
 .content form {
+	display: -ms-grid;
 	display: grid;
 	grid-column: 1 / 2;
+	grid-row: 2;
+	-ms-grid-columns: 1fr;
+	-ms-grid-row: 2;
 }
 
 .content form .input-container {
 	border: 1px solid #333;
+	display: -ms-grid;
 	display: grid;
 	grid-auto-rows: 1.5em;
+	grid-row: 1;
 	grid-gap: .75em;
 	grid-template-columns: 10em 1fr;
 	grid-template-rows: auto;
 	padding: 1em;
+	-ms-grid-columns: 10em auto;
+	-ms-grid-row: 1;
+	-ms-grid-rows: 1.5em 1.5em 1.5em 1.5em 1.5em 1.5em 1.5em 1.5em 1.5em 1.5em;
 }
 
 .content form input[type="email"],
@@ -76,8 +105,10 @@ header h3 {
 .content form input[type="tel"],
 .content form input[type="text"],
 .content form select {
+	display: -ms-grid;
 	grid-column: 2 / 3;
 	box-shadow: 0 2px 3px 0 rgba(150, 100, 0, 0.5);
+	-ms-grid-column: 2;
 }
 
 .content form input[type="email"]:valid:not(.untouched),
@@ -101,9 +132,87 @@ header h3 {
 }
 
 .content form label {
+	display: -ms-grid;
 	grid-column: 1 / 2;
+	-ms-grid-column: 1;
 }
 
 .content form legend {
 	display: none;
+}
+
+.content form .button {
+	-ms-grid-row: 3;
+	grid-row: 3;
+}
+
+#progress-indicator,
+.content form .input-container label,
+.content form .input-container select {
+	display: -ms-grid;
+}
+
+#progress-indicator {
+	-ms-grid-row: 2;
+	grid-row: 2;
+}
+
+label[for="mobile-flow-ind"], select[name="mobile-flow-ind"] {
+	-ms-grid-row: 1;
+	grid-row: 1;
+}
+
+label[for="claim-number"], input[name="claim-number"] {
+	-ms-grid-row: 2;
+	grid-row: 2;
+}
+
+label[for="first-name"], input[name="first-name"] {
+	-ms-grid-row: 3;
+	grid-row: 3;
+}
+
+label[for="last-name"], input[name="last-name"] {
+	-ms-grid-row: 4;
+	grid-row: 4;
+}
+
+label[for="phone-number"], input[name="phone-number"] {
+	-ms-grid-row: 5;
+	grid-row: 5;
+}
+
+label[for="zip-code"], input[name="zip-code"] {
+	-ms-grid-row: 6;
+	grid-row: 6;
+}
+
+label[for="zip-addon"], input[name="zip-addon"] {
+	-ms-grid-row: 7;
+	grid-row: 7;
+}
+
+label[for="state"], input[name="state"] {
+	-ms-grid-row: 8;
+	grid-row: 8;
+}
+
+label[for="email"], input[name="email"] {
+	-ms-grid-row: 9;
+	grid-row: 9;
+}
+
+label[for="vin"], input[name="vin"] {
+	-ms-grid-row: 10;
+	grid-row: 10;
+}
+
+label[for="loss-type"], input[name="loss-type"] {
+	-ms-grid-row: 11;
+	grid-row: 11;
+}
+
+label[for="deductible"], input[name="deductible"] {
+	-ms-grid-row: 12;
+	grid-row: 12;
 }

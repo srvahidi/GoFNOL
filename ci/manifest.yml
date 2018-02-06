@@ -3,6 +3,6 @@ applications:
 - name: GoFNOL
   instances: 1
   buildpack: dotnet_core_buildpack_latest
-  host: gofnol-devtest
+  host: [HOST_NAME]
   services:
   - EAI

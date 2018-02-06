@@ -62,6 +62,9 @@ namespace GoFNOL.Controllers
                 TempData["result"] = $"Work Assignment ID: '{workAssignmentId}' added successfully!";
                 TempData["claim"] = $"Claim: '{request.ClaimNumber}'.";
                 TempData["responseTime"] = $"It took {(int) sw.Elapsed.TotalSeconds} seconds";
+                TempData["rawWorkAssignmentId"] = workAssignmentId;
+                TempData["rawClaimNumber"] = request.ClaimNumber;
+                TempData["rawResponseTime"] = sw.Elapsed.TotalSeconds;
             }
             catch (Exception x)
             {

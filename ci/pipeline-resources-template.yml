@@ -1,0 +1,9 @@
+- name: GoFNOL-cf-[ENV]
+  type: cf
+  source:
+    api: ((cf-preprd-api))
+    username: ((cf-preprd-username))
+    password: ((cf-preprd-password))
+    organization: automated-appraisal-engine
+    space: [ENV]
+    skip_cert_check: false

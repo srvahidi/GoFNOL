@@ -1,0 +1,31 @@
+source: &docker-registry-credentials
+  username: ((internal-docker-user))
+  password: ((internal-docker-pass))
+  tag: latest
+
+resource_types:
+
+- name: artifactory
+  type: docker-image
+  source:
+    repository: pivotalservices/artifactory-resource
+    tag: latest
+
+resources:
+
+- name: GoFNOL-git
+  type: git
+  source:
+    uri: git@bitbucket.org:SoleraNA/gofnol.git
+    branch: master
+    private_key: ((private-repo-key))
+
+- name: GoFNOL-artifactory
+  type: artifactory
+  source:
+    endpoint: ((artifactory-base-url))
+    username: ((artifactory-username))
+    password: ((artifactory-password))
+    skip_ssl_verification: true
+    repository: /gotime-driver-release-local/com/solera/audatex/gotime-driver/GoFNOL
+    regex: "GoFNOL-(?<version>.*).zip"

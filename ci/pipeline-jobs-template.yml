@@ -1,0 +1,30 @@
+  - name: promote-GoFNOL-[ENV]
+    plan:
+      - get: GoFNOL-artifactory
+        trigger: true
+        passed:
+          - build-GoFNOL
+      - task: prepare-manifest
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              <<: *docker-registry-credentials
+              repository: ((internal-docker-addr))/a2e_utility
+          inputs:
+          - name: GoFNOL-artifactory
+          outputs:
+          - name: deployables
+          run:
+            path: bash
+            args:
+            - -exc
+            - |
+              zip_file=GoFNOL-*.zip
+              unzip ./GoFNOL-artifactory/${zip_file} -d ./deployables
+              sed -i -e "s/\[HOST_NAME\]/gofnol-[ENV]/" ./deployables/manifest.yml
+      - put: GoFNOL-cf-[ENV]
+        params:
+          manifest: deployables/manifest.yml
+          path: deployables/app

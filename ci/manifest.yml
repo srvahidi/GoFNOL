@@ -1,6 +1,6 @@
 ---
 applications:
-- name: GoFNOL
+- name: GoFNOL-blue
   instances: 1
   buildpack: dotnet_core_buildpack_latest
   host: [HOST_NAME]

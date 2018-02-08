@@ -1,6 +1,6 @@
 - name: GoFNOL-cf-[ENV]
   type: cf
-  source:
+  source: &GoFNOL-cf-[ENV]-source
     api: ((cf-preprd-api))
     username: ((cf-preprd-username))
     password: ((cf-preprd-password))

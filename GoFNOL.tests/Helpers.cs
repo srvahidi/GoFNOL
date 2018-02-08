@@ -32,6 +32,14 @@ namespace GoFNOL.tests
             return html.Substring(startPos, endPos - startPos);
         }
 
+        public static string ParseClaimNumber(string html)
+        {
+            const string encodedQuote = "&#x27;";
+            var startPos = html.IndexOf(encodedQuote, html.IndexOf("Claim Number:")) + encodedQuote.Length;
+            var endPos = html.IndexOf(encodedQuote, startPos);
+            return html.Substring(startPos, endPos - startPos);
+        }
+
         public static TestServer CreateTestServer()
         {
             return CreateTestServer(collection => { });

@@ -63,6 +63,8 @@ namespace GoFNOL.tests.E2E
             var html = await redirectResponse.Content.ReadAsStringAsync();
             var wapk = Helpers.ParseWorkAssignmentPK(html);
             wapk.Should().NotBeEmpty();
+            var claimNo = Helpers.ParseClaimNumber(html);
+            claimNo.Should().NotBeEmpty();
             var xClaim = await Helpers.GetClaimDocument(wapk);
             xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/ClaimNo").Value.Should().Be(claimNumber);
             xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/Owner/Party/First").Value.Should().Be(ownerFirstName);

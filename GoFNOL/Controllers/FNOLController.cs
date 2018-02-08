@@ -62,7 +62,7 @@ namespace GoFNOL.Controllers
                 var claim = await fnolService.CreateAssignment(request);
                 var workAssignmentId = claim.WorkAssignmentId;
                 TempData["result"] = $"Work Assignment ID: '{workAssignmentId}' added successfully!";
-                TempData["claim"] = $"Claim: '{request.ClaimNumber}'.";
+                TempData["claim"] = $"Claim Number: '{request.ClaimNumber}'.";
                 TempData["responseTime"] = $"It took {(int) sw.Elapsed.TotalSeconds} seconds";
                 TempData["rawWorkAssignmentId"] = workAssignmentId;
                 TempData["rawClaimNumber"] = request.ClaimNumber;

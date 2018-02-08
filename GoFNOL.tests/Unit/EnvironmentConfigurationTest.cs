@@ -19,9 +19,11 @@ namespace GoFNOL.tests.Unit
 
             // Execute
             var eaiEndpoint = environmentConfiguration.EAIEndpoint;
+            var isEndpoint = environmentConfiguration.ISEndpoint;
 
             // Verify
-            eaiEndpoint.Should().Be("http://dummy.com");
+            eaiEndpoint.Should().Be("http://eai.dummy");
+            isEndpoint.Should().Be("http://is.dummy");
         }
     }
 }

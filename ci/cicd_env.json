@@ -9,6 +9,16 @@
 			"syslog_drain_url": "",
 			"tags": [],
 			"volume_mounts": []
+		},
+		{
+			"credentials": {
+				"endpoint": "https://is.nowhere"
+			},
+			"label": "user-provided",
+			"name": "IS",
+			"syslog_drain_url": "",
+			"tags": [],
+			"volume_mounts": []
 		}
 	]
 }

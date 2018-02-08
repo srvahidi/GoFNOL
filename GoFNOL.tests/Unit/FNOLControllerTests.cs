@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -33,9 +34,10 @@ namespace GoFNOL.tests.Unit
             var formContent = new FormUrlEncodedContent(formData);
 
             // Execute
-            await client.PostAsync("/fnol", formContent);
+            var response = await client.PostAsync("/fnol", formContent);
 
             // Verify
+            response.StatusCode.Should().Be(HttpStatusCode.Found);
             actualRequest.Deductible.Should().Be("W");
         }
 
@@ -59,9 +61,10 @@ namespace GoFNOL.tests.Unit
             var formContent = new FormUrlEncodedContent(formData);
 
             // Execute
-            await client.PostAsync("/fnol", formContent);
+            var response = await client.PostAsync("/fnol", formContent);
 
             // Verify
+            response.StatusCode.Should().Be(HttpStatusCode.Found);
             actualRequest.Deductible.Should().Be("500");
         }
     }

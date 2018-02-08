@@ -6,3 +6,4 @@ applications:
   host: [HOST_NAME]
   services:
   - EAI
+  - IS

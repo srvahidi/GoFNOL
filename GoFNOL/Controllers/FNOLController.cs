@@ -3,12 +3,14 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using GoFNOL.Models;
 using GoFNOL.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace GoFNOL.Controllers
 {
+    [Authorize]
     public class FNOLController : Controller
     {
         private readonly IFNOLService fnolService;

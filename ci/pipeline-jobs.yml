@@ -19,6 +19,7 @@
             - -exc
             - |
               export VCAP_SERVICES=$(cat ./GoFNOL-git/ci/cicd_env.json)
+              export ASPNETCORE_ENVIRONMENT=Staging
               dotnet test ./GoFNOL-git/GoFNOL.tests/GoFNOL.tests.csproj
       - task: build-GoFNOL
         config:

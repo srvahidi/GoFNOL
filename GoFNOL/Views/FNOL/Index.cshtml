@@ -52,14 +52,12 @@
 </form>
 @if (TempData["result"] != null)
 {
-    <p>@TempData["result"]<br />
-    @TempData["claim"]</p>
+	<p>
+		@TempData["result"]
+		<br />
+		@TempData["claim"]
+	</p>
 	<p>@TempData["responseTime"]</p>
-	<ul>
-		<li>Click <a href='@string.Format("http://adxe-tools-1.pdlab.adp.com/Tools/Viewer.asp?c={0}&e={1}", TempData["rawClaimNumber"], "APPDEVA")'>here</a> to view in APP DEV A</li>
-		<li>Click <a href='@string.Format("http://adxe-tools-1.pdlab.adp.com/Tools/Viewer.asp?c={0}&e={1}", TempData["rawClaimNumber"], "APPDEVB")'>here</a> to view in APP DEV B</li>
-		<li>Click <a href='@string.Format("http://adxe-tools-1.pdlab.adp.com/Tools/Viewer.asp?c={0}&e={1}", TempData["rawClaimNumber"], "APPDEVC")'>here</a> to view in APP DEV C</li>
-	</ul>
 }
 <script>
 	// NOTE: State abbreviation regex courtesy of http://regexlib.com/REDetails.aspx?regexp_id=1574
@@ -72,7 +70,7 @@
 	const showProgress = () => {
 		disableForm()
 		const indicator = document.getElementById('progress-indicator')
-		const count = 1
+		let count = 1
 		const PROGRESS_UPDATE_INTERVAL = 1000
 		const updateProgressIndicator = () => {
 			indicator.textContent = `${count} second(s) elapsed (average response 15 to 20 seconds)`

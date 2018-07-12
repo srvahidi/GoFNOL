@@ -25,8 +25,8 @@ namespace GoFNOL.Controllers
 
 		public IActionResult Index()
 		{
-			var referer = Request.Host.Host;
-			var environmentDisplay = GetEnvironmentDisplay(referer, "Local");
+			var host = Request.Host.Host;
+			var environmentDisplay = GetEnvironmentDisplay(host, "Local");
 			ViewData["environmentDisplay"] = environmentDisplay;
 
 			return View();
@@ -76,36 +76,36 @@ namespace GoFNOL.Controllers
 			return Redirect("/");
 		}
 
-		private static string GetEnvironmentDisplay(string referer, string defaultDisplay)
+		private static string GetEnvironmentDisplay(string host, string defaultDisplay)
 		{
-			if (string.IsNullOrWhiteSpace(referer))
+			if (string.IsNullOrWhiteSpace(host))
 			{
 				return defaultDisplay;
 			}
 
-			referer = referer.ToLower();
+			host = host.ToLower();
 
-			if (referer.Contains("prod"))
-			{
-				return "Prod";
-			}
-
-			if (referer.Contains("demo"))
+			if (host.Contains("-demo"))// NOTE: check for this first because demo host may contain string `prod`
 			{
 				return "Demo";
 			}
 
-			if (referer.Contains("int"))
-			{
-				return "Int";
-			}
-
-			if (referer.Contains("devtest"))
+			if (host.Contains("-devtest"))
 			{
 				return "DevTest";
 			}
 
-			return referer.Contains("qa") ? "QA" : defaultDisplay;
+			if (host.Contains("-prod"))
+			{
+				return "Prod";
+			}
+
+			if (host.Contains("-int"))
+			{
+				return "Int";
+			}
+
+			return host.Contains("-qa") ? "QA" : defaultDisplay;
 		}
 	}
 }

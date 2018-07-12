@@ -25,7 +25,7 @@ namespace GoFNOL.Controllers
 
 		public IActionResult Index()
 		{
-			var referer = Request.Headers["Referer"].ToString();
+			var referer = Request.Host.ToString();
 			var environmentDisplay = GetEnvironmentDisplay(referer, "Local");
 			ViewData["environmentDisplay"] = environmentDisplay;
 

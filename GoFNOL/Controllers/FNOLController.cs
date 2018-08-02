@@ -85,19 +85,14 @@ namespace GoFNOL.Controllers
 
 			host = host.ToLower();
 
-			if (host.Contains("-demo"))// NOTE: check for this first because demo host may contain string `prod`
+			if (host.Contains("-demo")) // NOTE: check for this first because demo host may contain string `prod`
 			{
 				return "Demo";
 			}
 
-			if (host.Contains("-devtest"))
+			if (host.Contains("-acceptance"))
 			{
-				return "DevTest";
-			}
-
-			if (host.Contains("-prod"))
-			{
-				return "Prod";
+				return "Acceptance";
 			}
 
 			if (host.Contains("-int"))
@@ -105,7 +100,7 @@ namespace GoFNOL.Controllers
 				return "Int";
 			}
 
-			return host.Contains("-qa") ? "QA" : defaultDisplay;
+			return defaultDisplay;
 		}
 	}
 }

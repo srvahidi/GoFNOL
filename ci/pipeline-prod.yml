@@ -1,13 +1,50 @@
-- name: deploy-GoFNOL-[ENV]-blue
+resource_types:
+
+- name: artifactory
+  type: docker-image
+  source:
+    repository: pivotalservices/artifactory-resource
+    tag: latest
+
+resources:
+
+- name: GoFNOL-image
+  type: docker-image
+  source:
+    username: ((internal-docker-user))
+    password: ((internal-docker-pass))
+    tag: latest
+    repository: ((internal-docker-addr))/gofnol-default-image
+
+- name: GoFNOL-artifactory
+  type: artifactory
+  source:
+    endpoint: ((artifactory-base-url))
+    username: ((artifactory-username))
+    password: ((artifactory-password))
+    skip_ssl_verification: true
+    repository: /gotime-driver-release-local/com/solera/audatex/gotime-driver/GoFNOL
+    regex: "GoFNOL-(?<version>.*).zip"
+
+- name: GoFNOL-cf-demo
+  type: cf
+  source: &GoFNOL-cf-demo-source
+    api: ((cf-prd-api))
+    username: ((cf-prd-username))
+    password: ((cf-prd-password))
+    organization: automated-appraisal-engine
+    space: demo
+    skip_cert_check: false
+
+jobs:
+
+- name: deploy-GoFNOL-demo-blue
   plan:
   - get: GoFNOL-image
-    passed:
-    - build-GoFNOL
   - get: GoFNOL-artifactory
     trigger: true
-    passed:
-      - build-GoFNOL
   - task: prepare-manifest
+    image: GoFNOL-image
     config:
       platform: linux
       inputs:
@@ -21,24 +58,25 @@
         - |
           zip_file=GoFNOL-*.zip
           unzip ./GoFNOL-artifactory/${zip_file} -d ./deployables
-          sed -i -e "s/\[HOST_NAME\]/gofnol-[ENV]-blue/" ./deployables/manifest.yml
-  - put: GoFNOL-cf-[ENV]
+          sed -i -e "s/\[HOST_NAME\]/gofnol-demo-blue/" ./deployables/manifest.yml
+  - put: GoFNOL-cf-demo
     params:
       manifest: deployables/manifest.yml
       path: deployables/app
 
-- name: test-GoFNOL-[ENV]
+- name: test-GoFNOL-demo
   plan:
   - get: GoFNOL-image
     passed:
-    - deploy-GoFNOL-[ENV]-blue
-  - get: GoFNOL-cf-[ENV]
+    - deploy-GoFNOL-demo-blue
+  - get: GoFNOL-cf-demo
     passed:
-    - deploy-GoFNOL-[ENV]-blue
+    - deploy-GoFNOL-demo-blue
     trigger: true
   - task: do-the-magic
+    image: GoFNOL-image
     params:
-      <<: *GoFNOL-cf-[ENV]-source
+      <<: *GoFNOL-cf-demo-source
     config:
       platform: linux
       run:
@@ -79,18 +117,19 @@
             exit 1
           fi
 
-- name: greenify-GoFNOL-[ENV]
+- name: greenify-GoFNOL-demo
   plan:
   - get: GoFNOL-image
     passed:
-    - test-GoFNOL-[ENV]
-  - get: GoFNOL-cf-[ENV]
+    - test-GoFNOL-demo
+  - get: GoFNOL-cf-demo
     passed:
-    - test-GoFNOL-[ENV]
+    - test-GoFNOL-demo
     trigger: true
   - task: transition-blue-to-green
+    image: GoFNOL-image
     params:
-      <<: *GoFNOL-cf-[ENV]-source
+      <<: *GoFNOL-cf-demo-source
     config:
       platform: linux
       run:
@@ -99,7 +138,7 @@
         - -exc
         - |
           cf login -a ${api} -u ${username} -p ${password} -o "${organization}" -s "${space}"
-          cf map-route GoFNOL-blue apps-dev.gp2.axadmin.net --hostname gofnol-[ENV]
+          cf map-route GoFNOL-blue apps-prod.gp2.axadmin.net --hostname gofnol-demo
           cf delete GoFNOL -f || true
-          cf unmap-route GoFNOL-blue apps-dev.gp2.axadmin.net --hostname gofnol-[ENV]-blue
+          cf unmap-route GoFNOL-blue apps-prod.gp2.axadmin.net --hostname gofnol-demo-blue
           cf rename GoFNOL-blue GoFNOL

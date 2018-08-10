@@ -65,7 +65,6 @@ namespace GoFNOL
             if (hostingEnvironment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {

@@ -1,7 +1,7 @@
 ---
 applications:
 - name: GoFNOL-blue
-  instances: 1
+  memory: 256M
   buildpack: dotnet_core_buildpack_latest
   host: [HOST_NAME]
   services:

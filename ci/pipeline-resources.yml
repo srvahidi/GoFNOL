@@ -3,6 +3,11 @@ source: &docker-registry-credentials
   password: ((internal-docker-pass))
   tag: latest
 
+source: &GoFNOL-git
+  uri: git@bitbucket.org:SoleraNA/gofnol.git
+  branch: master
+  private_key: ((private-repo-key))
+
 resource_types:
 
 - name: artifactory
@@ -13,12 +18,23 @@ resource_types:
 
 resources:
 
+- name: GoFNOL-image
+  type: docker-image
+  source:
+    <<: *docker-registry-credentials
+    repository: ((internal-docker-addr))/GoFNOL-default-image
+
+- name: GoFNOL-dockerfile
+  type: git
+  source:
+    <<: *GoFNOL-git
+    paths:
+      - ci/docker
+
 - name: GoFNOL-git
   type: git
   source:
-    uri: git@bitbucket.org:SoleraNA/gofnol.git
-    branch: master
-    private_key: ((private-repo-key))
+    <<: *GoFNOL-git
 
 - name: GoFNOL-artifactory
   type: artifactory

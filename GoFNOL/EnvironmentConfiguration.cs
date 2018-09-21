@@ -10,6 +10,8 @@ namespace GoFNOL
         string EAIEndpoint { get; }
 
         string ISEndpoint { get; }
+
+        string NGPUsersEndpoint { get; }
     }
 
     public class EnvironmentConfiguration : IEnvironmentConfiguration
@@ -26,5 +28,7 @@ namespace GoFNOL
         public string EAIEndpoint => jvcap.Value["user-provided"].First(s => s["name"].Value<string>() == "EAI")["credentials"]["endpoint"].Value<string>();
 
         public string ISEndpoint => jvcap.Value["user-provided"].First(s => s["name"].Value<string>() == "IS")["credentials"]["endpoint"].Value<string>();
+
+        public string NGPUsersEndpoint => jvcap.Value["user-provided"].First(s => s["name"].Value<string>() == "NGP")["credentials"] ["endpoint"].Value<string>();
     }
 }

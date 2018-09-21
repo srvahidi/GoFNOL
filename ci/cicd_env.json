@@ -4,21 +4,19 @@
 			"credentials": {
 				"endpoint": "http://sys-arch-svr12.pdlab.adp.com/wsproxy/ws_proxy.asmx"
 			},
-			"label": "user-provided",
-			"name": "EAI",
-			"syslog_drain_url": "",
-			"tags": [],
-			"volume_mounts": []
+			"name": "EAI"
 		},
 		{
 			"credentials": {
 				"endpoint": "https://is.nowhere"
 			},
-			"label": "user-provided",
-			"name": "IS",
-			"syslog_drain_url": "",
-			"tags": [],
-			"volume_mounts": []
+			"name": "IS"
+		},
+		{
+			"credentials": {
+				"endpoint": "http://ngp-w2k8-appb/WsApp/WsApp.asmx"
+			},
+			"name": "NGP"
 		}
 	]
 }

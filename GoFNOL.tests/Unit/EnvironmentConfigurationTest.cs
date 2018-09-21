@@ -20,10 +20,12 @@ namespace GoFNOL.tests.Unit
             // Execute
             var eaiEndpoint = environmentConfiguration.EAIEndpoint;
             var isEndpoint = environmentConfiguration.ISEndpoint;
+            var ngpUsersEndpoint = environmentConfiguration.NGPUsersEndpoint;
 
             // Verify
             eaiEndpoint.Should().Be("http://eai.dummy");
             isEndpoint.Should().Be("http://is.dummy");
+            ngpUsersEndpoint.Should().Be("http://npg.dummy/users");
         }
     }
 }

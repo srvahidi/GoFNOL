@@ -30,10 +30,10 @@ namespace GoFNOL.tests.Integration
                     actualEAIEndpoint = uri;
                     actualContent = content;
                 })
-                .Returns(Task.FromResult(new HttpResponseMessage
+                .ReturnsAsync(new HttpResponseMessage
                 {
                     Content = new StringContent("<ADP_TRANSACTION_ID>123</ADP_TRANSACTION_ID>")
-                }));
+                });
             var client = Helpers.CreateTestServer(collection =>
             {
                 collection.AddSingleton(mockConfig.Object);
@@ -60,6 +60,7 @@ namespace GoFNOL.tests.Integration
             await client.PostAsync("/fnol", formContent);
 
             // Verify
+            mockHTTPService.VerifyAll();
             actualEAIEndpoint.AbsoluteUri.TrimEnd('/').Should().Be(expectedEndpoint);
             var xAssignment = Helpers.ParseAssignment(await actualContent.ReadAsStringAsync());
             xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value.Should().Be("D");

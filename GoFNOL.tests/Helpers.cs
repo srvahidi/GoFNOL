@@ -65,7 +65,7 @@ namespace GoFNOL.tests
                     }
                 })
                 .ConfigureServices(configureCustomServices)
-                .UseStartup<Startup>());
+                .UseStartup<TestStartup>());
         }
 
         public static XDocument ParseAssignment(string data)

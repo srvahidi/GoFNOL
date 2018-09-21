@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using GoFNOL.Models;
 using GoFNOL.Services;
@@ -15,16 +16,27 @@ namespace GoFNOL.Controllers
 	{
 		private readonly IFNOLService fnolService;
 
+		private readonly INGPService ngpService;
+
 		private readonly ILogger<FNOLController> logger;
 
-		public FNOLController(IFNOLService fnolService, ILogger<FNOLController> logger)
+		public FNOLController(IFNOLService fnolService, INGPService ngpService, ILogger<FNOLController> logger)
 		{
 			this.fnolService = fnolService;
+			this.ngpService = ngpService;
 			this.logger = logger;
 		}
 
-		public IActionResult Index()
+		public async Task<IActionResult> Index()
 		{
+			var subClaim = User.Claims.FirstOrDefault(c => c.Type == "sub");
+			if (subClaim == null)
+			{
+				logger.LogError("Sub claim was not found for current user");
+			}
+
+			var userProfileId = await ngpService.GetUserProfileIdAsync(subClaim.Value);
+			ViewData["userProfileId"] = userProfileId;
 			var host = Request.Host.Host;
 			var environmentDisplay = GetEnvironmentDisplay(host, "Local");
 			ViewData["environmentDisplay"] = environmentDisplay;

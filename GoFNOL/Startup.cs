@@ -38,6 +38,7 @@ namespace GoFNOL
 
             services.TryAddSingleton<IHTTPService, HTTPService>();
             services.TryAddSingleton<IFNOLService, FNOLService>();
+            services.TryAddSingleton<INGPService, NGPService>();
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -60,7 +61,7 @@ namespace GoFNOL
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        public virtual void Configure(IApplicationBuilder app)
         {
             if (hostingEnvironment.IsDevelopment())
             {

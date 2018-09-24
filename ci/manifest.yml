@@ -7,3 +7,4 @@ applications:
   services:
   - EAI
   - IS
+  - NGP

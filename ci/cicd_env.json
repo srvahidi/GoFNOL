@@ -14,7 +14,7 @@
 		},
 		{
 			"credentials": {
-				"endpoint": "http://ngp-w2k8-appb/WsApp/WsApp.asmx"
+				"endpoint": "http://ngp-w2k8-appb.pdlab.adp.com/WsApp/WsApp.asmx"
 			},
 			"name": "NGP"
 		}

@@ -30,14 +30,26 @@ header {
 	grid-row: 1;
 	-ms-grid-row: 1;
 	-ms-grid-column-span: 3;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+header * {
+	color: #fff;
+	font-weight: lighter;
+	margin: .5em 1.5em;
 }
 
 header h3 {
-	color: #fff;
 	font-size: 1.5em;
-	font-weight: lighter;
-	padding-top: .5em;
-	text-indent: 1.5em;
+}
+
+header button {
+	background-color: #333;
+	border: none;
+	font-size: 1em;
+	cursor: pointer;
 }
 
 .shadowed {
@@ -208,6 +220,6 @@ label[for="loss-type"], input[name="loss-type"] {
 }
 
 label[for="deductible"], .deductible {
-    -ms-grid-row: 12;
-    grid-row: 12;
+	-ms-grid-row: 12;
+	grid-row: 12;
 }

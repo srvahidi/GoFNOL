@@ -9,6 +9,9 @@
 	<body>
 		<header class="header shadowed">
 			<h3>GoFNOL - @ViewData["environmentDisplay"]</h3>
+			<form action="logout" method="post">
+				<button type="submit">Logout</button>
+			</form>
 		</header>
 		<section class="content">
 			@RenderBody()

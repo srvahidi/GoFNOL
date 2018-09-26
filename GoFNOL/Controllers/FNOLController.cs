@@ -49,6 +49,13 @@ namespace GoFNOL.Controllers
 			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 		}
 
+
+		[HttpPost("logout")]
+		public IActionResult Logout()
+		{
+			return new SignOutResult(new[] {"Cookies", "oidc"});
+		}
+
 		[HttpPost("fnol")]
 		public async Task<IActionResult> Create([FromForm] IFormCollection formBody)
 		{

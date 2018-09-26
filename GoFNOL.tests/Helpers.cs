@@ -40,6 +40,14 @@ namespace GoFNOL.tests
             return html.Substring(startPos, endPos - startPos);
         }
 
+        public static string GetHtmlElement(string html, string elementName)
+        {
+            var start = html.IndexOf($"<{elementName}>") + elementName.Length + 2;
+            var end = html.IndexOf($"</{elementName}>", start);
+            var value = html.Substring(start, end - start);
+            return value;
+        }
+
         public static TestServer CreateTestServer()
         {
             return CreateTestServer(collection => { });

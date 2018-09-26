@@ -1,11 +1,15 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
+using GoFNOL.Controllers;
 using GoFNOL.Models;
 using GoFNOL.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Xunit;
 
@@ -13,6 +17,19 @@ namespace GoFNOL.tests.Unit
 {
     public class FNOLControllerTests
     {
+        [Fact]
+        public void FNOLController_WhenLogoutIsInvoked_ShouldReturnSignOutResult()
+        {
+            // Setup
+            var fixture = new FNOLController(new Mock<IFNOLService>().Object, new Mock<INGPService>().Object, NullLogger<FNOLController>.Instance);
+
+            // Execute
+            var actual = fixture.Logout();
+
+            // Verify
+            actual.Should().BeEquivalentTo(new SignOutResult(new[] {"Cookies", "oidc"}));
+        }
+
         [Fact]
         public async Task FNOLController_WhenMainViewIsInvoked_ShouldRenderProfileId()
         {
@@ -33,10 +50,33 @@ namespace GoFNOL.tests.Unit
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             actualName.Should().Be("pe2generic1");
             var html = await response.Content.ReadAsStringAsync();
-            var start = html.IndexOf("<h2>") + 4;
-            var end = html.IndexOf("</h2>", start);
-            var header = html.Substring(start, end - start);
+            var header = Helpers.GetHtmlElement(html, "h2");
             header.Should().Be($"Create Claim for Profile: {profileId}");
+        }
+
+        [Theory]
+        [InlineData("localhost", "Local")]
+        [InlineData("localhost-acceptance", "Acceptance")]
+        [InlineData("localhost-int", "Int")]
+        [InlineData("localhost-demo", "Demo")]
+        [InlineData("localhost-prod", "Local")]
+        public async Task FNOLController_WhenMainViewIsInvoked_ShouldRenderEnvironment(string hostName, string displayString)
+        {
+            // Setup
+            var mockNGPService = new Mock<INGPService>();
+            mockNGPService.Setup(s => s.GetUserProfileIdAsync(It.IsAny<string>())).ReturnsAsync("profileid");
+            var server = Helpers.CreateTestServer(collection => collection.AddSingleton(mockNGPService.Object));
+            server.BaseAddress = new Uri($"http://{hostName}");
+            var client = server.CreateClient();
+
+            // Execute
+            var response = await client.GetAsync("/fnol");
+
+            // Verify
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var html = await response.Content.ReadAsStringAsync();
+            var header = Helpers.GetHtmlElement(html, "h3");
+            header.Should().Be($"GoFNOL - {displayString}");
         }
 
         [Fact]

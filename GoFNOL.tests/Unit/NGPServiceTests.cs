@@ -46,7 +46,7 @@ namespace GoFNOL.tests.Unit
 			(Uri actualUri, HttpContent actualContent)? actualRequest = null;
 			mockHTTPService.Setup(s => s.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
 				.Callback<Uri, HttpContent>((uri, content) => actualRequest = (uri, content))
-				.ReturnsAsync(new HttpResponseMessage {Content = new StringContent(ngpResponse)});
+				.ReturnsAsync(new HttpResponseMessage { Content = new StringContent(ngpResponse) });
 
 			// Execute
 			var actual = await fixture.GetUserProfileIdAsync(username);

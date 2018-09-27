@@ -53,7 +53,7 @@ namespace GoFNOL.Controllers
 		[HttpPost("logout")]
 		public IActionResult Logout()
 		{
-			return new SignOutResult(new[] {"Cookies", "oidc"});
+			return new SignOutResult(new[] { "Cookies", "oidc" });
 		}
 
 		[HttpPost("fnol")]

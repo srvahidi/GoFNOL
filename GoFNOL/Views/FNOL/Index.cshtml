@@ -13,42 +13,42 @@
 		</select>
 
 		<label for="claim-number">New Claim Number</label>
-		<input type="text" name="claim-number" id="claim-number" placeholder="Claim Number" required="required" class="untouched" onchange="removeUntouched(event)"/>
+		<input type="text" name="claim-number" id="claim-number" placeholder="Claim Number" required="required" class="untouched" onchange="removeUntouched(event)" />
 
 		<label for="first-name">First Name</label>
-		<input type="text" name="first-name" id="first-name" placeholder="First Name" required="required" class="untouched" onchange="removeUntouched(event)"/>
+		<input type="text" name="first-name" id="first-name" placeholder="First Name" required="required" class="untouched" onchange="removeUntouched(event)" />
 
 		<label for="last-name">Last Name</label>
-		<input type="text" name="last-name" id="last-name" placeholder="Last Name" required="required" class="untouched" onchange="removeUntouched(event)"/>
+		<input type="text" name="last-name" id="last-name" placeholder="Last Name" required="required" class="untouched" onchange="removeUntouched(event)" />
 
 		<label for="phone-number">Phone number</label>
-		<input type="tel" name="phone-number" id="phone-number" placeholder="Phone Number" required="required" pattern=".{7,}" class="untouched" onchange="removeUntouched(event)"/>
+		<input type="tel" name="phone-number" id="phone-number" placeholder="Phone Number" required="required" pattern=".{7,}" class="untouched" onchange="removeUntouched(event)" />
 
 		<label for="zip-code">Postal Code</label>
-		<input type="number" name="zip-code" id="zip-code" placeholder="Zip Code (first 5)" required="required" min="11111" max="99999" class="untouched" onchange="removeUntouched(event)"/>
-		<input type="number" name="zip-addon" id="zip-addon" placeholder="Extra Zip (extra 4)" minlength="4" min="1111" max="9999" class="untouched" onchange="removeUntouched(event)"/>
+		<input type="number" name="zip-code" id="zip-code" placeholder="Zip Code (first 5)" required="required" min="11111" max="99999" class="untouched" onchange="removeUntouched(event)" />
+		<input type="number" name="zip-addon" id="zip-addon" placeholder="Extra Zip (extra 4)" minlength="4" min="1111" max="9999" class="untouched" onchange="removeUntouched(event)" />
 
 		<label for="state">State</label>
-		<input type="text" name="state" id="state" placeholder="State" required="required" pattern="A[KLRZ]|C[AOT]|D[E]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMVY]|O[HKR]|P[AR]|RI|S[CD]|T[NX]|UT|V[AIT]|W[AIVY]" class="untouched" onchange="removeUntouched(event)"/>
+		<input type="text" name="state" id="state" placeholder="State" required="required" pattern="A[KLRZ]|C[AOT]|D[E]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMVY]|O[HKR]|P[AR]|RI|S[CD]|T[NX]|UT|V[AIT]|W[AIVY]" class="untouched" onchange="removeUntouched(event)" />
 
 		<label for="email">Email</label>
-		<input type="email" name="email" id="email" placeholder="Email" required="required" class="untouched" onchange="removeUntouched(event)"/>
+		<input type="email" name="email" id="email" placeholder="Email" required="required" class="untouched" onchange="removeUntouched(event)" />
 
 		<label for="vin">VIN</label>
-		<input type="text" name="vin" id="vin" placeholder="VIN" required="required" class="untouched" onchange="removeUntouched(event)"/>
+		<input type="text" name="vin" id="vin" placeholder="VIN" required="required" class="untouched" onchange="removeUntouched(event)" />
 
 		<label for="loss-type">Loss Type</label>
-		<input type="text" name="loss-type" id="loss-type" value="COLL" placeholder="Loss Type" required="required" class="untouched" onchange="removeUntouched(event)"/>
+		<input type="text" name="loss-type" id="loss-type" value="COLL" placeholder="Loss Type" required="required" class="untouched" onchange="removeUntouched(event)" />
 
 		<label for="deductible">Deductible</label>
 		<div class="deductible">
-			<label for="deductible-waived">Waive</label>	
-			<input type="checkbox" name="deductible-waived" id="deductible-waived" onchange="updateDeductibleState(event)"/>
-			<input type="text" name="deductible" id="deductible" placeholder="Deductible" class="untouched" onchange="removeUntouched(event)"/>
+			<label for="deductible-waived">Waive</label>
+			<input type="checkbox" name="deductible-waived" id="deductible-waived" onchange="updateDeductibleState(event)" />
+			<input type="text" name="deductible" id="deductible" placeholder="Deductible" class="untouched" onchange="removeUntouched(event)" />
 		</div>
 	</div>
 	<div id="progress-indicator">&nbsp;</div>
-	<input class="button primary shadowed" type="submit" value="Create"/>
+	<input class="button primary shadowed" type="submit" value="Create" />
 </form>
 @if (TempData["result"] != null)
 {
@@ -80,7 +80,7 @@
 		setInterval(updateProgressIndicator, PROGRESS_UPDATE_INTERVAL)
 	}
 	const updateDeductibleState = (e) => {
-		if(e.target.checked)
+		if (e.target.checked)
 			document.getElementById('deductible').setAttribute('disabled', 'disabled')
 		else
 			document.getElementById('deductible').removeAttribute('disabled');

@@ -18,6 +18,8 @@ namespace GoFNOL.Services
 
 		private const string _FixedContactPhoneType = "CP";
 
+		private const string _FixedLossDateTimezone = "MST";
+
 		private const string _FixedProfileId = "4774PE200001";
 
 		private readonly XNamespace _SOAPNamespace = "http://schemas.xmlsoap.org/soap/envelope/";
@@ -49,7 +51,7 @@ namespace GoFNOL.Services
 
 		private async Task<string> ExecuteEAIRequest(XDocument payload)
 		{
-			var xEAIRequest = XDocument.Parse(ReadResoruce(_EAIRequestResourceName));
+			var xEAIRequest = XDocument.Parse(ReadResource(_EAIRequestResourceName));
 
 			xEAIRequest.Element(_SOAPNamespace + "Envelope")
 				.Element(_SOAPNamespace + "Body")
@@ -63,19 +65,9 @@ namespace GoFNOL.Services
 			}
 		}
 
-		private static string ReadResoruce(string name)
+		private XDocument SetAssignmentValues(FNOLRequest fnolRequest)
 		{
-			var assembly = Assembly.GetExecutingAssembly();
-			var resourceStream = assembly.GetManifestResourceStream(name);
-			var streamReader = new StreamReader(resourceStream, Encoding.UTF8);
-			var allStreamContent = streamReader.ReadToEnd();
-
-			return allStreamContent;
-		}
-
-		private static XDocument SetAssignmentValues(FNOLRequest fnolRequest)
-		{
-			var xAssignment = XDocument.Parse(ReadResoruce(_AssignmentResourceName));
+			var xAssignment = XDocument.Parse(ReadResource(_AssignmentResourceName));
 
 			// NOTE: Processing meta information
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value = fnolRequest.MobileFlowIndicator;
@@ -85,7 +77,7 @@ namespace GoFNOL.Services
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/VEHICLE_VIN").Value = fnolRequest.VIN;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/LOSS_TYPE").Value = fnolRequest.LossType;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/DEDUCTIBLE_AMT").Value = fnolRequest.Deductible;
-
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/FNOL_DATETIME_TZ").Value = _FixedLossDateTimezone;
 			// NOTE: Owner information
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_FIRST_NAME").Value = fnolRequest.Owner.FirstName;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_LAST_NAME").Value = fnolRequest.Owner.LastName;
@@ -100,6 +92,16 @@ namespace GoFNOL.Services
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_EMAIL").Value = fnolRequest.Owner.Email;
 
 			return xAssignment;
+		}
+
+		private static string ReadResource(string name)
+		{
+			var assembly = Assembly.GetExecutingAssembly();
+			var resourceStream = assembly.GetManifestResourceStream(name);
+			var streamReader = new StreamReader(resourceStream, Encoding.UTF8);
+			var allStreamContent = streamReader.ReadToEnd();
+
+			return allStreamContent;
 		}
 	}
 }

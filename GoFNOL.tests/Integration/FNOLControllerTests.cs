@@ -79,7 +79,7 @@ namespace GoFNOL.tests.Integration
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_PHONE_TYPE_1").Value.Should().Be("CP");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_PHONE_NBR_1").Value.Should().Be("(123)456-7890");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_EMAIL").Value.Should().Be("somebody@some.where");
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/FNOL_DATETIME_TZ").Value.Should().Be("MST");
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/LOSS_DATE").Value.Should().Be(DateTime.UtcNow.ToString("yyyy-MM-dd"));
 		}
 	}
 }

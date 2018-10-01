@@ -75,6 +75,7 @@ namespace GoFNOL.tests.E2E
 			xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/Vehicle/AssignmentVIN").Value.Should().Be(vin);
 			xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/LossType").Value.Should().Be(lossType);
 			xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/Payers/Payer[1]/Totals/Deductible").Value.Should().Be($"{deductible}00");
+			xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/LossDateTime/DateTime/Date").Value.Should().Be(DateTime.UtcNow.ToString("yyyy-MM-dd"));
 		}
 	}
 }

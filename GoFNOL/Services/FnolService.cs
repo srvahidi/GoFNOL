@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -18,8 +19,6 @@ namespace GoFNOL.Services
 
 		private const string _FixedContactPhoneType = "CP";
 
-		private const string _FixedLossDateTimezone = "MST";
-
 		private const string _FixedProfileId = "4774PE200001";
 
 		private readonly XNamespace _SOAPNamespace = "http://schemas.xmlsoap.org/soap/envelope/";
@@ -35,6 +34,11 @@ namespace GoFNOL.Services
 			_Client = client;
 			_EnvironmentConfiguration = environmentConfiguration;
 		}
+
+		/// <summary>
+		/// Returns the current date using Mountain timezone in the format "yyyy-MM-dd"
+		/// </summary>
+		public string FormattedLossDate => DateTime.UtcNow.ToString("yyyy-MM-dd");
 
 		public async Task<Claim> CreateAssignment(FNOLRequest fnolRequest)
 		{
@@ -77,7 +81,8 @@ namespace GoFNOL.Services
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/VEHICLE_VIN").Value = fnolRequest.VIN;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/LOSS_TYPE").Value = fnolRequest.LossType;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/DEDUCTIBLE_AMT").Value = fnolRequest.Deductible;
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/FNOL_DATETIME_TZ").Value = _FixedLossDateTimezone;
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/LOSS_DATE").Value = FormattedLossDate;
+
 			// NOTE: Owner information
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_FIRST_NAME").Value = fnolRequest.Owner.FirstName;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_LAST_NAME").Value = fnolRequest.Owner.LastName;

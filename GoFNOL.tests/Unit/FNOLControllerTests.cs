@@ -52,6 +52,8 @@ namespace GoFNOL.tests.Unit
 			var html = await response.Content.ReadAsStringAsync();
 			var header = Helpers.GetHtmlElement(html, "h2");
 			header.Should().Be($"Create Claim for Profile: {profileId}");
+			var createdForProfileId = Helpers.GetHtmlElement(html, "input", ("name", "created-for-profileid"));
+			Helpers.GetHtmlAttributeValue(createdForProfileId, "value").Should().Be(profileId);
 		}
 
 		[Theory]

@@ -79,7 +79,8 @@ namespace GoFNOL.Controllers
 							PostalCode = $"{(string)formBody["zip-code"]}-{(string)formBody["zip-addon"]}",
 							State = formBody["state"]
 						}
-					}
+					},
+					CreatedForProfileId = formBody["created-for-profileid"]
 				};
 				var sw = Stopwatch.StartNew();
 				var claim = await fnolService.CreateAssignment(request);

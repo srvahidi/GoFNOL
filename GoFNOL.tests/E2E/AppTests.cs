@@ -29,6 +29,7 @@ namespace GoFNOL.tests.E2E
 			const string vin = "WP0ZZZ99ZTS392124";
 			const string lossType = "COLL";
 			const string deductible = "100500";
+			const string createdForProfileId = "4774PE200001";
 			var formContent = new FormUrlEncodedContent(new[]
 			{
 				new KeyValuePair<string, string>("mobile-flow-ind", "N"),
@@ -42,7 +43,8 @@ namespace GoFNOL.tests.E2E
 				new KeyValuePair<string, string>("email", ownerEmail),
 				new KeyValuePair<string, string>("vin", vin),
 				new KeyValuePair<string, string>("loss-type", lossType),
-				new KeyValuePair<string, string>("deductible", deductible)
+				new KeyValuePair<string, string>("deductible", deductible),
+				new KeyValuePair<string, string>("created-for-profileid", createdForProfileId)
 			});
 
 			// Execute
@@ -67,6 +69,7 @@ namespace GoFNOL.tests.E2E
 			claimNo.Should().NotBeEmpty();
 			var xClaim = await Helpers.GetClaimDocument(wapk);
 			xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/ClaimNo").Value.Should().Be(claimNumber);
+			xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/CreatedForProfileId").Value.Should().Be(createdForProfileId);
 			xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/Owner/Party/First").Value.Should().Be(ownerFirstName);
 			xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/Owner/Party/Last").Value.Should().Be(ownerLastName);
 			xClaim.XPathSelectElement("//Response/Claim/Estimates/Estimate[1]/Owner/Party/Fax").Value.Should().Be(ownerPhoneNumber);

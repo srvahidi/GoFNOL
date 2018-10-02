@@ -19,8 +19,6 @@ namespace GoFNOL.Services
 
 		private const string _FixedContactPhoneType = "CP";
 
-		private const string _FixedProfileId = "4774PE200001";
-
 		private readonly XNamespace _SOAPNamespace = "http://schemas.xmlsoap.org/soap/envelope/";
 
 		private readonly XNamespace _ADPNamespace = "http://csg.adp.com";
@@ -49,7 +47,7 @@ namespace GoFNOL.Services
 			{
 				ClaimNumber = fnolRequest.ClaimNumber,
 				WorkAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value,
-				CreatedForProfileId = _FixedProfileId
+				CreatedForProfileId = fnolRequest.CreatedForProfileId
 			};
 		}
 
@@ -75,6 +73,9 @@ namespace GoFNOL.Services
 
 			// NOTE: Processing meta information
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value = fnolRequest.MobileFlowIndicator;
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/COMPANY_ID").Value = fnolRequest.CreatedForProfileId.Substring(0,3);
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/OFFICE_ID").Value = fnolRequest.CreatedForProfileId.Substring(0,7);
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/USER_ID").Value = fnolRequest.CreatedForProfileId;
 
 			// NOTE: Claim information
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/CLAIM_NBR").Value = fnolRequest.ClaimNumber;

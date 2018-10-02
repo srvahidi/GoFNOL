@@ -44,5 +44,12 @@
 		/// The owner information to use when creating a Claim
 		/// </summary>
 		public Party Owner { get; set; }
+
+		/// <summary>
+		/// The profile ID used to create a claim
+		///
+		/// <example>"4774PE200001"</example>
+		/// </summary>
+		public string CreatedForProfileId { get; set; }
 	}
 }

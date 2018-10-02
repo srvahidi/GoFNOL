@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Hosting;
@@ -48,6 +50,20 @@ namespace GoFNOL.tests
 			return value;
 		}
 
+		public static string GetHtmlElement(string html, string elementName, (string name, string value) attribute)
+		{
+			var regex = new Regex($"<{elementName}.+{attribute.name}=\"{attribute.value}\".+\\/>");
+			var match = regex.Match(html);
+			return match.Value;
+		}
+
+		public static string GetHtmlAttributeValue(string elementHtml, string attributeName)
+		{
+			var regex = new Regex($"{attributeName}=\"(.+)\"");
+			var match = regex.Match(elementHtml);
+			return match.Groups.First(g => g.Name == "1").Value;
+		}
+
 		public static TestServer CreateTestServer()
 		{
 			return CreateTestServer(collection => { });
@@ -79,8 +95,8 @@ namespace GoFNOL.tests
 		public static XDocument ParseAssignment(string data)
 		{
 			var xRequest = XDocument.Parse(data);
-			var soapNs = (XNamespace)"http://schemas.xmlsoap.org/soap/envelope/";
-			var adpNs = (XNamespace)"http://csg.adp.com";
+			var soapNs = (XNamespace) "http://schemas.xmlsoap.org/soap/envelope/";
+			var adpNs = (XNamespace) "http://csg.adp.com";
 			var innerPayload = xRequest.Element(soapNs + "Envelope")
 				.Element(soapNs + "Body")
 				.Element(adpNs + "Transmit")

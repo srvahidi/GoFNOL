@@ -52,7 +52,8 @@ namespace GoFNOL.tests.Integration
 				{"email", "somebody@some.where"},
 				{"vin", "0"},
 				{"loss-type", "T"},
-				{"deductible", "0"}
+				{"deductible", "0"},
+				{"created-for-profileid", "1234567890"}
 			};
 			var formContent = new FormUrlEncodedContent(formData);
 
@@ -64,6 +65,9 @@ namespace GoFNOL.tests.Integration
 			actualEAIEndpoint.AbsoluteUri.TrimEnd('/').Should().Be(expectedEndpoint);
 			var xAssignment = Helpers.ParseAssignment(await actualContent.ReadAsStringAsync());
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value.Should().Be("D");
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/USER_ID").Value.Should().Be("1234567890");
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/COMPANY_ID").Value.Should().Be("123");
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/OFFICE_ID").Value.Should().Be("1234567");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/CLAIM_NBR").Value.Should().Be("01AB");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_FIRST_NAME").Value.Should().Be("Na");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_LAST_NAME").Value.Should().Be("Me");

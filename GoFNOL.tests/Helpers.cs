@@ -1,10 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -15,71 +9,9 @@ namespace GoFNOL.tests
 {
 	public static class Helpers
 	{
-		public static async Task<XDocument> GetClaimDocument(string wapk)
-		{
-			var falconClient = new HttpClient();
-			var getClaimRequest = new StringContent($"<Request><Header><Action>OONShopGetAssignment</Action></Header><ServiceInput><CreatedForProfileId>4774PE200001</CreatedForProfileId><WorkAssignmentID>{wapk}</WorkAssignmentID><GUID/></ServiceInput></Request>");
-
-			getClaimRequest.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
-			var getClaimResponse = await falconClient.PostAsync("http://dev-adxe-4.pdlab.adp.com/FalconApp/Mobile.asp", getClaimRequest);
-			var claim = await getClaimResponse.Content.ReadAsStringAsync();
-			return XDocument.Parse(claim);
-		}
-
-		public static string ParseWorkAssignmentPK(string html)
-		{
-			const string encodedQuote = "&#x27;";
-			var startPos = html.IndexOf(encodedQuote, html.IndexOf("Work Assignment ID:")) + encodedQuote.Length;
-			var endPos = html.IndexOf(encodedQuote, startPos);
-			return html.Substring(startPos, endPos - startPos);
-		}
-
-		public static string ParseClaimNumber(string html)
-		{
-			const string encodedQuote = "&#x27;";
-			var startPos = html.IndexOf(encodedQuote, html.IndexOf("Claim Number:")) + encodedQuote.Length;
-			var endPos = html.IndexOf(encodedQuote, startPos);
-			return html.Substring(startPos, endPos - startPos);
-		}
-
-		public static string GetHtmlElement(string html, string elementName)
-		{
-			var start = html.IndexOf($"<{elementName}>") + elementName.Length + 2;
-			var end = html.IndexOf($"</{elementName}>", start);
-			var value = html.Substring(start, end - start);
-			return value;
-		}
-
-		public static string GetHtmlElement(string html, string elementName, (string name, string value) attribute)
-		{
-			var regex = new Regex($"<{elementName}.+{attribute.name}=\"{attribute.value}\".+\\/>");
-			var match = regex.Match(html);
-			return match.Value;
-		}
-
-		public static string GetHtmlAttributeValue(string elementHtml, string attributeName)
-		{
-			var regex = new Regex($"{attributeName}=\"(.+)\"");
-			var match = regex.Match(elementHtml);
-			return match.Groups.First(g => g.Name == "1").Value;
-		}
-
-		public static TestServer CreateTestServer()
-		{
-			return CreateTestServer(collection => { });
-		}
-
 		public static TestServer CreateTestServer(Action<IServiceCollection> configureCustomServices)
 		{
-			var currentDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
-			while (currentDirectory.Name != "GoFNOL.tests")
-			{
-				currentDirectory = currentDirectory.Parent;
-			}
-
-			var contentRoot = Path.Combine(currentDirectory.Parent.FullName, "GoFNOL");
 			return new TestServer(new WebHostBuilder()
-				.UseContentRoot(contentRoot)
 				.ConfigureAppConfiguration((context, builder) =>
 				{
 					builder.AddEnvironmentVariables();

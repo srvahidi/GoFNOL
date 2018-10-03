@@ -7,6 +7,6 @@ namespace GoFNOL.Services
 	{
 		string FormattedLossDate { get; }
 
-		Task<Claim> CreateAssignment(FNOLRequest fnolRequest);
+		Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest);
 	}
 }

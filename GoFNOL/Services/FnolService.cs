@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -38,16 +37,14 @@ namespace GoFNOL.Services
 		/// </summary>
 		public string FormattedLossDate => DateTime.UtcNow.ToString("yyyy-MM-dd");
 
-		public async Task<Claim> CreateAssignment(FNOLRequest fnolRequest)
+		public async Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest)
 		{
 			var fnolData = SetAssignmentValues(fnolRequest);
 			var eaiResponseString = await ExecuteEAIRequest(fnolData);
 
-			return new Claim
+			return new FNOLResponse
 			{
-				ClaimNumber = fnolRequest.ClaimNumber,
 				WorkAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value,
-				CreatedForProfileId = fnolRequest.CreatedForProfileId
 			};
 		}
 
@@ -73,9 +70,9 @@ namespace GoFNOL.Services
 
 			// NOTE: Processing meta information
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value = fnolRequest.MobileFlowIndicator;
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/COMPANY_ID").Value = fnolRequest.CreatedForProfileId.Substring(0,3);
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/OFFICE_ID").Value = fnolRequest.CreatedForProfileId.Substring(0,7);
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/USER_ID").Value = fnolRequest.CreatedForProfileId;
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/COMPANY_ID").Value = fnolRequest.ProfileId.Substring(0,3);
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/OFFICE_ID").Value = fnolRequest.ProfileId.Substring(0,7);
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/USER_ID").Value = fnolRequest.ProfileId;
 
 			// NOTE: Claim information
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/CLAIM_NBR").Value = fnolRequest.ClaimNumber;

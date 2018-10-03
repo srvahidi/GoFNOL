@@ -1,0 +1,63 @@
+.profile-label {
+	font-weight: bold;
+	font-size: 1.5em;
+}
+
+.form {
+	border: 1px solid #333;
+	padding: 1em;
+	display: grid;
+	grid-gap: .75em;
+}
+
+.form label {
+	font-weight: normal;
+}
+
+.form .claim-number,
+.form .mobile-flow-ind,
+.form .first-name,
+.form .last-name,
+.form .phone-number,
+.form .postal-code,
+.form .state,
+.form .email,
+.form .vin,
+.form .loss-type,
+.form .deductible {
+	display: grid;
+	grid-template-columns: 10em 1fr;
+}
+
+.form .postal-code {
+	grid-row-gap: .75em;
+}
+
+.form .deductible .deductible-waive{
+	margin-left: 1em;
+	margin-right: 1em;
+}
+
+.form .postal-code .zip-code-extra {
+	grid-column: 2;
+	grid-gap: .75em;
+}
+
+.create {
+	border: none;
+	border-radius: .75em;
+	padding: .45em .45em;
+	letter-spacing: .2em;
+	background-color: #f90;
+	color: #fff;
+}
+
+.create:hover {
+	background-color: #fff;
+	border: 1px solid #f90;
+	color: #333;
+}
+
+.create:disabled {
+	background-color: #b97;
+}

@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using GoFNOL.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -25,15 +26,14 @@ namespace GoFNOL
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			if (hostingEnvironment.IsDevelopment() || hostingEnvironment.IsStaging())
+			services.AddMvc(config =>
 			{
-				services.AddMvc(options => options.Filters.Add<AllowAnonymousFilter>());
-			}
-			else
-			{
-				services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-			}
-
+				if (hostingEnvironment.IsProduction())
+				{
+					config.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+				}
+			}).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+			
 			var environmentConfiguration = new EnvironmentConfiguration(configuration);
 			services.TryAddSingleton<IEnvironmentConfiguration>(environmentConfiguration);
 			services.TryAddSingleton<IHTTPService, HTTPService>();

@@ -136,6 +136,18 @@ describe('Home component', () => {
 		})
 	})
 
+	describe('entering lower cased chars as claim number and bluring input focus', () => {
+		beforeEach(() => {
+			let form = fixture.find('.form')
+			form.find('.claim-number input').simulate('change', { currentTarget: { value: 'aBc-123-xy' } })
+			form.find('.claim-number input').simulate('blur')
+		})
+
+		fit('should uppercase claim number', ()=>{
+			expect(fixture.find('.form .claim-number input').props().value).toBe('ABC-123-XY')
+		})
+	})
+
 	describe('checking waive deductible and clicking Create button', () => {
 		beforeEach(() => {
 			fixture.find('.form .deductible input.deductible-waive').simulate('change')

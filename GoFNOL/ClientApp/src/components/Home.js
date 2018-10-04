@@ -10,7 +10,18 @@ export class Home extends Component {
 		this.api = props.api ? props.api : new Api()
 		this.state = {
 			mobileFlowIndicator: 'D',
-			lossType: 'COLL'
+			claimNumber: '',
+			firstName: '',
+			lastName: '',
+			phoneNumber: '',
+			zipCode: '',
+			zipCodeExtra: '',
+			state: '',
+			email: '',
+			vin: '',
+			lossType: 'COLL',
+			deductibleWaived: false,
+			deductible: ''
 		}
 	}
 
@@ -34,7 +45,7 @@ export class Home extends Component {
 					</div>
 					<div className="claim-number">
 						<label>New Claim Number</label>
-						<input type="text" placeholder="Claim Number" value={this.state.claimNumber} onChange={e => this.setState({ claimNumber: e.currentTarget.value })} />
+						<input type="text" placeholder="Claim Number" value={this.state.claimNumber} onChange={e => this.setState({ claimNumber: e.currentTarget.value })} onBlur={() => this.setState({ claimNumber: this.state.claimNumber.toUpperCase() })} />
 					</div>
 					<div className="first-name">
 						<label>First Name</label>

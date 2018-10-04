@@ -73,6 +73,8 @@ namespace GoFNOL
 				app.UseExceptionHandler("/Error");
 			}
 
+			app.UseAuthentication();
+
 			app.Use(async (context, next) =>
 			{
 				// In PCF all traffic beyond GoRouter goes over http. Need to make it look like it's https.
@@ -91,8 +93,6 @@ namespace GoFNOL
 					await next.Invoke();
 				}
 			});
-
-			app.UseAuthentication();
 
 			app.UseStaticFiles();
 

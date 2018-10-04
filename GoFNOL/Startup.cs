@@ -73,7 +73,15 @@ namespace GoFNOL
 				app.UseExceptionHandler("/Error");
 			}
 
-			app.UseAuthentication();
+			if (hostingEnvironment.IsProduction())
+			{
+				app.UseAuthentication();
+			}
+			else
+			{
+				// Allow developers to skip IS and have always signed in user.
+				app.UseMiddleware<UserSpoofMiddleware>();
+			}
 
 			app.Use(async (context, next) =>
 			{

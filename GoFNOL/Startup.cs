@@ -1,10 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using GoFNOL.Services;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,13 +25,7 @@ namespace GoFNOL
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddMvc(config =>
-			{
-				if (hostingEnvironment.IsProduction())
-				{
-					config.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
-				}
-			}).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 			
 			var environmentConfiguration = new EnvironmentConfiguration(configuration);
 			services.TryAddSingleton<IEnvironmentConfiguration>(environmentConfiguration);
@@ -88,7 +81,15 @@ namespace GoFNOL
 					context.Request.Scheme = "https";
 				}
 
-				await next.Invoke();
+				// Force authorization somehow finally in that weird SPA setup
+				if (hostingEnvironment.IsProduction() && !context.User.Identity.IsAuthenticated)
+				{
+					await context.ChallengeAsync();
+				}
+				else
+				{
+					await next.Invoke();
+				}
 			});
 
 			app.UseAuthentication();

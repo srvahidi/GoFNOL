@@ -5,23 +5,9 @@ import App from './App'
 describe('App component', () => {
 
 	let fixture
-	let mockApi
 
 	beforeEach(() => {
-		mockApi = {
-			postUserLogout: jest.fn()
-		}
-		fixture = shallow(<App api={mockApi} />)
-	})
-
-	describe('clicking logout button', () => {
-		beforeEach(() => {
-			fixture.find('.logout').simulate('click')
-		})
-
-		it('should make an api call', () => {
-			expect(mockApi.postUserLogout).toHaveBeenCalledTimes(1)
-		})
+		fixture = shallow(<App />)
 	})
 
 	it('should render local as environment name', () => {

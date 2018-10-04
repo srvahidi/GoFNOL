@@ -1,21 +1,16 @@
 import React, { Component } from 'react'
 import { Route } from 'react-router'
 import { Home } from './components/Home'
-import { Api } from './Api'
 
 export default class App extends Component {
-
-	constructor(props) {
-		super(props)
-		this.api = props.api ? props.api : new Api()
-		this.state = {}
-	}
 
 	render() {
 		return <React.Fragment>
 			<header className="header shadowed">
 				<h3>GoFNOL - {this.getEnvironmentName()}</h3>
-				<button className="logout" onClick={this.onLogoutClick}>Logout</button>
+				<form action="api/user/logout" method="post">
+					<button type="submit">Logout</button>
+				</form>
 			</header>
 			<div className="content">
 				<Route exact path='/' component={Home} />
@@ -37,9 +32,5 @@ export default class App extends Component {
 		}
 
 		return 'Local'
-	}
-
-	onLogoutClick = () => {
-		this.api.postUserLogout()
 	}
 }

@@ -23,15 +23,6 @@ describe('Api tests', () => {
 		expect(mockFetch).toHaveBeenCalledWith('/api/user/data', { method: 'GET', credentials: 'same-origin' })
 	})
 
-	it('should post user logout', () => {
-		const mockFetch = jest.fn(() => Promise.resolve())
-		window.fetch = mockFetch
-
-		fixture.postUserLogout()
-		expect(mockFetch).toHaveBeenCalledTimes(1)
-		expect(mockFetch).toHaveBeenCalledWith('/api/user/logout', { method: 'POST', credentials: 'same-origin' })
-	})
-
 	it('should post create assignment request', () => {
 		const mockFetch = jest.fn(() => Promise.resolve(new Response(JSON.stringify({ prop: 'response data' }))))
 		window.fetch = mockFetch

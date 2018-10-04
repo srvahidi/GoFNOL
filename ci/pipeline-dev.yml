@@ -83,7 +83,21 @@ jobs:
   - get: GoFNOL-git
     trigger: true
     version: every
-  - task: test-GoFNOL.tests
+  - task: test-GoFNOL.frontendTest
+    image: GoFNOL-image
+    config:
+      platform: linux
+      inputs:
+      - name: GoFNOL-git
+      run:
+        path: bash
+        args:
+        - -exc
+        - |
+          cd ./GoFNOL-git/GoFNOL/ClientApp
+          npm ci
+          CI=true npm test
+  - task: test-GoFNOL.backendtests
     image: GoFNOL-image
     config:
       platform: linux

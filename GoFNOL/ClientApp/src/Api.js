@@ -18,11 +18,4 @@ export class Api {
 		})
 		return response.json()
 	}
-
-	postUserLogout() {
-		fetch('/api/user/logout', {
-			method: 'POST',
-			credentials: 'same-origin'
-		})
-	}
 }

@@ -16,10 +16,10 @@ resources:
 - name: GoFNOL-image
   type: docker-image
   source:
-    username: ((internal-docker-user))
-    password: ((internal-docker-pass))
+    username: ((vm-harbor-user))
+    password: ((vm-harbor-pass))
     tag: latest
-    repository: ((internal-docker-addr))/gofnol-default-image
+    repository: ((vm-harbor-addr))/gdc/gofnol-default-image
 
 - name: GoFNOL-dockerfile
   type: git

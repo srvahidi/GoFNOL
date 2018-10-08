@@ -32,6 +32,9 @@ resources:
   type: git
   source:
     <<: *GoFNOL-git
+    ignore_paths:
+      - ci/pipeline-dev.yml
+      - ci/pipeline-prod.yml
 
 - name: GoFNOL-artifactory
   type: artifactory

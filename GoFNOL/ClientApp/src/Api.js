@@ -16,6 +16,9 @@ export class Api {
 			},
 			body: JSON.stringify(request)
 		})
-		return response.json()
+		if (response.status !== 200)
+			return { error: true }
+		const data = await response.json()
+		return { content: data }
 	}
 }

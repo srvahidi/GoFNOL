@@ -122,16 +122,47 @@ describe('Home component', () => {
 		describe('when response contains work assignment id', () => {
 			beforeEach(() => {
 				postCreateAssignmentResolve({
-					workAssignmentId: 12345
+					content: {
+						workAssignmentId: 12345
+					}
 				})
 			})
 
-			it('should render it', () => {
+			it('should render it and enable create button', () => {
 				expect(fixture.find('.work-assignment-id').text()).toBe('Work Assignment ID: \'12345\' added successfully!')
 			})
 
-			it('should enable create button', () => {
+			describe('clicking Create button again', () => {
+				beforeEach(() => {
+					fixture.find('button.create').simulate('click')
+				})
+
+				it('should hide previous output', () => {
+					expect(fixture.find('.work-assignment-id').exists()).toBeFalsy()
+				})
+			})
+		})
+
+		describe('when response contains error', () => {
+			beforeEach(() => {
+				postCreateAssignmentResolve({
+					error: true
+				})
+			})
+
+			it('should render it and enable create button', () => {
+				expect(fixture.find('.error').text()).toBe('GoFNOL failed, please resubmit.')
 				expect(fixture.find('button.create').props().disabled).toBeFalsy()
+			})
+
+			describe('clicking Create button again', () => {
+				beforeEach(() => {
+					fixture.find('button.create').simulate('click')
+				})
+
+				it('should hide error', () => {
+					expect(fixture.find('.error').exists()).toBeFalsy()
+				})
 			})
 		})
 	})
@@ -143,7 +174,7 @@ describe('Home component', () => {
 			form.find('.claim-number input').simulate('blur')
 		})
 
-		fit('should uppercase claim number', ()=>{
+		it('should uppercase claim number', () => {
 			expect(fixture.find('.form .claim-number input').props().value).toBe('ABC-123-XY')
 		})
 	})

@@ -90,6 +90,7 @@ export class Home extends Component {
 					</div>
 				</div>
 				<button className="create shadowed" onClick={this.onCreateClicked} disabled={this.state.disableForm}>Create</button>
+				{this.state.error && <span className="error">GoFNOL failed, please resubmit.</span>}
 				{this.state.workAssignmentId && <span className="work-assignment-id">Work Assignment ID: '{this.state.workAssignmentId}' added successfully!</span>}
 			</React.Fragment>
 		)
@@ -114,11 +115,23 @@ export class Home extends Component {
 			lossType: this.state.lossType,
 			deductible: this.state.deductibleWaived ? 'W' : this.state.deductible
 		}
-		this.setState({ disableForm: true })
-		const response = await this.api.postCreateAssignmentRequest(request)
 		this.setState({
-			disableForm: false,
-			workAssignmentId: response.workAssignmentId
+			disableForm: true,
+			error: false,
+			workAssignmentId: ''
 		})
+		const response = await this.api.postCreateAssignmentRequest(request)
+		if (response.error) {
+			this.setState({
+				disableForm: false,
+				error: true
+			})
+		}
+		else {
+			this.setState({
+				disableForm: false,
+				workAssignmentId: response.content.workAssignmentId
+			})
+		}
 	}
 }

@@ -8,17 +8,24 @@ export class Api {
 	}
 
 	async postCreateAssignmentRequest(request) {
-		const response = await fetch('/api/fnol', {
+		const requestOptions = {
 			method: 'POST',
 			credentials: 'same-origin',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(request)
-		})
-		if (response.status !== 200)
-			return { error: true }
-		const data = await response.json()
-		return { content: data }
+		}
+
+		try {
+			const response = await fetch('/api/fnol', requestOptions)
+			if (response.status === 200) {
+				const data = await response.json()
+				return { content: data }
+			}
+		}
+		catch (e) { }
+
+		return { error: true }
 	}
 }

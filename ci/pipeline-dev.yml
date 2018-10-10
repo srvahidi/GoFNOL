@@ -1,7 +1,52 @@
-source: &GoFNOL-git
+source: &git-config
   uri: git@bitbucket.org:SoleraNA/gofnol.git
   branch: master
   private_key: ((private-repo-key))
+
+source: &docker-config
+  username: ((vm-harbor-user))
+  password: ((vm-harbor-pass))
+  tag: latest
+
+config: &smoke-tests-task-config
+  platform: linux
+  run:
+    path: sh
+    args:
+    - -ec
+    - |
+      app_name=GoFNOL-blue
+      cf login -a ${api} -u ${username} -p ${password} -o "${organization}" -s "${space}"
+      set -x
+      app_url=$(cf app $app_name | grep routes | sed -e 's/routes:\s*/https:\/\//')
+
+      #visit home page
+      response=$(curl -I $app_url)
+
+      #verify auth redirect occurred
+      response_status=$(echo "$response" | grep HTTP/1.1 | tr -d '\r\n')
+      if [ "$response_status" != "HTTP/1.1 302 Found" ]
+      then
+        echo "App did not respond with redirect as expected"
+        exit 1
+      fi
+
+      #get IS endpoint from cf
+      cf_env_vars=$(cf env $app_name)
+      set +x
+      vcap_start=$(echo "$cf_env_vars" | grep -m 1 -n '^{' | cut -f1 -d:)
+      vcap_end=$(echo "$cf_env_vars" | grep -m 1 -n '^}' | cut -f1 -d:)
+      vcap=$(echo "$cf_env_vars" | tail -n+${vcap_start} | head -n$(($vcap_end - $vcap_start + 1)))
+      expected_redirect_url=$(echo "$vcap" | jq -r '.["VCAP_SERVICES"]["user-provided"] | .[] | select(.["name"] | startswith("IS")) | .["credentials"]["endpoint"]')
+      set -x
+
+      #verify auth redirect location
+      location_path=$(echo "$response" | grep Location: | sed -e 's/Location: //' | sed -e 's/?.*//')
+      if [ "$location_path" != "${expected_redirect_url}/connect/authorize" ]
+      then
+        echo "App did not respond with correct redirect as expected"
+        exit 1
+      fi
 
 resource_types:
 
@@ -13,28 +58,52 @@ resource_types:
 
 resources:
 
-- name: GoFNOL-image
-  type: docker-image
-  source:
-    username: ((vm-harbor-user))
-    password: ((vm-harbor-pass))
-    tag: latest
-    repository: ((vm-harbor-addr))/gdc/gofnol-default-image
-
-- name: GoFNOL-dockerfile
+- name: GoFNOL-sdk-dockerfile
   type: git
   source:
-    <<: *GoFNOL-git
+    <<: *git-config
     paths:
-      - ci/docker
+      - ci/docker/sdk.Dockerfile
+
+- name: GoFNOL-utility-dockerfile
+  type: git
+  source:
+    <<: *git-config
+    paths:
+      - ci/docker/utility.Dockerfile
+
+- name: GoFNOL-node-dockerfile
+  type: git
+  source:
+    <<: *git-config
+    paths:
+      - ci/docker/node.Dockerfile
 
 - name: GoFNOL-git
   type: git
   source:
-    <<: *GoFNOL-git
+    <<: *git-config
     ignore_paths:
       - ci/pipeline-dev.yml
       - ci/pipeline-prod.yml
+
+- name: GoFNOL-sdk-image
+  type: docker-image
+  source:
+    <<: *docker-config
+    repository: ((vm-harbor-addr))/gdc/gofnol-sdk-image
+
+- name: GoFNOL-utility-image
+  type: docker-image
+  source:
+    <<: *docker-config
+    repository: ((vm-harbor-addr))/gdc/gofnol-utility-image
+
+- name: GoFNOL-node-image
+  type: docker-image
+  source:
+    <<: *docker-config
+    repository: ((vm-harbor-addr))/gdc/gofnol-node-image
 
 - name: GoFNOL-artifactory
   type: artifactory
@@ -68,81 +137,122 @@ resources:
 
 jobs:
 
-- name: build-GoFNOL-image
+- name: build-GoFNOL-utility-image
+  serial: true
   plan:
-  - get: GoFNOL-dockerfile
-    trigger: true
-    version: every
-  - put: GoFNOL-image
+  - get: GoFNOL-utility-dockerfile
+  - put: GoFNOL-utility-image
     params:
-      build: GoFNOL-dockerfile
-      dockerfile: GoFNOL-dockerfile/ci/docker/Dockerfile
+      build: GoFNOL-utility-dockerfile
+      dockerfile: GoFNOL-utility-dockerfile/ci/docker/utility.Dockerfile
+
+- name: build-GoFNOL-sdk-image
+  serial: true
+  plan:
+  - get: GoFNOL-sdk-dockerfile
+  - put: GoFNOL-sdk-image
+    params:
+      build: GoFNOL-sdk-dockerfile
+      dockerfile: GoFNOL-sdk-dockerfile/ci/docker/sdk.Dockerfile
+
+- name: build-GoFNOL-node-image
+  serial: true
+  plan:
+  - get: GoFNOL-node-dockerfile
+  - put: GoFNOL-node-image
+    params:
+      build: GoFNOL-node-dockerfile
+      dockerfile: GoFNOL-node-dockerfile/ci/docker/node.Dockerfile
 
 - name: build-GoFNOL
   plan:
-  - get: GoFNOL-image
-    passed:
-    - build-GoFNOL-image
-  - get: GoFNOL-git
-    trigger: true
-    version: every
-  - task: test-GoFNOL.frontendTest
-    image: GoFNOL-image
+  - aggregate:
+    - get: GoFNOL-sdk-image
+      passed:
+      - build-GoFNOL-sdk-image
+    - get: GoFNOL-utility-image
+      passed:
+      - build-GoFNOL-utility-image
+    - get: GoFNOL-node-image
+      passed:
+      - build-GoFNOL-node-image
+    - get: GoFNOL-git
+      trigger: true
+      version: every
+  - aggregate:
+    - task: build-GoFNOL
+      image: GoFNOL-sdk-image
+      config:
+        platform: linux
+        inputs:
+        - name: GoFNOL-git
+        outputs:
+        - name: GoFNOL-binaries
+        run:
+          path: sh
+          args:
+          - -exc
+          - |
+            output_directory=${PWD}/GoFNOL-binaries
+            cd ./GoFNOL-git
+            dotnet publish ./GoFNOL/GoFNOL.csproj -c Release -o ${output_directory}/app
+            # format the version so that we can use lexicographic search to find the latest
+            version=$(git describe | awk -F- '{printf "%s-%04d-%s", $1, $2, $3}')
+            echo $version > ${output_directory}/version.txt
+            cp ./ci/manifest.yml ${output_directory}/manifest.yml
+    - task: test-GoFNOL.frontendTest
+      image: GoFNOL-node-image
+      config:
+        platform: linux
+        inputs:
+        - name: GoFNOL-git
+        run:
+          path: sh
+          args:
+          - -exc
+          - |
+            cd ./GoFNOL-git/GoFNOL/ClientApp
+            npm ci
+            CI=true npm test
+    - task: test-GoFNOL.backendtests
+      image: GoFNOL-sdk-image
+      config:
+        platform: linux
+        inputs:
+        - name: GoFNOL-git
+        run:
+          path: sh
+          args:
+          - -exc
+          - |
+            export VCAP_SERVICES=$(cat ./GoFNOL-git/ci/cicd_env.json)
+            export ASPNETCORE_ENVIRONMENT=Staging
+            dotnet test ./GoFNOL-git/GoFNOL.tests/GoFNOL.tests.csproj
+  - task: publish-GoFNOL
+    image: GoFNOL-utility-image
     config:
       platform: linux
       inputs:
-      - name: GoFNOL-git
-      run:
-        path: bash
-        args:
-        - -exc
-        - |
-          cd ./GoFNOL-git/GoFNOL/ClientApp
-          npm ci
-          CI=true npm test
-  - task: test-GoFNOL.backendtests
-    image: GoFNOL-image
-    config:
-      platform: linux
-      inputs:
-      - name: GoFNOL-git
-      run:
-        path: bash
-        args:
-        - -exc
-        - |
-          export VCAP_SERVICES=$(cat ./GoFNOL-git/ci/cicd_env.json)
-          export ASPNETCORE_ENVIRONMENT=Staging
-          dotnet test ./GoFNOL-git/GoFNOL.tests/GoFNOL.tests.csproj
-  - task: build-GoFNOL
-    image: GoFNOL-image
-    config:
-      platform: linux
-      inputs:
-      - name: GoFNOL-git
+      - name: GoFNOL-binaries
       outputs:
       - name: artifact
       run:
-        path: bash
+        path: sh
         args:
         - -exc
         - |
-          output_directory=${PWD}/artifact
-          cd ./GoFNOL-git
-          dotnet publish ./GoFNOL/GoFNOL.csproj -c Release -o ${output_directory}/app
-          # format the version so that we can use lexicographic search to find the latest
-          version=$(git describe | awk -F- '{printf "%s-%04d-%s", $1, $2, $3}')
+          cd ${PWD}/GoFNOL-binaries
+          version=$(cat ./version.txt)
           filename=GoFNOL-${version}.zip
-          cp ./ci/manifest.yml ${output_directory}/manifest.yml
-          cd ${output_directory}
           zip -r ${filename} ./*
+          mv ${filename} ../artifact/${filename}
   - put: GoFNOL-artifactory
     params:
       file: artifact/GoFNOL-*.zip
 
 - name: deploy-GoFNOL-acceptance-blue
   plan:
-  - get: GoFNOL-image
+  - get: GoFNOL-utility-image
     passed:
     - build-GoFNOL
   - get: GoFNOL-artifactory
@@ -150,7 +260,7 @@ jobs:
     passed:
       - build-GoFNOL
   - task: prepare-manifest
-    image: GoFNOL-image
+    image: GoFNOL-utility-image
     config:
       platform: linux
       inputs:
@@ -158,7 +268,7 @@ jobs:
       outputs:
       - name: deployables
       run:
-        path: bash
+        path: sh
         args:
         - -exc
         - |
@@ -172,7 +282,7 @@ jobs:
 
 - name: test-GoFNOL-acceptance
   plan:
-  - get: GoFNOL-image
+  - get: GoFNOL-utility-image
     passed:
     - deploy-GoFNOL-acceptance-blue
   - get: GoFNOL-cf-acceptance
@@ -180,52 +290,15 @@ jobs:
     - deploy-GoFNOL-acceptance-blue
     trigger: true
   - task: do-the-magic
-    image: GoFNOL-image
+    image: GoFNOL-utility-image
     params:
       <<: *GoFNOL-cf-acceptance-source
     config:
-      platform: linux
-      run:
-        path: bash
-        args:
-        - -ec
-        - |
-          app_name=GoFNOL-blue
-          cf login -a ${api} -u ${username} -p ${password} -o "${organization}" -s "${space}"
-          set -x
-          app_url=$(cf app $app_name | grep routes | sed -e 's/routes:\s*/https:\/\//')
-
-          #visit home page
-          response=$(curl -I $app_url)
-
-          #verify auth redirect occurred
-          response_status=$(echo "$response" | grep HTTP/1.1 | tr -d '\r\n')
-          if [ "$response_status" != "HTTP/1.1 302 Found" ]
-          then
-            echo "App did not respond with redirect as expected"
-            exit 1
-          fi
-
-          #get IS endpoint from cf
-          cf_env_vars=$(cf env $app_name)
-          set +x
-          vcap_start=$(echo "$cf_env_vars" | grep -m 1 -n '^{' | cut -f1 -d:)
-          vcap_end=$(echo "$cf_env_vars" | grep -m 1 -n '^}' | cut -f1 -d:)
-          vcap=$(echo "$cf_env_vars" | tail -n+${vcap_start} | head -n$(($vcap_end - $vcap_start + 1)))
-          expected_redirect_url=$(echo "$vcap" | jq -r '.["VCAP_SERVICES"]["user-provided"] | .[] | select(.["name"] | startswith("IS")) | .["credentials"]["endpoint"]')
-          set -x
-
-          #verify auth redirect location
-          location_path=$(echo "$response" | grep Location: | sed -e 's/Location: //' | sed -e 's/\?.*//')
-          if [ "$location_path" != "${expected_redirect_url}/connect/authorize" ]
-          then
-            echo "App did not respond with correct redirect as expected"
-            exit 1
-          fi
+      <<: *smoke-tests-task-config
 
 - name: greenify-GoFNOL-acceptance
   plan:
-  - get: GoFNOL-image
+  - get: GoFNOL-utility-image
     passed:
     - test-GoFNOL-acceptance
   - get: GoFNOL-cf-acceptance
@@ -233,13 +306,13 @@ jobs:
     - test-GoFNOL-acceptance
     trigger: true
   - task: transition-blue-to-green
-    image: GoFNOL-image
+    image: GoFNOL-utility-image
     params:
       <<: *GoFNOL-cf-acceptance-source
     config:
       platform: linux
       run:
-        path: bash
+        path: sh
         args:
         - -exc
         - |
@@ -251,7 +324,7 @@ jobs:
 
 - name: deploy-GoFNOL-int-blue
   plan:
-  - get: GoFNOL-image
+  - get: GoFNOL-utility-image
     passed:
     - build-GoFNOL
   - get: GoFNOL-artifactory
@@ -259,7 +332,7 @@ jobs:
     passed:
       - build-GoFNOL
   - task: prepare-manifest
-    image: GoFNOL-image
+    image: GoFNOL-utility-image
     config:
       platform: linux
       inputs:
@@ -267,7 +340,7 @@ jobs:
       outputs:
       - name: deployables
       run:
-        path: bash
+        path: sh
         args:
         - -exc
         - |
@@ -281,7 +354,7 @@ jobs:
 
 - name: test-GoFNOL-int
   plan:
-  - get: GoFNOL-image
+  - get: GoFNOL-utility-image
     passed:
     - deploy-GoFNOL-int-blue
   - get: GoFNOL-cf-int
@@ -289,52 +362,15 @@ jobs:
     - deploy-GoFNOL-int-blue
     trigger: true
   - task: do-the-magic
-    image: GoFNOL-image
+    image: GoFNOL-utility-image
     params:
       <<: *GoFNOL-cf-int-source
     config:
-      platform: linux
-      run:
-        path: bash
-        args:
-        - -ec
-        - |
-          app_name=GoFNOL-blue
-          cf login -a ${api} -u ${username} -p ${password} -o "${organization}" -s "${space}"
-          set -x
-          app_url=$(cf app $app_name | grep routes | sed -e 's/routes:\s*/https:\/\//')
-
-          #visit home page
-          response=$(curl -I $app_url)
-
-          #verify auth redirect occurred
-          response_status=$(echo "$response" | grep HTTP/1.1 | tr -d '\r\n')
-          if [ "$response_status" != "HTTP/1.1 302 Found" ]
-          then
-            echo "App did not respond with redirect as expected"
-            exit 1
-          fi
-
-          #get IS endpoint from cf
-          cf_env_vars=$(cf env $app_name)
-          set +x
-          vcap_start=$(echo "$cf_env_vars" | grep -m 1 -n '^{' | cut -f1 -d:)
-          vcap_end=$(echo "$cf_env_vars" | grep -m 1 -n '^}' | cut -f1 -d:)
-          vcap=$(echo "$cf_env_vars" | tail -n+${vcap_start} | head -n$(($vcap_end - $vcap_start + 1)))
-          expected_redirect_url=$(echo "$vcap" | jq -r '.["VCAP_SERVICES"]["user-provided"] | .[] | select(.["name"] | startswith("IS")) | .["credentials"]["endpoint"]')
-          set -x
-
-          #verify auth redirect location
-          location_path=$(echo "$response" | grep Location: | sed -e 's/Location: //' | sed -e 's/\?.*//')
-          if [ "$location_path" != "${expected_redirect_url}/connect/authorize" ]
-          then
-            echo "App did not respond with correct redirect as expected"
-            exit 1
-          fi
+      <<: *smoke-tests-task-config
 
 - name: greenify-GoFNOL-int
   plan:
-  - get: GoFNOL-image
+  - get: GoFNOL-utility-image
     passed:
     - test-GoFNOL-int
   - get: GoFNOL-cf-int
@@ -342,13 +378,13 @@ jobs:
     - test-GoFNOL-int
     trigger: true
   - task: transition-blue-to-green
-    image: GoFNOL-image
+    image: GoFNOL-utility-image
     params:
       <<: *GoFNOL-cf-int-source
     config:
       platform: linux
       run:
-        path: bash
+        path: sh
         args:
         - -exc
         - |

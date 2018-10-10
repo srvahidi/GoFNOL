@@ -28,9 +28,13 @@ describe('Api tests', () => {
 		let actual
 		let mockFetch
 		let postAssignmentResolve
+		let postAssignmentReject
 
 		beforeEach(() => {
-			mockFetch = jest.fn(() => new Promise(r => postAssignmentResolve = r))
+			mockFetch = jest.fn(() => new Promise((res, rej) => {
+				postAssignmentResolve = res
+				postAssignmentReject = rej
+			}))
 			window.fetch = mockFetch
 
 			actual = fixture.postCreateAssignmentRequest({ prop: 'request data' })
@@ -62,6 +66,16 @@ describe('Api tests', () => {
 		describe('when failure response', () => {
 			beforeEach(() => {
 				postAssignmentResolve(new Response(null, { status: 500 }))
+			})
+
+			it('should return error', () => {
+				actual.then(data => expect(data).toEqual({ error: true }))
+			})
+		})
+
+		describe('when no response', () => {
+			beforeEach(() => {
+				postAssignmentReject(new Error())
 			})
 
 			it('should return error', () => {

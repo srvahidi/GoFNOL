@@ -35,7 +35,7 @@ namespace GoFNOL.tests.Integration
 			actualName.Should().Be("pe2generic1");
 			var responseContent = await response.Content.ReadAsStringAsync();
 			var jContent = JObject.Parse(responseContent);
-			jContent.Should().BeEquivalentTo(new JObject
+			jContent.ShouldBeEquivalentTo(new JObject
 			{
 				["profileId"] = "profileid"
 			});

@@ -2,6 +2,11 @@
 {
 	public class FNOLResponse
 	{
-		public string WorkAssignmentId { get; set; }
+		public FNOLResponse(string workAssignmentId)
+		{
+			WorkAssignmentId = workAssignmentId;
+		}
+
+		public string WorkAssignmentId { get; }
 	}
 }

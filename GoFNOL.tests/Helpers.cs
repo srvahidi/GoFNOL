@@ -4,11 +4,19 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
+using Xunit;
 
 namespace GoFNOL.tests
 {
 	public static class Helpers
 	{
+		public static void ShouldBeEquivalentTo(this JToken actual, JToken expected)
+		{
+			var result = JToken.DeepEquals(actual, expected);
+			Assert.True(result, $"expected {actual.ToString()} to equal {expected.ToString()}");
+		}
+
 		public static TestServer CreateTestServer(Action<IServiceCollection> configureCustomServices)
 		{
 			return new TestServer(new WebHostBuilder()

@@ -29,7 +29,7 @@ namespace GoFNOL.tests.Integration
 				.Callback<Uri, HttpContent>((uri, content) => actualEAI = (uri, content))
 				.ReturnsAsync(new HttpResponseMessage
 				{
-					Content = new StringContent("<ADP_TRANSACTION_ID>123</ADP_TRANSACTION_ID>")
+					Content = new StringContent("&lt;ADP_TRANSACTION_ID&gt;123&lt;/ADP_TRANSACTION_ID&gt;")
 				});
 			var client = Helpers.CreateTestServer(collection =>
 			{
@@ -68,7 +68,7 @@ namespace GoFNOL.tests.Integration
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
 			response.Content.Headers.ContentType.MediaType.Should().Be("application/json");
 			var jResponse = JObject.Parse(await response.Content.ReadAsStringAsync());
-			jResponse.Should().BeEquivalentTo(new JObject
+			jResponse.ShouldBeEquivalentTo(new JObject
 			{
 				["workAssignmentId"] = "123"
 			});
@@ -95,6 +95,56 @@ namespace GoFNOL.tests.Integration
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_PHONE_NBR_1").Value.Should().Be("(012) 345 67-89");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_EMAIL").Value.Should().Be("a@b.c");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/LOSS_DATE").Value.Should().Be(DateTime.UtcNow.ToString("yyyy-MM-dd"));
+		}
+
+		[Fact]
+		public async Task FNOLController_WhenPostIsInvokedAndNoWorkAssignmentIdReturned_ShouldFail()
+		{
+			// Setup
+			var mockConfig = new Mock<IEnvironmentConfiguration>();
+			mockConfig.SetupGet(c => c.EAIEndpoint).Returns("http://dum.my");
+
+			var mockHTTPService = new Mock<IHTTPService>();
+			mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
+				.ReturnsAsync(new HttpResponseMessage
+				{
+					Content = new StringContent("&lt;ADP_TRANSACTION_ID&gt;&lt;/ADP_TRANSACTION_ID&gt;")
+				});
+			var client = Helpers.CreateTestServer(collection =>
+			{
+				collection.AddSingleton(mockConfig.Object);
+				collection.AddSingleton(mockHTTPService.Object);
+			}).CreateClient();
+			var jRequest = new JObject
+			{
+				["profileId"] = "1234567890",
+				["mobileFlowIndicator"] = "D",
+				["claimNumber"] = "ABC-123",
+				["owner"] = new JObject
+				{
+					["firstName"] = "1st name",
+					["lastName"] = "nst name",
+					["phoneNumber"] = "(012) 345 67-89",
+					["email"] = "a@b.c",
+					["address"] = new JObject
+					{
+						["postalCode"] = "34567-0110",
+						["state"] = "ST"
+					}
+				},
+				["vin"] = "0123456789ABCDEFG",
+				["lossType"] = "COLL",
+				["deductible"] = "500"
+			};
+			var requestContent = new StringContent(jRequest.ToString());
+			requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+			// Execute
+			var response = await client.PostAsync("/api/fnol", requestContent);
+
+			// Verify
+			mockHTTPService.VerifyAll();
+			response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 		}
 	}
 }

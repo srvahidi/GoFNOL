@@ -1,3 +1,5 @@
+using System;
+using System.Net;
 using System.Threading.Tasks;
 using GoFNOL.Models;
 using GoFNOL.Services;
@@ -11,8 +13,15 @@ namespace GoFNOL.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] FNOLRequest request, [FromServices] IFNOLService fnolService)
 		{
-			var response = await fnolService.CreateAssignment(request);
-			return Json(response);
+			try
+			{
+				var response = await fnolService.CreateAssignment(request);
+				return Json(response);
+			}
+			catch (Exception)
+			{
+				return StatusCode((int) HttpStatusCode.InternalServerError);
+			}
 		}
 	}
 }

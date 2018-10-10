@@ -42,10 +42,9 @@ namespace GoFNOL.Services
 			var fnolData = SetAssignmentValues(fnolRequest);
 			var eaiResponseString = await ExecuteEAIRequest(fnolData);
 
-			return new FNOLResponse
-			{
-				WorkAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value,
-			};
+			var workAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value;
+			if (string.IsNullOrEmpty(workAssignmentId)) throw new Exception("Work assignment id is null or empty");
+			return new FNOLResponse(workAssignmentId);
 		}
 
 		private async Task<string> ExecuteEAIRequest(XDocument payload)

@@ -90,7 +90,7 @@ describe('Home component', () => {
 			form.find('.email input').simulate('change', { currentTarget: { value: 'a@b.c' } })
 			form.find('.vin input').simulate('change', { currentTarget: { value: '0123456789ABCDEFG' } })
 			form.find('.deductible input.deductible-value').simulate('change', { currentTarget: { value: '500' } })
-			fixture.find('button.create').simulate('click')
+			form.simulate('submit', { preventDefault: jest.fn() })
 		})
 
 		it('should make an Api call', () => {
@@ -134,7 +134,7 @@ describe('Home component', () => {
 
 			describe('clicking Create button again', () => {
 				beforeEach(() => {
-					fixture.find('button.create').simulate('click')
+					fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
 				})
 
 				it('should hide previous output', () => {
@@ -157,7 +157,7 @@ describe('Home component', () => {
 
 			describe('clicking Create button again', () => {
 				beforeEach(() => {
-					fixture.find('button.create').simulate('click')
+					fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
 				})
 
 				it('should hide error', () => {
@@ -182,7 +182,7 @@ describe('Home component', () => {
 	describe('checking waive deductible and clicking Create button', () => {
 		beforeEach(() => {
 			fixture.find('.form .deductible input.deductible-waive').simulate('change')
-			fixture.find('button.create').simulate('click')
+			fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
 		})
 
 		it('should make an Api call', () => {
@@ -194,7 +194,7 @@ describe('Home component', () => {
 	describe('selecting "pocket estimate" as mobile flow indicator and clicking Create button', () => {
 		beforeEach(() => {
 			fixture.find('.form .mobile-flow-ind select').simulate('change', { target: { value: 'Y' } })
-			fixture.find('button.create').simulate('click')
+			fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
 		})
 
 		it('should make an Api call', () => {
@@ -206,7 +206,7 @@ describe('Home component', () => {
 	describe('selecting "not mobile" as mobile flow indicator and clicking Create button', () => {
 		beforeEach(() => {
 			fixture.find('.form .mobile-flow-ind select').simulate('change', { target: { value: 'N' } })
-			fixture.find('button.create').simulate('click')
+			fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
 		})
 
 		it('should make an Api call', () => {

@@ -9,6 +9,7 @@ describe('Home component', () => {
 	let postCreateAssignmentResolve
 
 	beforeEach(() => {
+		jest.useFakeTimers()
 		mockApi = {
 			getUserData: jest.fn(() => Promise.resolve({ content: { profileId: 'PROF123' } })),
 			postCreateAssignmentRequest: jest.fn(() => new Promise(r => postCreateAssignmentResolve = r))
@@ -113,12 +114,22 @@ describe('Home component', () => {
 			})
 		})
 
-		it('should diable create button', () => {
+		it('should diable create button and display elapsed time', () => {
 			expect(fixture.find('button.create').props().disabled).toBeTruthy()
+			jest.runOnlyPendingTimers()
+			expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
+			jest.runOnlyPendingTimers()
+			expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 2 seconds.')
+			jest.runOnlyPendingTimers()
+			jest.runOnlyPendingTimers()
+			expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 4 seconds.')
 		})
 
 		describe('when response contains work assignment id', () => {
 			beforeEach(() => {
+				jest.runOnlyPendingTimers()
+				jest.runOnlyPendingTimers()
+				jest.runOnlyPendingTimers()
 				postCreateAssignmentResolve({
 					content: {
 						workAssignmentId: 12345
@@ -128,14 +139,17 @@ describe('Home component', () => {
 
 			it('should render it and enable create button', () => {
 				expect(fixture.find('.work-assignment-id').text()).toBe('Work Assignment ID: \'12345\' added successfully!')
+				expect(fixture.find('.time-elapsed').text()).toBe('GoFNOL took 3 seconds to create the assignment.')
 			})
 
 			describe('clicking Create button again', () => {
 				beforeEach(() => {
 					fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+					jest.runOnlyPendingTimers()
 				})
 
 				it('should hide previous output', () => {
+					expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
 					expect(fixture.find('.work-assignment-id').exists()).toBeFalsy()
 				})
 			})
@@ -143,6 +157,7 @@ describe('Home component', () => {
 
 		describe('when response contains error', () => {
 			beforeEach(() => {
+				jest.runOnlyPendingTimers()
 				postCreateAssignmentResolve({
 					error: true
 				})
@@ -151,15 +166,18 @@ describe('Home component', () => {
 			it('should render it and enable create button', () => {
 				expect(fixture.find('.error').text()).toBe('GoFNOL failed, please resubmit.')
 				expect(fixture.find('button.create').props().disabled).toBeFalsy()
+				expect(fixture.find('.time-elapsed').exists()).toBeFalsy()
 			})
 
 			describe('clicking Create button again', () => {
 				beforeEach(() => {
 					fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+					jest.runOnlyPendingTimers()
 				})
 
 				it('should hide error', () => {
 					expect(fixture.find('.error').exists()).toBeFalsy()
+					expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
 				})
 			})
 		})
@@ -213,4 +231,3 @@ describe('Home component', () => {
 		})
 	})
 })
-

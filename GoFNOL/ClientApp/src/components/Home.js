@@ -88,8 +88,9 @@ export class Home extends Component {
 							<input type="text" name="deductible" className="deductible-value" placeholder="Deductible" value={this.state.deductible} onChange={e => this.setState({ deductible: e.currentTarget.value })} />
 						</div>
 					</div>
-					<button type="submit" className="create shadowed" disabled={this.state.disableForm}>Create</button>
+					<button type="submit" className="create shadowed" disabled={this.state.inProgress}>Create</button>
 				</form>
+				{this.state.stopwatchSeconds > 0 && <span className="time-elapsed">{this.state.inProgress ? `Elapsed time: ${this.state.stopwatchSeconds} seconds.` : `GoFNOL took ${this.state.stopwatchSeconds} seconds to create the assignment.`}</span>}
 				{this.state.error && <span className="error">GoFNOL failed, please resubmit.</span>}
 				{this.state.workAssignmentId && <span className="work-assignment-id">Work Assignment ID: '{this.state.workAssignmentId}' added successfully!</span>}
 			</React.Fragment>
@@ -121,20 +122,30 @@ export class Home extends Component {
 			deductible: this.state.deductibleWaived ? 'W' : this.state.deductible
 		}
 		this.setState({
-			disableForm: true,
+			inProgress: true,
+			stopwatchSeconds: 0,
 			error: false,
 			workAssignmentId: ''
 		})
+		const interval = setInterval(() => {
+			this.setState(s => {
+				return {
+					stopwatchSeconds: s.stopwatchSeconds ? s.stopwatchSeconds + 1 : 1
+				}
+			})
+		}, 1000)
 		const response = await this.api.postCreateAssignmentRequest(request)
+		clearInterval(interval)
 		if (response.error) {
 			this.setState({
-				disableForm: false,
+				inProgress: false,
+				stopwatchSeconds: 0,
 				error: true
 			})
 		}
 		else {
 			this.setState({
-				disableForm: false,
+				inProgress: false,
 				workAssignmentId: response.content.workAssignmentId
 			})
 		}

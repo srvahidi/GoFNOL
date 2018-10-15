@@ -14,13 +14,47 @@ describe('Api tests', () => {
 		window.fetch = fetch
 	})
 
-	it('should get user data', () => {
-		const mockFetch = jest.fn(() => Promise.resolve(new Response(JSON.stringify({ prop: 'data' }))))
-		window.fetch = mockFetch
+	describe('get user data', () => {
 
-		fixture.getUserData().then(data => expect(data).toEqual({ prop: 'data' }))
-		expect(mockFetch).toHaveBeenCalledTimes(1)
-		expect(mockFetch).toHaveBeenCalledWith('/api/user/data', { method: 'GET', credentials: 'same-origin' })
+		let actual
+		let mockFetch
+		let getUserDataResolve
+		let getUserDataReject
+
+		beforeEach(() => {
+			mockFetch = jest.fn(() => new Promise((res, rej) => {
+				getUserDataResolve = res
+				getUserDataReject = rej
+			}))
+			window.fetch = mockFetch
+
+			actual = fixture.getUserData()
+		})
+
+		it('should get user data', () => {
+			expect(mockFetch).toHaveBeenCalledTimes(1)
+			expect(mockFetch).toHaveBeenCalledWith('/api/user/data', { method: 'GET', credentials: 'same-origin' })
+		})
+
+		describe('when successful response', () => {
+			beforeEach(() => {
+				getUserDataResolve(new Response(JSON.stringify({ prop: 'data' })))
+			})
+
+			it('should return data', () => {
+				actual.then(data => expect(data).toEqual({ content: { prop: 'data' } }))
+			})
+		})
+
+		describe('when no response', () => {
+			beforeEach(() => {
+				getUserDataReject(new Error())
+			})
+
+			it('should return error', () => {
+				actual.then(data => expect(data).toEqual({ error: true }))
+			})
+		})
 	})
 
 	describe('post create assignment request', () => {

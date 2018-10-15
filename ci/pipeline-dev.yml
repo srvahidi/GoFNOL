@@ -64,6 +64,8 @@ resources:
     <<: *git-config
     paths:
       - ci/docker/sdk.Dockerfile
+      - '**/*.csproj'
+      - '*.sln'
 
 - name: GoFNOL-utility-dockerfile
   type: git

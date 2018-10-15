@@ -24,7 +24,7 @@
 .form .first-name,
 .form .last-name,
 .form .phone-number,
-.form .postal-code,
+.form .zip-code,
 .form .state,
 .form .email,
 .form .vin,
@@ -34,18 +34,9 @@
 	grid-template-columns: 10em 1fr;
 }
 
-.form .postal-code {
-	grid-row-gap: .75em;
-}
-
 .form .deductible .deductible-waive{
 	margin-left: 1em;
 	margin-right: 1em;
-}
-
-.form .postal-code .zip-code-extra {
-	grid-column: 2;
-	grid-gap: .75em;
 }
 
 .create {

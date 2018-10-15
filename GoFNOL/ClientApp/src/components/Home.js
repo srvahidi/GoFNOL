@@ -15,7 +15,6 @@ export class Home extends Component {
 			lastName: '',
 			phoneNumber: '',
 			zipCode: '',
-			zipCodeExtra: '',
 			state: '',
 			email: '',
 			vin: '',
@@ -26,8 +25,10 @@ export class Home extends Component {
 	}
 
 	async componentDidMount() {
-		const userData = await this.api.getUserData()
-		this.setState({ profileId: userData.profileId })
+		const userDataResponse = await this.api.getUserData()
+		if (userDataResponse.content) {
+			this.setState({ profileId: userDataResponse.content.profileId })
+		}
 	}
 
 	render() {
@@ -59,10 +60,9 @@ export class Home extends Component {
 						<label>Phone number</label>
 						<input type="text" name="phone-number" placeholder="Phone number" value={this.state.phoneNumber} onChange={e => this.setState({ phoneNumber: e.currentTarget.value })} />
 					</div>
-					<div className="postal-code">
-						<label>Postal Code</label>
-						<input type="text" name="zip-code" className="zip-code" placeholder="Zip Code (first 5)" value={this.state.zipCode} onChange={e => this.setState({ zipCode: e.currentTarget.value })} />
-						<input type="text" name="zip-code-extra" className="zip-code-extra" placeholder="Extra Zip (extra 4)" value={this.state.zipCodeExtra} onChange={e => this.setState({ zipCodeExtra: e.currentTarget.value })} />
+					<div className="zip-code">
+						<label>ZIP Code</label>
+						<input type="text" name="zip-code" placeholder="ZIP Code" value={this.state.zipCode} onChange={e => this.setState({ zipCode: e.currentTarget.value })} />
 					</div>
 					<div className="state">
 						<label>State</label>
@@ -112,7 +112,7 @@ export class Home extends Component {
 				phoneNumber: this.state.phoneNumber,
 				email: this.state.email,
 				address: {
-					postalCode: `${this.state.zipCode}-${this.state.zipCodeExtra}`,
+					zipCode: this.state.zipCode,
 					state: this.state.state
 				}
 			},

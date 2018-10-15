@@ -2,7 +2,7 @@
 {
 	public class Address
 	{
-		public string PostalCode { get; set; }
+		public string ZIPCode { get; set; }
 
 		public string State { get; set; }
 	}

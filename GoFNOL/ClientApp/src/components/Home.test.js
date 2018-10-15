@@ -10,7 +10,7 @@ describe('Home component', () => {
 
 	beforeEach(() => {
 		mockApi = {
-			getUserData: jest.fn(() => Promise.resolve({ profileId: 'PROF123' })),
+			getUserData: jest.fn(() => Promise.resolve({ content: { profileId: 'PROF123' } })),
 			postCreateAssignmentRequest: jest.fn(() => new Promise(r => postCreateAssignmentResolve = r))
 		}
 
@@ -49,10 +49,9 @@ describe('Home component', () => {
 		expect(phoneNumber.find('label').text()).toBe('Phone number')
 		expect(phoneNumber.find('input').props().placeholder).toBe('Phone number')
 
-		const postalCodes = form.find('.postal-code')
-		expect(postalCodes.find('label').text()).toBe('Postal Code')
-		expect(postalCodes.find('input.zip-code').props().placeholder).toBe('Zip Code (first 5)')
-		expect(postalCodes.find('input.zip-code-extra').props().placeholder).toBe('Extra Zip (extra 4)')
+		const zipCode = form.find('.zip-code')
+		expect(zipCode.find('label').text()).toBe('ZIP Code')
+		expect(zipCode.find('input').props().placeholder).toBe('ZIP Code')
 
 		const state = form.find('.state')
 		expect(state.find('label').text()).toBe('State')
@@ -84,8 +83,7 @@ describe('Home component', () => {
 			form.find('.first-name input').simulate('change', { currentTarget: { value: '1st name' } })
 			form.find('.last-name input').simulate('change', { currentTarget: { value: 'nst name' } })
 			form.find('.phone-number input').simulate('change', { currentTarget: { value: '(012) 345 67-89' } })
-			form.find('.postal-code input.zip-code').simulate('change', { currentTarget: { value: '34567' } })
-			form.find('.postal-code input.zip-code-extra').simulate('change', { currentTarget: { value: '0110' } })
+			form.find('.zip-code input').simulate('change', { currentTarget: { value: '34567' } })
 			form.find('.state input').simulate('change', { currentTarget: { value: 'ST' } })
 			form.find('.email input').simulate('change', { currentTarget: { value: 'a@b.c' } })
 			form.find('.vin input').simulate('change', { currentTarget: { value: '0123456789ABCDEFG' } })
@@ -105,7 +103,7 @@ describe('Home component', () => {
 					phoneNumber: '(012) 345 67-89',
 					email: 'a@b.c',
 					address: {
-						postalCode: '34567-0110',
+						zipCode: '34567',
 						state: 'ST'
 					}
 				},

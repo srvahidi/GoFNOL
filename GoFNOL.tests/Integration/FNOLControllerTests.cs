@@ -49,7 +49,7 @@ namespace GoFNOL.tests.Integration
 					["email"] = "a@b.c",
 					["address"] = new JObject
 					{
-						["postalCode"] = "34567-0110",
+						["zipCode"] = "34567",
 						["state"] = "ST"
 					}
 				},
@@ -83,7 +83,7 @@ namespace GoFNOL.tests.Integration
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_FIRST_NAME").Value.Should().Be("1st name");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_LAST_NAME").Value.Should().Be("nst name");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_CONTACT_PHONE_NBR_3").Value.Should().Be("(012) 345 67-89");
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_POSTAL_CODE").Value.Should().Be("34567-0110");
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_POSTAL_CODE").Value.Should().Be("34567");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_STATE").Value.Should().Be("ST");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_CONTACT_EMAIL").Value.Should().Be("a@b.c");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/VEHICLE_VIN").Value.Should().Be("0123456789ABCDEFG");
@@ -128,7 +128,7 @@ namespace GoFNOL.tests.Integration
 					["email"] = "a@b.c",
 					["address"] = new JObject
 					{
-						["postalCode"] = "34567-0110",
+						["zipCode"] = "34567",
 						["state"] = "ST"
 					}
 				},

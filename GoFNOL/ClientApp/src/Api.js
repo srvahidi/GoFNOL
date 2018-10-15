@@ -1,10 +1,17 @@
 export class Api {
 	async getUserData() {
-		const response = await fetch('/api/user/data', {
+		const requestOptions = {
 			method: 'GET',
 			credentials: 'same-origin'
-		})
-		return response.json()
+		}
+		try {
+			const response = await fetch('/api/user/data', requestOptions)
+			const data = await response.json()
+			return { content: data }
+		}
+		catch (e) { }
+
+		return { error: true }
 	}
 
 	async postCreateAssignmentRequest(request) {

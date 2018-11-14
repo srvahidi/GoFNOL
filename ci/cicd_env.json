@@ -2,7 +2,9 @@
 	"user-provided": [
 		{
 			"credentials": {
-				"endpoint": "http://sys-arch-svr12.pdlab.adp.com/wsproxy/ws_proxy.asmx"
+				"endpoint": "http://sys-arch-svr12.pdlab.adp.com/wsproxy/ws_proxy.asmx",
+				"password": "e85taweb",
+				"username": "password"
 			},
 			"name": "EAI"
 		},

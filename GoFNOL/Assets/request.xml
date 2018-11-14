@@ -1,8 +1,8 @@
 ﻿<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:pm="http://sys-arch-svr12.pdlab.adp.com/wsproxy/">
 <soapenv:Header>
     <SOAPHeader xmlns="http://csg.adp.com">
-        <Client>E80Jain_Dispatcher</Client>
-        <Passphrase>password17</Passphrase>
+        <Client></Client>
+        <Passphrase></Passphrase>
         <Service>EAIFNOLWebService</Service>
         <Method>SubmitXml</Method>
     </SOAPHeader>

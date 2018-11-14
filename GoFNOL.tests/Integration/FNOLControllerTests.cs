@@ -20,8 +20,12 @@ namespace GoFNOL.tests.Integration
 		{
 			// Setup
 			const string expectedEndpoint = "http://dum.my";
+			const string expectedEAIUsername = "eai user";
+			const string expectedEAIPassword = "eai pass";
 			var mockConfig = new Mock<IEnvironmentConfiguration>();
 			mockConfig.SetupGet(c => c.EAIEndpoint).Returns(expectedEndpoint);
+			mockConfig.SetupGet(c => c.EAIUsername).Returns(expectedEAIUsername);
+			mockConfig.SetupGet(c => c.EAIPassword).Returns(expectedEAIPassword);
 
 			var mockHTTPService = new Mock<IHTTPService>();
 			(Uri uri, HttpContent content)? actualEAI = null;
@@ -74,7 +78,11 @@ namespace GoFNOL.tests.Integration
 			});
 
 			actualEAI.Value.uri.AbsoluteUri.TrimEnd('/').Should().Be(expectedEndpoint);
-			var xAssignment = Helpers.ParseAssignment(await actualEAI.Value.content.ReadAsStringAsync());
+			var eaiContent = await actualEAI.Value.content.ReadAsStringAsync();
+			var eaiCredentials = Helpers.ParseCredentials(eaiContent);
+			eaiCredentials.username.Should().Be(expectedEAIUsername);
+			eaiCredentials.password.Should().Be(expectedEAIPassword);
+			var xAssignment = Helpers.ParseAssignment(eaiContent);
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value.Should().Be("D");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/USER_ID").Value.Should().Be("1234567890");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/COMPANY_ID").Value.Should().Be("123");
@@ -103,6 +111,8 @@ namespace GoFNOL.tests.Integration
 			// Setup
 			var mockConfig = new Mock<IEnvironmentConfiguration>();
 			mockConfig.SetupGet(c => c.EAIEndpoint).Returns("http://dum.my");
+			mockConfig.SetupGet(c => c.EAIUsername).Returns("eai user");
+			mockConfig.SetupGet(c => c.EAIPassword).Returns("eai pass");
 
 			var mockHTTPService = new Mock<IHTTPService>();
 			mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))

@@ -57,6 +57,13 @@ namespace GoFNOL.Services
 				.Element(_ADPNamespace + "parameters")
 				.Value = payload.ToString();
 
+			var xHeader = xEAIRequest.Element(_SOAPNamespace + "Envelope")
+				.Element(_SOAPNamespace + "Header")
+				.Element(_ADPNamespace + "SOAPHeader");
+
+			xHeader.Element(_ADPNamespace + "Client").Value = _EnvironmentConfiguration.EAIUsername;
+			xHeader.Element(_ADPNamespace + "Passphrase").Value = _EnvironmentConfiguration.EAIPassword;
+
 			using (var response = await _Client.PostAsync(new Uri(_EnvironmentConfiguration.EAIEndpoint), new EAIRequest(xEAIRequest.ToString())))
 			{
 				return await response.Content.ReadAsStringAsync();

@@ -44,5 +44,16 @@ namespace GoFNOL.tests
 				.Value;
 			return XDocument.Parse(innerPayload);
 		}
+
+		public static (string username, string password) ParseCredentials(string eaiContent)
+		{
+			var xRequest = XDocument.Parse(eaiContent);
+			var soapNs = (XNamespace)"http://schemas.xmlsoap.org/soap/envelope/";
+			var adpNs = (XNamespace)"http://csg.adp.com";
+			var xHeader = xRequest.Element(soapNs + "Envelope")
+				.Element(soapNs + "Header")
+				.Element(adpNs + "SOAPHeader");
+			return (xHeader.Element(adpNs + "Client").Value, xHeader.Element(adpNs + "Passphrase").Value);
+		}
 	}
 }

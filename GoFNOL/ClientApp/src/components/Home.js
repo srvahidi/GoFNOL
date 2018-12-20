@@ -29,9 +29,20 @@ export class Home extends Component {
 		if (userDataResponse.content) {
 			this.setState({ profileId: userDataResponse.content.profileId })
 		}
+		else {
+			this.setState({ profileId: null })
+		}
 	}
 
 	render() {
+		if (typeof this.state.profileId === "undefined") {
+			return <div className="status-message">Requesting NGP data. Please wait.</div>
+		}
+
+		if (this.state.profileId === null) {
+			return <div className="status-message">GoFNOL is unavailable because there is no Profile ID. Please use the Appraiser's credentials for this organization.</div>
+		}
+
 		return (
 			<React.Fragment>
 				<h2 className="profile-label">Create Claim for Profile: {this.state.profileId}</h2>

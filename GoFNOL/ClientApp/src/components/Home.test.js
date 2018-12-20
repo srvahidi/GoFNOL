@@ -7,227 +7,251 @@ describe('Home component', () => {
 	let fixture
 	let mockApi
 	let postCreateAssignmentResolve
+	let resolveGetUserData
 
 	beforeEach(() => {
 		jest.useFakeTimers()
 		mockApi = {
-			getUserData: jest.fn(() => Promise.resolve({ content: { profileId: 'PROF123' } })),
+			getUserData: jest.fn(() => new Promise(r => resolveGetUserData = r)),
 			postCreateAssignmentRequest: jest.fn(() => new Promise(r => postCreateAssignmentResolve = r))
 		}
 
 		fixture = shallow(<Home api={mockApi} />)
 	})
 
-	it('should render profile data', () => {
+	it('should request user data and render "In Progress" message', () => {
 		expect(mockApi.getUserData).toHaveBeenCalledTimes(1)
-		expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: PROF123')
+		expect(fixture.find('.status-message').text()).toBe('Requesting NGP data. Please wait.')
+		expect(fixture.find('form').exists()).toBe(false)
 	})
 
-	it('should render all inputs', () => {
-		const form = fixture.find('.form')
-
-		const mobileFlowIndicator = form.find('.mobile-flow-ind')
-		expect(mobileFlowIndicator.find('label').text()).toBe('Mobile Flow Indicator')
-		const mobileFlowIndicatorOptions = mobileFlowIndicator.find('option')
-		expect(mobileFlowIndicatorOptions.length).toBe(3)
-		expect(mobileFlowIndicatorOptions.at(0).text()).toBe('Digital Garage Claims (D)')
-		expect(mobileFlowIndicatorOptions.at(1).text()).toBe('Pocket Estimate (Y)')
-		expect(mobileFlowIndicatorOptions.at(2).text()).toBe('Not Mobile (N)')
-
-		const claimNumber = form.find('.claim-number')
-		expect(claimNumber.find('label').text()).toBe('New Claim Number')
-		expect(claimNumber.find('input').props().placeholder).toBe('Claim Number')
-
-		const firstName = form.find('.first-name')
-		expect(firstName.find('label').text()).toBe('First Name')
-		expect(firstName.find('input').props().placeholder).toBe('First Name')
-
-		const lastName = form.find('.last-name')
-		expect(lastName.find('label').text()).toBe('Last Name')
-		expect(lastName.find('input').props().placeholder).toBe('Last Name')
-
-		const phoneNumber = form.find('.phone-number')
-		expect(phoneNumber.find('label').text()).toBe('Phone number')
-		expect(phoneNumber.find('input').props().placeholder).toBe('Phone number')
-
-		const zipCode = form.find('.zip-code')
-		expect(zipCode.find('label').text()).toBe('ZIP Code')
-		expect(zipCode.find('input').props().placeholder).toBe('ZIP Code')
-
-		const state = form.find('.state')
-		expect(state.find('label').text()).toBe('State')
-		expect(state.find('input').props().placeholder).toBe('State')
-
-		const email = form.find('.email')
-		expect(email.find('label').text()).toBe('Email')
-		expect(email.find('input').props().placeholder).toBe('Email')
-
-		const vin = form.find('.vin')
-		expect(vin.find('label').text()).toBe('VIN')
-		expect(vin.find('input').props().placeholder).toBe('VIN')
-
-		const lossType = form.find('.loss-type')
-		expect(lossType.find('label').text()).toBe('Loss Type')
-		expect(lossType.find('input').props().placeholder).toBe('Loss Type')
-		expect(lossType.find('input').props().value).toBe('COLL')
-
-		const deductible = form.find('.deductible')
-		expect(deductible.find('label').text()).toBe('Deductible')
-		expect(deductible.find('.waive-label').text()).toBe('Waive')
-		expect(deductible.find('input.deductible-value').props().placeholder).toBe('Deductible')
-	})
-
-	describe('filling out all inputs and clicking Create button', () => {
+	describe('when profileId is NOT returned', () => {
 		beforeEach(() => {
+			resolveGetUserData({ error: true })
+		})
+
+		it('should not render form and render unauthorized message', () => {
+			expect(fixture.find('.status-message').text()).toBe('GoFNOL is unavailable because there is no Profile ID. Please use the Appraiser\'s credentials for this organization.')
+			expect(fixture.find('form').exists()).toBe(false)
+		})
+	})
+
+	describe('when profileId is returned', () => {
+		beforeEach(() => {
+			resolveGetUserData({ content: { profileId: 'PROF123' } })
+		})
+		
+		it('should render profile data', () => {
+			expect(fixture.find('.status-message').exists()).toBe(false)
+			expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: PROF123')
+		})
+
+		it('should render all inputs', () => {
 			const form = fixture.find('.form')
-			form.find('.claim-number input').simulate('change', { currentTarget: { value: 'ABC-123' } })
-			form.find('.first-name input').simulate('change', { currentTarget: { value: '1st name' } })
-			form.find('.last-name input').simulate('change', { currentTarget: { value: 'nst name' } })
-			form.find('.phone-number input').simulate('change', { currentTarget: { value: '(012) 345 67-89' } })
-			form.find('.zip-code input').simulate('change', { currentTarget: { value: '34567' } })
-			form.find('.state input').simulate('change', { currentTarget: { value: 'ST' } })
-			form.find('.email input').simulate('change', { currentTarget: { value: 'a@b.c' } })
-			form.find('.vin input').simulate('change', { currentTarget: { value: '0123456789ABCDEFG' } })
-			form.find('.deductible input.deductible-value').simulate('change', { currentTarget: { value: '500' } })
-			form.simulate('submit', { preventDefault: jest.fn() })
+
+			const mobileFlowIndicator = form.find('.mobile-flow-ind')
+			expect(mobileFlowIndicator.find('label').text()).toBe('Mobile Flow Indicator')
+			const mobileFlowIndicatorOptions = mobileFlowIndicator.find('option')
+			expect(mobileFlowIndicatorOptions.length).toBe(3)
+			expect(mobileFlowIndicatorOptions.at(0).text()).toBe('Digital Garage Claims (D)')
+			expect(mobileFlowIndicatorOptions.at(1).text()).toBe('Pocket Estimate (Y)')
+			expect(mobileFlowIndicatorOptions.at(2).text()).toBe('Not Mobile (N)')
+
+			const claimNumber = form.find('.claim-number')
+			expect(claimNumber.find('label').text()).toBe('New Claim Number')
+			expect(claimNumber.find('input').props().placeholder).toBe('Claim Number')
+
+			const firstName = form.find('.first-name')
+			expect(firstName.find('label').text()).toBe('First Name')
+			expect(firstName.find('input').props().placeholder).toBe('First Name')
+
+			const lastName = form.find('.last-name')
+			expect(lastName.find('label').text()).toBe('Last Name')
+			expect(lastName.find('input').props().placeholder).toBe('Last Name')
+
+			const phoneNumber = form.find('.phone-number')
+			expect(phoneNumber.find('label').text()).toBe('Phone number')
+			expect(phoneNumber.find('input').props().placeholder).toBe('Phone number')
+
+			const zipCode = form.find('.zip-code')
+			expect(zipCode.find('label').text()).toBe('ZIP Code')
+			expect(zipCode.find('input').props().placeholder).toBe('ZIP Code')
+
+			const state = form.find('.state')
+			expect(state.find('label').text()).toBe('State')
+			expect(state.find('input').props().placeholder).toBe('State')
+
+			const email = form.find('.email')
+			expect(email.find('label').text()).toBe('Email')
+			expect(email.find('input').props().placeholder).toBe('Email')
+
+			const vin = form.find('.vin')
+			expect(vin.find('label').text()).toBe('VIN')
+			expect(vin.find('input').props().placeholder).toBe('VIN')
+
+			const lossType = form.find('.loss-type')
+			expect(lossType.find('label').text()).toBe('Loss Type')
+			expect(lossType.find('input').props().placeholder).toBe('Loss Type')
+			expect(lossType.find('input').props().value).toBe('COLL')
+
+			const deductible = form.find('.deductible')
+			expect(deductible.find('label').text()).toBe('Deductible')
+			expect(deductible.find('.waive-label').text()).toBe('Waive')
+			expect(deductible.find('input.deductible-value').props().placeholder).toBe('Deductible')
 		})
 
-		it('should make an Api call', () => {
-			expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
-			expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0]).toEqual({
-				profileId: 'PROF123',
-				mobileFlowIndicator: 'D',
-				claimNumber: 'ABC-123',
-				owner: {
-					firstName: '1st name',
-					lastName: 'nst name',
-					phoneNumber: '(012) 345 67-89',
-					email: 'a@b.c',
-					address: {
-						zipCode: '34567',
-						state: 'ST'
-					}
-				},
-				vin: '0123456789ABCDEFG',
-				lossType: 'COLL',
-				deductible: '500'
-			})
-		})
-
-		it('should diable create button and display elapsed time', () => {
-			expect(fixture.find('button.create').props().disabled).toBeTruthy()
-			jest.runOnlyPendingTimers()
-			expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
-			jest.runOnlyPendingTimers()
-			expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 2 seconds.')
-			jest.runOnlyPendingTimers()
-			jest.runOnlyPendingTimers()
-			expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 4 seconds.')
-		})
-
-		describe('when response contains work assignment id', () => {
+		describe('filling out all inputs and clicking Create button', () => {
 			beforeEach(() => {
-				jest.runOnlyPendingTimers()
-				jest.runOnlyPendingTimers()
-				jest.runOnlyPendingTimers()
-				postCreateAssignmentResolve({
-					content: {
-						workAssignmentId: 12345
-					}
+				const form = fixture.find('.form')
+				form.find('.claim-number input').simulate('change', { currentTarget: { value: 'ABC-123' } })
+				form.find('.first-name input').simulate('change', { currentTarget: { value: '1st name' } })
+				form.find('.last-name input').simulate('change', { currentTarget: { value: 'nst name' } })
+				form.find('.phone-number input').simulate('change', { currentTarget: { value: '(012) 345 67-89' } })
+				form.find('.zip-code input').simulate('change', { currentTarget: { value: '34567' } })
+				form.find('.state input').simulate('change', { currentTarget: { value: 'ST' } })
+				form.find('.email input').simulate('change', { currentTarget: { value: 'a@b.c' } })
+				form.find('.vin input').simulate('change', { currentTarget: { value: '0123456789ABCDEFG' } })
+				form.find('.deductible input.deductible-value').simulate('change', { currentTarget: { value: '500' } })
+				form.simulate('submit', { preventDefault: jest.fn() })
+			})
+
+			it('should make an Api call', () => {
+				expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
+				expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0]).toEqual({
+					profileId: 'PROF123',
+					mobileFlowIndicator: 'D',
+					claimNumber: 'ABC-123',
+					owner: {
+						firstName: '1st name',
+						lastName: 'nst name',
+						phoneNumber: '(012) 345 67-89',
+						email: 'a@b.c',
+						address: {
+							zipCode: '34567',
+							state: 'ST'
+						}
+					},
+					vin: '0123456789ABCDEFG',
+					lossType: 'COLL',
+					deductible: '500'
 				})
 			})
 
-			it('should render it and enable create button', () => {
-				expect(fixture.find('.work-assignment-id').text()).toBe('Work Assignment ID: \'12345\' added successfully!')
-				expect(fixture.find('.time-elapsed').text()).toBe('GoFNOL took 3 seconds to create the assignment.')
+			it('should diable create button and display elapsed time', () => {
+				expect(fixture.find('button.create').props().disabled).toBeTruthy()
+				jest.runOnlyPendingTimers()
+				expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
+				jest.runOnlyPendingTimers()
+				expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 2 seconds.')
+				jest.runOnlyPendingTimers()
+				jest.runOnlyPendingTimers()
+				expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 4 seconds.')
 			})
 
-			describe('clicking Create button again', () => {
+			describe('when response contains work assignment id', () => {
 				beforeEach(() => {
-					fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
 					jest.runOnlyPendingTimers()
+					jest.runOnlyPendingTimers()
+					jest.runOnlyPendingTimers()
+					postCreateAssignmentResolve({
+						content: {
+							workAssignmentId: 12345
+						}
+					})
 				})
 
-				it('should hide previous output', () => {
-					expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
-					expect(fixture.find('.work-assignment-id').exists()).toBeFalsy()
+				it('should render it and enable create button', () => {
+					expect(fixture.find('.work-assignment-id').text()).toBe('Work Assignment ID: \'12345\' added successfully!')
+					expect(fixture.find('.time-elapsed').text()).toBe('GoFNOL took 3 seconds to create the assignment.')
+				})
+
+				describe('clicking Create button again', () => {
+					beforeEach(() => {
+						fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+						jest.runOnlyPendingTimers()
+					})
+
+					it('should hide previous output', () => {
+						expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
+						expect(fixture.find('.work-assignment-id').exists()).toBeFalsy()
+					})
+				})
+			})
+
+			describe('when response contains error', () => {
+				beforeEach(() => {
+					jest.runOnlyPendingTimers()
+					postCreateAssignmentResolve({
+						error: true
+					})
+				})
+
+				it('should render it and enable create button', () => {
+					expect(fixture.find('.error').text()).toBe('GoFNOL failed, please resubmit.')
+					expect(fixture.find('button.create').props().disabled).toBeFalsy()
+					expect(fixture.find('.time-elapsed').exists()).toBeFalsy()
+				})
+
+				describe('clicking Create button again', () => {
+					beforeEach(() => {
+						fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+						jest.runOnlyPendingTimers()
+					})
+
+					it('should hide error', () => {
+						expect(fixture.find('.error').exists()).toBeFalsy()
+						expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
+					})
 				})
 			})
 		})
 
-		describe('when response contains error', () => {
+		describe('entering lower cased chars as claim number and bluring input focus', () => {
 			beforeEach(() => {
-				jest.runOnlyPendingTimers()
-				postCreateAssignmentResolve({
-					error: true
-				})
+				let form = fixture.find('.form')
+				form.find('.claim-number input').simulate('change', { currentTarget: { value: 'aBc-123-xy' } })
+				form.find('.claim-number input').simulate('blur')
 			})
 
-			it('should render it and enable create button', () => {
-				expect(fixture.find('.error').text()).toBe('GoFNOL failed, please resubmit.')
-				expect(fixture.find('button.create').props().disabled).toBeFalsy()
-				expect(fixture.find('.time-elapsed').exists()).toBeFalsy()
-			})
-
-			describe('clicking Create button again', () => {
-				beforeEach(() => {
-					fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
-					jest.runOnlyPendingTimers()
-				})
-
-				it('should hide error', () => {
-					expect(fixture.find('.error').exists()).toBeFalsy()
-					expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
-				})
+			it('should uppercase claim number', () => {
+				expect(fixture.find('.form .claim-number input').props().value).toBe('ABC-123-XY')
 			})
 		})
-	})
 
-	describe('entering lower cased chars as claim number and bluring input focus', () => {
-		beforeEach(() => {
-			let form = fixture.find('.form')
-			form.find('.claim-number input').simulate('change', { currentTarget: { value: 'aBc-123-xy' } })
-			form.find('.claim-number input').simulate('blur')
+		describe('checking waive deductible and clicking Create button', () => {
+			beforeEach(() => {
+				fixture.find('.form .deductible input.deductible-waive').simulate('change')
+				fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+			})
+
+			it('should make an Api call', () => {
+				expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
+				expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0].deductible).toBe('W')
+			})
 		})
 
-		it('should uppercase claim number', () => {
-			expect(fixture.find('.form .claim-number input').props().value).toBe('ABC-123-XY')
-		})
-	})
+		describe('selecting "pocket estimate" as mobile flow indicator and clicking Create button', () => {
+			beforeEach(() => {
+				fixture.find('.form .mobile-flow-ind select').simulate('change', { target: { value: 'Y' } })
+				fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+			})
 
-	describe('checking waive deductible and clicking Create button', () => {
-		beforeEach(() => {
-			fixture.find('.form .deductible input.deductible-waive').simulate('change')
-			fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
-		})
-
-		it('should make an Api call', () => {
-			expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
-			expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0].deductible).toBe('W')
-		})
-	})
-
-	describe('selecting "pocket estimate" as mobile flow indicator and clicking Create button', () => {
-		beforeEach(() => {
-			fixture.find('.form .mobile-flow-ind select').simulate('change', { target: { value: 'Y' } })
-			fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+			it('should make an Api call', () => {
+				expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
+				expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0].mobileFlowIndicator).toBe('Y')
+			})
 		})
 
-		it('should make an Api call', () => {
-			expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
-			expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0].mobileFlowIndicator).toBe('Y')
-		})
-	})
+		describe('selecting "not mobile" as mobile flow indicator and clicking Create button', () => {
+			beforeEach(() => {
+				fixture.find('.form .mobile-flow-ind select').simulate('change', { target: { value: 'N' } })
+				fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+			})
 
-	describe('selecting "not mobile" as mobile flow indicator and clicking Create button', () => {
-		beforeEach(() => {
-			fixture.find('.form .mobile-flow-ind select').simulate('change', { target: { value: 'N' } })
-			fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
-		})
-
-		it('should make an Api call', () => {
-			expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
-			expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0].mobileFlowIndicator).toBe('N')
+			it('should make an Api call', () => {
+				expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
+				expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0].mobileFlowIndicator).toBe('N')
+			})
 		})
 	})
 })

@@ -19,6 +19,7 @@
     "start": "rimraf ./build && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "testing": "react-scripts test --env=jsdom --watch",
     "eject": "react-scripts eject"
   }
 }

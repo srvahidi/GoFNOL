@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using GoFNOL.Models;
 using GoFNOL.Services;
@@ -17,6 +18,14 @@ namespace GoFNOL.Controllers
 			{
 				var response = await fnolService.CreateAssignment(request);
 				return Json(response);
+			}
+			catch (EAIException)
+			{
+				return StatusCode((int) HttpStatusCode.BadGateway);
+			}
+			catch (HttpRequestException)
+			{
+				return StatusCode((int) HttpStatusCode.GatewayTimeout);
 			}
 			catch (Exception)
 			{

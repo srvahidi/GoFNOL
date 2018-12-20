@@ -43,7 +43,7 @@ namespace GoFNOL.Services
 			var eaiResponseString = await ExecuteEAIRequest(fnolData);
 
 			var workAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value;
-			if (string.IsNullOrEmpty(workAssignmentId)) throw new Exception("Work assignment id is null or empty");
+			if (string.IsNullOrEmpty(workAssignmentId)) throw new EAIException();
 			return new FNOLResponse(workAssignmentId);
 		}
 

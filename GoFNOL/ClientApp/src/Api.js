@@ -4,17 +4,15 @@ export class Api {
 			method: 'GET',
 			credentials: 'same-origin'
 		}
-		try {
-			const response = await fetch('/api/user/data', requestOptions)
-			const data = await response.json()
-			return { content: data }
-		}
-		catch (e) { }
 
-		return { error: true }
+		const response = await fetch('/api/user/data', requestOptions)
+		if (response.status === 200)
+			return await response.json()
+
+		throw new Error()
 	}
 
-	async postCreateAssignmentRequest(request) {
+	async postCreateAssignment(request) {
 		const requestOptions = {
 			method: 'POST',
 			credentials: 'same-origin',
@@ -24,15 +22,24 @@ export class Api {
 			body: JSON.stringify(request)
 		}
 
+		let response
 		try {
-			const response = await fetch('/api/fnol', requestOptions)
-			if (response.status === 200) {
-				const data = await response.json()
-				return { content: data }
-			}
+			response = await fetch('/api/fnol', requestOptions)
+		} catch (e) {
+			throw new Error('ClientFailure')
 		}
-		catch (e) { }
 
-		return { error: true }
+		switch (response.status) {
+			case 200:
+				return await response.json()
+			case 500:
+				throw new Error('APIFailure')
+			case 502:
+				throw new Error('EAIFailure')
+			case 504:
+				throw new Error('NetworkFailure')
+		}
 	}
 }
+
+export const getApi = () => new Api()

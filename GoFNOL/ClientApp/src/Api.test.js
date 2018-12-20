@@ -41,18 +41,28 @@ describe('Api tests', () => {
 				getUserDataResolve(new Response(JSON.stringify({ prop: 'data' })))
 			})
 
-			it('should return data', () => {
-				actual.then(data => expect(data).toEqual({ content: { prop: 'data' } }))
+			it('should resolve with response payload', () => {
+				actual.then(data => expect(data).toEqual({ prop: 'data' }))
+			})
+		})
+
+		describe('when unsuccessful response', () => {
+			beforeEach(() => {
+				getUserDataResolve(new Response(null, { status: 500 }))
+			})
+
+			it('should reject', (done) => {
+				actual.catch(() => done())
 			})
 		})
 
 		describe('when no response', () => {
 			beforeEach(() => {
-				getUserDataReject(new Error())
+				getUserDataReject()
 			})
 
-			it('should return error', () => {
-				actual.then(data => expect(data).toEqual({ error: true }))
+			it('should reject', (done) => {
+				actual.catch(() => done())
 			})
 		})
 	})
@@ -61,17 +71,17 @@ describe('Api tests', () => {
 
 		let actual
 		let mockFetch
-		let postAssignmentResolve
-		let postAssignmentReject
+		let postCreateAssignmentResolve
+		let postCreateAssignmentReject
 
 		beforeEach(() => {
 			mockFetch = jest.fn(() => new Promise((res, rej) => {
-				postAssignmentResolve = res
-				postAssignmentReject = rej
+				postCreateAssignmentResolve = res
+				postCreateAssignmentReject = rej
 			}))
 			window.fetch = mockFetch
 
-			actual = fixture.postCreateAssignmentRequest({ prop: 'request data' })
+			actual = fixture.postCreateAssignment({ prop: 'request data' })
 		})
 
 		it('should make correct request create assignment request', () => {
@@ -89,31 +99,63 @@ describe('Api tests', () => {
 
 		describe('when successful response', () => {
 			beforeEach(() => {
-				postAssignmentResolve(new Response(JSON.stringify({ prop: 'response data' })))
+				postCreateAssignmentResolve(new Response(JSON.stringify({ prop: 'response data' })))
 			})
 
-			it('should return data', () => {
-				actual.then(data => expect(data).toEqual({ content: { prop: 'response data' } }))
+			it('should resolve with response payload', () => {
+				actual.then(data => expect(data).toEqual({ prop: 'response data' }))
 			})
 		})
 
-		describe('when failure response', () => {
+		describe('when status 500 response', () => {
 			beforeEach(() => {
-				postAssignmentResolve(new Response(null, { status: 500 }))
+				postCreateAssignmentResolve(new Response(null, { status: 500 }))
 			})
 
-			it('should return error', () => {
-				actual.then(data => expect(data).toEqual({ error: true }))
+			it('should reject with APIFailure error', (done) => {
+				actual.catch(data => {
+					expect(data).toEqual(new Error('APIFailure'))
+					done()
+				})
+			})
+		})
+
+		describe('when status 502 response', () => {
+			beforeEach(() => {
+				postCreateAssignmentResolve(new Response(null, { status: 502 }))
+			})
+
+			it('should reject with EAIFailure error', (done) => {
+				actual.catch(data => {
+					expect(data).toEqual(new Error('EAIFailure'))
+					done()
+				})
+			})
+		})
+
+		describe('when status 504 response', () => {
+			beforeEach(() => {
+				postCreateAssignmentResolve(new Response(null, { status: 504 }))
+			})
+
+			it('should reject with NetworkFailure error', (done) => {
+				actual.catch(data => {
+					expect(data).toEqual(new Error('NetworkFailure'))
+					done()
+				})
 			})
 		})
 
 		describe('when no response', () => {
 			beforeEach(() => {
-				postAssignmentReject(new Error())
+				postCreateAssignmentReject()
 			})
 
-			it('should return error', () => {
-				actual.then(data => expect(data).toEqual({ error: true }))
+			it('should reject with ClientFailure error', (done) => {
+				actual.catch(data => {
+					expect(data).toEqual(new Error('ClientFailure'))
+					done()
+				})
 			})
 		})
 	})

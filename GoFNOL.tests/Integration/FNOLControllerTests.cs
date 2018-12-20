@@ -15,31 +15,16 @@ namespace GoFNOL.tests.Integration
 {
 	public class FNOLControllerTests
 	{
-		[Fact]
-		public async Task FNOLController_WhenPostIsInvoked_ShouldSubmitToEAIAndReturnData()
-		{
-			// Setup
-			const string expectedEndpoint = "http://dum.my";
-			const string expectedEAIUsername = "eai user";
-			const string expectedEAIPassword = "eai pass";
-			var mockConfig = new Mock<IEnvironmentConfiguration>();
-			mockConfig.SetupGet(c => c.EAIEndpoint).Returns(expectedEndpoint);
-			mockConfig.SetupGet(c => c.EAIUsername).Returns(expectedEAIUsername);
-			mockConfig.SetupGet(c => c.EAIPassword).Returns(expectedEAIPassword);
+		private readonly HttpContent requestContent;
 
-			var mockHTTPService = new Mock<IHTTPService>();
-			(Uri uri, HttpContent content)? actualEAI = null;
-			mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
-				.Callback<Uri, HttpContent>((uri, content) => actualEAI = (uri, content))
-				.ReturnsAsync(new HttpResponseMessage
-				{
-					Content = new StringContent("&lt;ADP_TRANSACTION_ID&gt;123&lt;/ADP_TRANSACTION_ID&gt;")
-				});
-			var client = Helpers.CreateTestServer(collection =>
-			{
-				collection.AddSingleton(mockConfig.Object);
-				collection.AddSingleton(mockHTTPService.Object);
-			}).CreateClient();
+		private readonly HttpClient client;
+
+		private readonly Mock<IEnvironmentConfiguration> mockConfig;
+
+		private readonly Mock<IHTTPService> mockHTTPService;
+
+		public FNOLControllerTests()
+		{
 			var jRequest = new JObject
 			{
 				["profileId"] = "1234567890",
@@ -61,8 +46,37 @@ namespace GoFNOL.tests.Integration
 				["lossType"] = "COLL",
 				["deductible"] = "500"
 			};
-			var requestContent = new StringContent(jRequest.ToString());
+			requestContent = new StringContent(jRequest.ToString());
 			requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+			mockConfig = new Mock<IEnvironmentConfiguration>();
+			mockHTTPService = new Mock<IHTTPService>();
+			client = Helpers.CreateTestServer(collection =>
+			{
+				collection.AddSingleton(mockConfig.Object);
+				collection.AddSingleton(mockHTTPService.Object);
+			}).CreateClient();
+		}
+
+		[Fact]
+		public async Task FNOLController_WhenPostIsInvoked_ShouldSubmitToEAIAndReturnData()
+		{
+			// Setup
+			const string expectedEndpoint = "http://dum.my";
+			const string expectedEAIUsername = "eai user";
+			const string expectedEAIPassword = "eai pass";
+
+			mockConfig.SetupGet(c => c.EAIEndpoint).Returns(expectedEndpoint);
+			mockConfig.SetupGet(c => c.EAIUsername).Returns(expectedEAIUsername);
+			mockConfig.SetupGet(c => c.EAIPassword).Returns(expectedEAIPassword);
+
+			(Uri uri, HttpContent content)? actualEAI = null;
+			mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
+				.Callback<Uri, HttpContent>((uri, content) => actualEAI = (uri, content))
+				.ReturnsAsync(new HttpResponseMessage
+				{
+					Content = new StringContent("&lt;ADP_TRANSACTION_ID&gt;123&lt;/ADP_TRANSACTION_ID&gt;")
+				});
 
 			// Execute
 			var response = await client.PostAsync("/api/fnol", requestContent);
@@ -106,51 +120,59 @@ namespace GoFNOL.tests.Integration
 		}
 
 		[Fact]
-		public async Task FNOLController_WhenPostIsInvokedAndNoWorkAssignmentIdReturned_ShouldFail()
+		public async Task FNOLController_WhenPostIsInvokedAndNoWorkAssignmentIdReturned_ShouldReturnErrorThatEAIFailed()
 		{
 			// Setup
-			var mockConfig = new Mock<IEnvironmentConfiguration>();
 			mockConfig.SetupGet(c => c.EAIEndpoint).Returns("http://dum.my");
 			mockConfig.SetupGet(c => c.EAIUsername).Returns("eai user");
 			mockConfig.SetupGet(c => c.EAIPassword).Returns("eai pass");
 
-			var mockHTTPService = new Mock<IHTTPService>();
 			mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
 				.ReturnsAsync(new HttpResponseMessage
 				{
 					Content = new StringContent("&lt;ADP_TRANSACTION_ID&gt;&lt;/ADP_TRANSACTION_ID&gt;")
 				});
-			var client = Helpers.CreateTestServer(collection =>
-			{
-				collection.AddSingleton(mockConfig.Object);
-				collection.AddSingleton(mockHTTPService.Object);
-			}).CreateClient();
-			var jRequest = new JObject
-			{
-				["profileId"] = "1234567890",
-				["mobileFlowIndicator"] = "D",
-				["claimNumber"] = "ABC-123",
-				["owner"] = new JObject
-				{
-					["firstName"] = "1st name",
-					["lastName"] = "nst name",
-					["phoneNumber"] = "(012) 345 67-89",
-					["email"] = "a@b.c",
-					["address"] = new JObject
-					{
-						["zipCode"] = "34567",
-						["state"] = "ST"
-					}
-				},
-				["vin"] = "0123456789ABCDEFG",
-				["lossType"] = "COLL",
-				["deductible"] = "500"
-			};
-			var requestContent = new StringContent(jRequest.ToString());
-			requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
 			// Execute
 			var response = await client.PostAsync("/api/fnol", requestContent);
+
+			// Verify
+			mockHTTPService.VerifyAll();
+			response.StatusCode.Should().Be(HttpStatusCode.BadGateway);
+		}
+
+		[Fact]
+		public async Task FNOLController_WhenPostIsInvokedAndHttpRequestExceptionThrown_ShouldReturnErrorThatNetworkFailed()
+		{
+			// Setup
+			mockConfig.SetupGet(c => c.EAIEndpoint).Returns("http://dum.my");
+			mockConfig.SetupGet(c => c.EAIUsername).Returns("eai user");
+			mockConfig.SetupGet(c => c.EAIPassword).Returns("eai pass");
+
+			mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
+				.Throws<HttpRequestException>();
+
+			// Execute
+			var response = await client.PostAsync("/api/fnol", requestContent);
+
+			// Verify
+			mockHTTPService.VerifyAll();
+			response.StatusCode.Should().Be(HttpStatusCode.GatewayTimeout);
+		}
+
+		[Fact]
+		public async Task FNOLController_WhenPostIsInvokedAndExceptionThrown_ShouldReturnErrorThatAPIFailed()
+		{
+			// Setup
+			mockConfig.SetupGet(c => c.EAIEndpoint).Returns("http://dum.my");
+			mockConfig.SetupGet(c => c.EAIUsername).Returns("eai user");
+			mockConfig.SetupGet(c => c.EAIPassword).Returns("eai pass");
+			var jRequest = new JObject();
+			var emptyRequestContent = new StringContent(jRequest.ToString());
+			emptyRequestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+			// Execute
+			var response = await client.PostAsync("/api/fnol", emptyRequestContent);
 
 			// Verify
 			mockHTTPService.VerifyAll();

@@ -1,13 +1,20 @@
 import React, { Component } from 'react'
-import { Api } from '../Api'
+import { getApi } from '../Api'
 
 import './Home.css'
 
 export class Home extends Component {
 
+	errorMessages = {
+		EAIFailure: 'Dependent services failed, please try again. If you continue to experience this error, please contact client services.',
+		NetworkFailure: 'GoFNOL failed because it was unable to reach a dependent service, please try again. If you continue to experience this error, please contact client services.',
+		APIFailure: 'The API layer encountered an error, please try again. If you continue to experience this error, please contact client services.',
+		ClientFailure: 'The client app encountered an error, please try again. If you continue to experience this error, please contact client services.'
+	}
+
 	constructor(props) {
 		super(props)
-		this.api = props.api ? props.api : new Api()
+		this.api = props.api ? props.api : getApi()
 		this.state = {
 			mobileFlowIndicator: 'D',
 			claimNumber: '',
@@ -25,11 +32,10 @@ export class Home extends Component {
 	}
 
 	async componentDidMount() {
-		const userDataResponse = await this.api.getUserData()
-		if (userDataResponse.content) {
-			this.setState({ profileId: userDataResponse.content.profileId })
-		}
-		else {
+		try {
+			const userDataResponse = await this.api.getUserData()
+			this.setState({ profileId: userDataResponse.profileId })
+		} catch (e) {
 			this.setState({ profileId: null })
 		}
 	}
@@ -102,7 +108,7 @@ export class Home extends Component {
 					<button type="submit" className="create shadowed" disabled={this.state.inProgress}>Create</button>
 				</form>
 				{this.state.stopwatchSeconds > 0 && <span className="time-elapsed">{this.state.inProgress ? `Elapsed time: ${this.state.stopwatchSeconds} seconds.` : `GoFNOL took ${this.state.stopwatchSeconds} seconds to create the assignment.`}</span>}
-				{this.state.error && <span className="error">GoFNOL failed, please resubmit.</span>}
+				{this.state.errorMessage && <span className="error">{this.state.errorMessage}</span>}
 				{this.state.workAssignmentId && <span className="work-assignment-id">Work Assignment ID: '{this.state.workAssignmentId}' added successfully!</span>}
 			</React.Fragment>
 		)
@@ -135,7 +141,7 @@ export class Home extends Component {
 		this.setState({
 			inProgress: true,
 			stopwatchSeconds: 0,
-			error: false,
+			errorMessage: '',
 			workAssignmentId: ''
 		})
 		const interval = setInterval(() => {
@@ -145,20 +151,20 @@ export class Home extends Component {
 				}
 			})
 		}, 1000)
-		const response = await this.api.postCreateAssignmentRequest(request)
-		clearInterval(interval)
-		if (response.error) {
+		try {
+			const response = await this.api.postCreateAssignment(request)
+			this.setState({
+				inProgress: false,
+				workAssignmentId: response.workAssignmentId
+			})
+		}
+		catch (error) {
 			this.setState({
 				inProgress: false,
 				stopwatchSeconds: 0,
-				error: true
+				errorMessage: this.errorMessages[error.message]
 			})
 		}
-		else {
-			this.setState({
-				inProgress: false,
-				workAssignmentId: response.content.workAssignmentId
-			})
-		}
+		clearInterval(interval)
 	}
 }

@@ -7,13 +7,21 @@ describe('Home component', () => {
 	let fixture
 	let mockApi
 	let postCreateAssignmentResolve
-	let resolveGetUserData
+	let postCreateAssignmentReject
+	let getUserDataResolve
+	let getUserDataReject
 
 	beforeEach(() => {
 		jest.useFakeTimers()
 		mockApi = {
-			getUserData: jest.fn(() => new Promise(r => resolveGetUserData = r)),
-			postCreateAssignmentRequest: jest.fn(() => new Promise(r => postCreateAssignmentResolve = r))
+			getUserData: jest.fn(() => new Promise((res, rej) => {
+				getUserDataResolve = res
+				getUserDataReject = rej
+			})),
+			postCreateAssignment: jest.fn(() => new Promise((res, rej) => {
+				postCreateAssignmentResolve = res
+				postCreateAssignmentReject = rej
+			}))
 		}
 
 		fixture = shallow(<Home api={mockApi} />)
@@ -27,7 +35,7 @@ describe('Home component', () => {
 
 	describe('when profileId is NOT returned', () => {
 		beforeEach(() => {
-			resolveGetUserData({ error: true })
+			getUserDataReject()
 		})
 
 		it('should not render form and render unauthorized message', () => {
@@ -38,9 +46,9 @@ describe('Home component', () => {
 
 	describe('when profileId is returned', () => {
 		beforeEach(() => {
-			resolveGetUserData({ content: { profileId: 'PROF123' } })
+			getUserDataResolve({ profileId: 'PROF123' })
 		})
-		
+
 		it('should render profile data', () => {
 			expect(fixture.find('.status-message').exists()).toBe(false)
 			expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: PROF123')
@@ -116,8 +124,8 @@ describe('Home component', () => {
 			})
 
 			it('should make an Api call', () => {
-				expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
-				expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0]).toEqual({
+				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
+				expect(mockApi.postCreateAssignment.mock.calls[0][0]).toEqual({
 					profileId: 'PROF123',
 					mobileFlowIndicator: 'D',
 					claimNumber: 'ABC-123',
@@ -153,11 +161,7 @@ describe('Home component', () => {
 					jest.runOnlyPendingTimers()
 					jest.runOnlyPendingTimers()
 					jest.runOnlyPendingTimers()
-					postCreateAssignmentResolve({
-						content: {
-							workAssignmentId: 12345
-						}
-					})
+					postCreateAssignmentResolve({ workAssignmentId: 12345 })
 				})
 
 				it('should render it and enable create button', () => {
@@ -178,32 +182,39 @@ describe('Home component', () => {
 				})
 			})
 
-			describe('when response contains error', () => {
-				beforeEach(() => {
-					jest.runOnlyPendingTimers()
-					postCreateAssignmentResolve({
-						error: true
-					})
-				})
+			const testCases = [
+				{ error: 'EAIFailure', message: 'Dependent services failed, please try again. If you continue to experience this error, please contact client services.' },
+				{ error: 'NetworkFailure', message: 'GoFNOL failed because it was unable to reach a dependent service, please try again. If you continue to experience this error, please contact client services.' },
+				{ error: 'APIFailure', message: 'The API layer encountered an error, please try again. If you continue to experience this error, please contact client services.' },
+				{ error: 'ClientFailure', message: 'The client app encountered an error, please try again. If you continue to experience this error, please contact client services.' }
+			]
 
-				it('should render it and enable create button', () => {
-					expect(fixture.find('.error').text()).toBe('GoFNOL failed, please resubmit.')
-					expect(fixture.find('button.create').props().disabled).toBeFalsy()
-					expect(fixture.find('.time-elapsed').exists()).toBeFalsy()
-				})
-
-				describe('clicking Create button again', () => {
+			for (let testCase of testCases) {
+				describe(`when response contains ${testCase.error} error`, () => {
 					beforeEach(() => {
-						fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
 						jest.runOnlyPendingTimers()
+						postCreateAssignmentReject(new Error(testCase.error))
 					})
 
-					it('should hide error', () => {
-						expect(fixture.find('.error').exists()).toBeFalsy()
-						expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
+					it('should render it and enable create button', () => {
+						expect(fixture.find('.error').text()).toBe(testCase.message)
+						expect(fixture.find('button.create').props().disabled).toBeFalsy()
+						expect(fixture.find('.time-elapsed').exists()).toBeFalsy()
+					})
+
+					describe('clicking Create button again', () => {
+						beforeEach(() => {
+							fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+							jest.runOnlyPendingTimers()
+						})
+
+						it('should hide error', () => {
+							expect(fixture.find('.error').exists()).toBeFalsy()
+							expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
+						})
 					})
 				})
-			})
+			}
 		})
 
 		describe('entering lower cased chars as claim number and bluring input focus', () => {
@@ -225,8 +236,8 @@ describe('Home component', () => {
 			})
 
 			it('should make an Api call', () => {
-				expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
-				expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0].deductible).toBe('W')
+				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
+				expect(mockApi.postCreateAssignment.mock.calls[0][0].deductible).toBe('W')
 			})
 		})
 
@@ -237,8 +248,8 @@ describe('Home component', () => {
 			})
 
 			it('should make an Api call', () => {
-				expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
-				expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0].mobileFlowIndicator).toBe('Y')
+				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
+				expect(mockApi.postCreateAssignment.mock.calls[0][0].mobileFlowIndicator).toBe('Y')
 			})
 		})
 
@@ -249,8 +260,8 @@ describe('Home component', () => {
 			})
 
 			it('should make an Api call', () => {
-				expect(mockApi.postCreateAssignmentRequest).toHaveBeenCalledTimes(1)
-				expect(mockApi.postCreateAssignmentRequest.mock.calls[0][0].mobileFlowIndicator).toBe('N')
+				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
+				expect(mockApi.postCreateAssignment.mock.calls[0][0].mobileFlowIndicator).toBe('N')
 			})
 		})
 	})

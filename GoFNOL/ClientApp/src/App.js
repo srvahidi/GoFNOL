@@ -19,15 +19,16 @@ export default class App extends Component {
 	}
 
 	getEnvironmentName = () => {
-		if (window.location.href.indexOf('-acceptance') !== -1) {
+		const href = this.props.getWindowLocation().href
+		if (href.indexOf('-acceptance') !== -1) {
 			return 'Acceptance'
 		}
 
-		if (window.location.href.indexOf('-int') !== -1) {
+		if (href.indexOf('-int') !== -1) {
 			return 'Int'
 		}
 
-		if (window.location.href.indexOf('-demo') !== -1) {
+		if (href.indexOf('-demo') !== -1) {
 			return 'Demo'
 		}
 

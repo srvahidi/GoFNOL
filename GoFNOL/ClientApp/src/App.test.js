@@ -7,7 +7,7 @@ describe('App component', () => {
 	let fixture
 
 	beforeEach(() => {
-		fixture = shallow(<App />)
+		fixture = shallow(<App getWindowLocation={() => ({ href: 'http://localhost' })} />)
 	})
 
 	it('should render local as environment name', () => {
@@ -18,11 +18,7 @@ describe('App component', () => {
 describe('App component in acceptance environment', () => {
 	let fixture
 	beforeEach(() => {
-		Object.defineProperty(window.location, 'href', {
-			writable: true,
-			value: 'http://gofnol-acceptance.domain'
-		})
-		fixture = shallow(<App />)
+		fixture = shallow(<App getWindowLocation={() => ({ href: 'http://gofnol-acceptance.domain' })} />)
 	})
 
 	it('should render acceptance as environment name', () => {
@@ -33,11 +29,7 @@ describe('App component in acceptance environment', () => {
 describe('App component in int environment', () => {
 	let fixture
 	beforeEach(() => {
-		Object.defineProperty(window.location, 'href', {
-			writable: true,
-			value: 'http://gofnol-int.domain'
-		})
-		fixture = shallow(<App />)
+		fixture = shallow(<App getWindowLocation={() => ({ href: 'http://gofnol-int.domain' })} />)
 	})
 
 	it('should render int as environment name', () => {
@@ -48,11 +40,7 @@ describe('App component in int environment', () => {
 describe('App component in demo environment', () => {
 	let fixture
 	beforeEach(() => {
-		Object.defineProperty(window.location, 'href', {
-			writable: true,
-			value: 'http://gofnol-demo.domain'
-		})
-		fixture = shallow(<App />)
+		fixture = shallow(<App getWindowLocation={() => ({ href: 'http://gofnol-demo.domain' })} />)
 	})
 
 	it('should render demo as environment name', () => {

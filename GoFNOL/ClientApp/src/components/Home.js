@@ -22,6 +22,7 @@ export class Home extends Component {
 			lastName: '',
 			phoneNumber: '',
 			zipCode: '',
+			city: '',
 			state: '',
 			email: '',
 			vin: '',
@@ -81,6 +82,10 @@ export class Home extends Component {
 						<label>ZIP Code</label>
 						<input type="text" name="zip-code" placeholder="ZIP Code" value={this.state.zipCode} onChange={e => this.setState({ zipCode: e.currentTarget.value })} />
 					</div>
+					<div className="city">
+						<label>City</label>
+						<input type="text" name="city" placeholder="City" value={this.state.city} onChange={e => this.setState({ city: e.currentTarget.value })} />
+					</div>
 					<div className="state">
 						<label>State</label>
 						<input type="text" name="state" placeholder="State" value={this.state.state} onChange={e => this.setState({ state: e.currentTarget.value })} />
@@ -130,6 +135,7 @@ export class Home extends Component {
 				phoneNumber: this.state.phoneNumber,
 				email: this.state.email,
 				address: {
+					city: this.state.city,
 					zipCode: this.state.zipCode,
 					state: this.state.state
 				}
@@ -138,6 +144,12 @@ export class Home extends Component {
 			lossType: this.state.lossType,
 			deductible: this.state.deductibleWaived ? 'W' : this.state.deductible
 		}
+
+		if (!request.owner.address.city) {
+			this.setState({ errorMessage: 'City is a required field. Please update and resubmit.' })
+			return
+		}
+
 		this.setState({
 			inProgress: true,
 			stopwatchSeconds: 0,

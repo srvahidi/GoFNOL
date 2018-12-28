@@ -85,6 +85,10 @@ describe('Home component', () => {
 			expect(zipCode.find('label').text()).toBe('ZIP Code')
 			expect(zipCode.find('input').props().placeholder).toBe('ZIP Code')
 
+			const city = form.find('.city')
+			expect(city.find('label').text()).toBe('City')
+			expect(city.find('input').props().placeholder).toBe('City')
+
 			const state = form.find('.state')
 			expect(state.find('label').text()).toBe('State')
 			expect(state.find('input').props().placeholder).toBe('State')
@@ -108,6 +112,18 @@ describe('Home component', () => {
 			expect(deductible.find('input.deductible-value').props().placeholder).toBe('Deductible')
 		})
 
+		describe('clicking Create button without entered city value', () => {
+			beforeEach(() => {
+				const form = fixture.find('.form')
+				form.simulate('submit', { preventDefault: jest.fn() })
+			})
+
+			it('should NOT make an Api call and should display error message', () => {
+				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(0)
+				expect(fixture.find('.error').text()).toBe('City is a required field. Please update and resubmit.')
+			})
+		})
+
 		describe('filling out all inputs and clicking Create button', () => {
 			beforeEach(() => {
 				const form = fixture.find('.form')
@@ -116,6 +132,7 @@ describe('Home component', () => {
 				form.find('.last-name input').simulate('change', { currentTarget: { value: 'nst name' } })
 				form.find('.phone-number input').simulate('change', { currentTarget: { value: '(012) 345 67-89' } })
 				form.find('.zip-code input').simulate('change', { currentTarget: { value: '34567' } })
+				form.find('.city input').simulate('change', { currentTarget: { value: 'Cityville' } })
 				form.find('.state input').simulate('change', { currentTarget: { value: 'ST' } })
 				form.find('.email input').simulate('change', { currentTarget: { value: 'a@b.c' } })
 				form.find('.vin input').simulate('change', { currentTarget: { value: '0123456789ABCDEFG' } })
@@ -135,6 +152,7 @@ describe('Home component', () => {
 						phoneNumber: '(012) 345 67-89',
 						email: 'a@b.c',
 						address: {
+							city: 'Cityville',
 							zipCode: '34567',
 							state: 'ST'
 						}
@@ -229,39 +247,46 @@ describe('Home component', () => {
 			})
 		})
 
-		describe('checking waive deductible and clicking Create button', () => {
+
+		describe('filling out all required fields', () => {
 			beforeEach(() => {
-				fixture.find('.form .deductible input.deductible-waive').simulate('change')
-				fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+				fixture.find('.form .city input').simulate('change', { currentTarget: { value: 'Cityville' } })
 			})
 
-			it('should make an Api call', () => {
-				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
-				expect(mockApi.postCreateAssignment.mock.calls[0][0].deductible).toBe('W')
-			})
-		})
+			describe('checking waive deductible and clicking Create button', () => {
+				beforeEach(() => {
+					fixture.find('.form .deductible input.deductible-waive').simulate('change')
+					fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+				})
 
-		describe('selecting "pocket estimate" as mobile flow indicator and clicking Create button', () => {
-			beforeEach(() => {
-				fixture.find('.form .mobile-flow-ind select').simulate('change', { target: { value: 'Y' } })
-				fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
-			})
-
-			it('should make an Api call', () => {
-				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
-				expect(mockApi.postCreateAssignment.mock.calls[0][0].mobileFlowIndicator).toBe('Y')
-			})
-		})
-
-		describe('selecting "not mobile" as mobile flow indicator and clicking Create button', () => {
-			beforeEach(() => {
-				fixture.find('.form .mobile-flow-ind select').simulate('change', { target: { value: 'N' } })
-				fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+				it('should make an Api call', () => {
+					expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
+					expect(mockApi.postCreateAssignment.mock.calls[0][0].deductible).toBe('W')
+				})
 			})
 
-			it('should make an Api call', () => {
-				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
-				expect(mockApi.postCreateAssignment.mock.calls[0][0].mobileFlowIndicator).toBe('N')
+			describe('selecting "pocket estimate" as mobile flow indicator and clicking Create button', () => {
+				beforeEach(() => {
+					fixture.find('.form .mobile-flow-ind select').simulate('change', { target: { value: 'Y' } })
+					fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+				})
+
+				it('should make an Api call', () => {
+					expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
+					expect(mockApi.postCreateAssignment.mock.calls[0][0].mobileFlowIndicator).toBe('Y')
+				})
+			})
+
+			describe('selecting "not mobile" as mobile flow indicator and clicking Create button', () => {
+				beforeEach(() => {
+					fixture.find('.form .mobile-flow-ind select').simulate('change', { target: { value: 'N' } })
+					fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+				})
+
+				it('should make an Api call', () => {
+					expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
+					expect(mockApi.postCreateAssignment.mock.calls[0][0].mobileFlowIndicator).toBe('N')
+				})
 			})
 		})
 	})

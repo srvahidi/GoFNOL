@@ -3,7 +3,8 @@ applications:
 - name: GoFNOL-blue
   memory: 256M
   buildpack: dotnet_core_buildpack_latest
-  host: [HOST_NAME]
+  routes:
+  - route: gofnol-[ENV]-blue.[DOMAIN]
   services:
   - EAI
   - IS

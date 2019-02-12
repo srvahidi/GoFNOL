@@ -14,7 +14,7 @@ resources:
     username: ((vm-harbor-user))
     password: ((vm-harbor-pass))
     tag: latest
-    repository: ((vm-harbor-addr))/gdc/gofnol-default-image
+    repository: ((vm-harbor-addr))/gdc/gofnol-utility-image
 
 - name: GoFNOL-artifactory
   type: artifactory
@@ -52,13 +52,14 @@ jobs:
       outputs:
       - name: deployables
       run:
-        path: bash
+        path: sh
         args:
         - -exc
         - |
           zip_file=GoFNOL-*.zip
           unzip ./GoFNOL-artifactory/${zip_file} -d ./deployables
-          sed -i -e "s/\[HOST_NAME\]/gofnol-demo-blue/" ./deployables/manifest.yml
+          sed -i -e "s/\[ENV\]/demo/" ./deployables/manifest.yml
+          sed -i -e "s/\[DOMAIN\]/audatex.com/" ./deployables/manifest.yml
   - put: GoFNOL-cf-demo
     params:
       manifest: deployables/manifest.yml
@@ -80,7 +81,7 @@ jobs:
     config:
       platform: linux
       run:
-        path: bash
+        path: sh
         args:
         - -ec
         - |
@@ -110,7 +111,7 @@ jobs:
           set -x
 
           #verify auth redirect location
-          location_path=$(echo "$response" | grep Location: | sed -e 's/Location: //' | sed -e 's/\?.*//')
+          location_path=$(echo "$response" | grep Location: | sed -e 's/Location: //' | sed -e 's/?.*//')
           if [ "$location_path" != "${expected_redirect_url}/connect/authorize" ]
           then
             echo "App did not respond with correct redirect as expected"
@@ -133,12 +134,12 @@ jobs:
     config:
       platform: linux
       run:
-        path: bash
+        path: sh
         args:
         - -exc
         - |
           cf login -a ${api} -u ${username} -p ${password} -o "${organization}" -s "${space}"
-          cf map-route GoFNOL-blue apps-prod.gp2.axadmin.net --hostname gofnol-demo
+          cf map-route GoFNOL-blue audatex.com --hostname gofnol-demo
           cf delete GoFNOL -f || true
-          cf unmap-route GoFNOL-blue apps-prod.gp2.axadmin.net --hostname gofnol-demo-blue
+          cf unmap-route GoFNOL-blue audatex.com --hostname gofnol-demo-blue
           cf rename GoFNOL-blue GoFNOL

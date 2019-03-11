@@ -26,7 +26,7 @@ namespace GoFNOL
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-			
+
 			var environmentConfiguration = new EnvironmentConfiguration(configuration);
 			services.TryAddSingleton<IEnvironmentConfiguration>(environmentConfiguration);
 			services.TryAddSingleton<IHTTPService, HTTPService>();
@@ -72,6 +72,8 @@ namespace GoFNOL
 			{
 				app.UseExceptionHandler("/Error");
 			}
+
+			app.UseMiddleware<HealthCheckMiddleware>();
 
 			if (hostingEnvironment.IsProduction())
 			{

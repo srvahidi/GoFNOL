@@ -42,23 +42,27 @@ export class Home extends Component {
 	}
 
 	render() {
-		if (typeof this.state.profileId === "undefined") {
+		const { profileId } = this.state
+
+		if (typeof profileId === 'undefined') {
 			return <div className="status-message">Requesting NGP data. Please wait.</div>
 		}
 
-		if (this.state.profileId === null) {
+		if (profileId === null) {
 			return <div className="status-message">GoFNOL is unavailable because there is no Profile ID. Please use the Appraiser's credentials for this organization.</div>
 		}
 
+		const isStateFarm = profileId.toString().trim().toLowerCase().startsWith('477')
+
 		return (
 			<React.Fragment>
-				<h2 className="profile-label">Create Claim for Profile: {this.state.profileId}</h2>
+				<h2 className="profile-label">Create Claim for Profile: {profileId}</h2>
 				<form className="form" onSubmit={this.onFormSubmit}>
 					<div className="mobile-flow-ind">
 						<label>Mobile Flow Indicator</label>
 						<select onChange={e => this.setState({ mobileFlowIndicator: e.target.value })} value={this.state.mobileFlowIndicator}>
 							<option value={'D'}>Digital Garage Claims (D)</option>
-							<option value={'Y'}>Pocket Estimate (Y)</option>
+							<option value={'Y'}>{isStateFarm ? 'Pocket Estimate (Y)' : 'GoTime Driver (Y)' }</option>
 							<option value={'N'}>Not Mobile (N)</option>
 						</select>
 					</div>

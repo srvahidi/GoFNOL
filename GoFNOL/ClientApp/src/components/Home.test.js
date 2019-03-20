@@ -44,14 +44,14 @@ describe('Home component', () => {
 		})
 	})
 
-	describe('when profileId is returned', () => {
+	describe('when profileId starting with 477 is returned', () => {
 		beforeEach(() => {
-			getUserDataResolve({ profileId: 'PROF123' })
+			getUserDataResolve({ profileId: '4774PE200001' })
 		})
 
 		it('should render profile data', () => {
 			expect(fixture.find('.status-message').exists()).toBe(false)
-			expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: PROF123')
+			expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: 4774PE200001')
 		})
 
 		it('should render all inputs', () => {
@@ -143,7 +143,7 @@ describe('Home component', () => {
 			it('should make an Api call', () => {
 				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
 				expect(mockApi.postCreateAssignment.mock.calls[0][0]).toEqual({
-					profileId: 'PROF123',
+					profileId: '4774PE200001',
 					mobileFlowIndicator: 'D',
 					claimNumber: 'ABC-123',
 					owner: {
@@ -288,6 +288,29 @@ describe('Home component', () => {
 					expect(mockApi.postCreateAssignment.mock.calls[0][0].mobileFlowIndicator).toBe('N')
 				})
 			})
+		})
+	})
+
+	describe('when profileId that does NOT start with 477 is returned', () => {
+		beforeEach(() => {
+			getUserDataResolve({ profileId: 'PROF123' })
+		})
+
+		it('should render profile data', () => {
+			expect(fixture.find('.status-message').exists()).toBe(false)
+			expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: PROF123')
+		})
+
+		it('should render all inputs', () => {
+			const form = fixture.find('.form')
+
+			const mobileFlowIndicator = form.find('.mobile-flow-ind')
+			expect(mobileFlowIndicator.find('label').text()).toBe('Mobile Flow Indicator')
+			const mobileFlowIndicatorOptions = mobileFlowIndicator.find('option')
+			expect(mobileFlowIndicatorOptions.length).toBe(3)
+			expect(mobileFlowIndicatorOptions.at(0).text()).toBe('Digital Garage Claims (D)')
+			expect(mobileFlowIndicatorOptions.at(1).text()).toBe('GoTime Driver (Y)')
+			expect(mobileFlowIndicatorOptions.at(2).text()).toBe('Not Mobile (N)')
 		})
 	})
 })

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -34,11 +35,34 @@ namespace GoFNOL.tests.Unit
 			const string ngpUsersEndpoint = "http://ng.p/users";
 			mockEnvironmentConfiguration.SetupGet(c => c.NGPUsersEndpoint).Returns(ngpUsersEndpoint);
 
+			var payloadXml = $@"<xmldata>
+  <users>
+    <user>
+      <roles>
+        <role>
+          <role_type>Estimate Reviewer</role_type>
+          <ext_identity>NULL</ext_identity>
+          <role_logical_delete_flg>N</role_logical_delete_flg>
+        </role>
+        <role>
+          <role_type>Appraiser</role_type>
+          <ext_identity>sam456</ext_identity>
+          <role_logical_delete_flg>Y</role_logical_delete_flg>
+        </role>
+        <role>
+          <role_type>Appraiser</role_type>
+          <ext_identity>{userProfileId}</ext_identity>
+          <role_logical_delete_flg>N</role_logical_delete_flg>
+        </role>
+      </roles>
+    </user>
+  </users>
+</xmldata>";
 			var ngpResponse = $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <soap:Envelope xmlns:soap=""http://www.w3.org/2003/05/soap-envelope"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
     <soap:Body>
         <GetUserByExactUidResponse xmlns=""http://ngp.audatex.com/"">
-            <GetUserByExactUidResult>&lt;xmldata&gt;&lt;users&gt;&lt;user&gt;&lt;roles&gt;&lt;role&gt;&lt;role_type&gt;Estimate Reviewer&lt;/role_type&gt;&lt;ext_identity&gt;NULL&lt;/ext_identity&gt;&lt;/role&gt;&lt;role&gt;&lt;role_type&gt;Appraiser&lt;/role_type&gt;&lt;ext_identity&gt;{userProfileId}&lt;/ext_identity&gt;&lt;/role&gt;&lt;/roles&gt;&lt;/user&gt;&lt;/users&gt;&lt;/xmldata&gt;</GetUserByExactUidResult>
+            <GetUserByExactUidResult>{WebUtility.HtmlEncode(payloadXml)}</GetUserByExactUidResult>
         </GetUserByExactUidResponse>
     </soap:Body>
 </soap:Envelope>";
@@ -46,7 +70,7 @@ namespace GoFNOL.tests.Unit
 			(Uri actualUri, HttpContent actualContent)? actualRequest = null;
 			mockHTTPService.Setup(s => s.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
 				.Callback<Uri, HttpContent>((uri, content) => actualRequest = (uri, content))
-				.ReturnsAsync(new HttpResponseMessage { Content = new StringContent(ngpResponse) });
+				.ReturnsAsync(new HttpResponseMessage {Content = new StringContent(ngpResponse)});
 
 			// Execute
 			var actual = await fixture.GetUserProfileIdAsync(username);

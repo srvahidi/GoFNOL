@@ -47,7 +47,7 @@ namespace GoFNOL.Services
 			var innerPayload = xBody.Element(ngpNs + "GetUserByExactUidResponse").Element(ngpNs + "GetUserByExactUidResult").Value;
 			var xPayload = XDocument.Parse(innerPayload);
 			var xRoles = xPayload.XPathSelectElements("//xmldata/users/user[1]/roles/role");
-			var xRole = xRoles.Where(x => x.Element("role_type").Value == "Appraiser").ToArray();
+			var xRole = xRoles.Where(x => x.Element("role_type").Value == "Appraiser" && x.Element("role_logical_delete_flg").Value != "Y").ToArray();
 			if (xRole.Length == 0)
 			{
 				logger.LogError("Appraiser role was not found in NGP response");

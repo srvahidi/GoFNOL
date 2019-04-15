@@ -7,29 +7,32 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using GoFNOL.Models;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace GoFNOL.Services
 {
 	public class FNOLService : IFNOLService
 	{
-		private const string _AssignmentResourceName = "GoFNOL.Assets.assignment.xml";
+		private const string AssignmentResourceName = "GoFNOL.Assets.assignment.xml";
 
-		private const string _EAIRequestResourceName = "GoFNOL.Assets.request.xml";
+		private const string EAIRequestResourceName = "GoFNOL.Assets.request.xml";
 
-		private const string _FixedContactPhoneType = "CP";
+		private readonly XNamespace _soapNamespace = "http://schemas.xmlsoap.org/soap/envelope/";
 
-		private readonly XNamespace _SOAPNamespace = "http://schemas.xmlsoap.org/soap/envelope/";
+		private readonly XNamespace _adpNamespace = "http://csg.adp.com";
 
-		private readonly XNamespace _ADPNamespace = "http://csg.adp.com";
+		private readonly IHTTPService _client;
 
-		private readonly IHTTPService _Client;
+		private readonly IEnvironmentConfiguration _environmentConfiguration;
 
-		private readonly IEnvironmentConfiguration _EnvironmentConfiguration;
+		private readonly ILogger<FNOLService> _logger;
 
-		public FNOLService(IHTTPService client, IEnvironmentConfiguration environmentConfiguration)
+		public FNOLService(IHTTPService client, IEnvironmentConfiguration environmentConfiguration, ILogger<FNOLService> logger)
 		{
-			_Client = client;
-			_EnvironmentConfiguration = environmentConfiguration;
+			_client = client;
+			_environmentConfiguration = environmentConfiguration;
+			_logger = logger;
 		}
 
 		/// <summary>
@@ -39,45 +42,48 @@ namespace GoFNOL.Services
 
 		public async Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest)
 		{
+			_logger.LogInformation($"Creating an assignment for request {JsonConvert.SerializeObject(fnolRequest, Formatting.None)}");
 			var fnolData = SetAssignmentValues(fnolRequest);
 			var eaiResponseString = await ExecuteEAIRequest(fnolData);
 
 			var workAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value;
+			_logger.LogInformation($"New assignment waId = '{workAssignmentId}'");
 			if (string.IsNullOrEmpty(workAssignmentId)) throw new EAIException();
 			return new FNOLResponse(workAssignmentId);
 		}
 
 		private async Task<string> ExecuteEAIRequest(XDocument payload)
 		{
-			var xEAIRequest = XDocument.Parse(ReadResource(_EAIRequestResourceName));
+			var xEAIRequest = XDocument.Parse(ReadResource(EAIRequestResourceName));
 
-			xEAIRequest.Element(_SOAPNamespace + "Envelope")
-				.Element(_SOAPNamespace + "Body")
-				.Element(_ADPNamespace + "Transmit")
-				.Element(_ADPNamespace + "parameters")
+			xEAIRequest.Element(_soapNamespace + "Envelope")
+				.Element(_soapNamespace + "Body")
+				.Element(_adpNamespace + "Transmit")
+				.Element(_adpNamespace + "parameters")
 				.Value = payload.ToString();
 
-			var xHeader = xEAIRequest.Element(_SOAPNamespace + "Envelope")
-				.Element(_SOAPNamespace + "Header")
-				.Element(_ADPNamespace + "SOAPHeader");
+			var xHeader = xEAIRequest.Element(_soapNamespace + "Envelope")
+				.Element(_soapNamespace + "Header")
+				.Element(_adpNamespace + "SOAPHeader");
 
-			xHeader.Element(_ADPNamespace + "Client").Value = _EnvironmentConfiguration.EAIUsername;
-			xHeader.Element(_ADPNamespace + "Passphrase").Value = _EnvironmentConfiguration.EAIPassword;
+			xHeader.Element(_adpNamespace + "Client").Value = _environmentConfiguration.EAIUsername;
+			xHeader.Element(_adpNamespace + "Passphrase").Value = _environmentConfiguration.EAIPassword;
 
-			using (var response = await _Client.PostAsync(new Uri(_EnvironmentConfiguration.EAIEndpoint), new EAIRequest(xEAIRequest.ToString())))
+			using (var response = await _client.PostAsync(new Uri(_environmentConfiguration.EAIEndpoint), new EAIRequest(xEAIRequest.ToString())))
 			{
+				_logger.LogInformation($"EAI response status = {response.StatusCode}");
 				return await response.Content.ReadAsStringAsync();
 			}
 		}
 
 		private XDocument SetAssignmentValues(FNOLRequest fnolRequest)
 		{
-			var xAssignment = XDocument.Parse(ReadResource(_AssignmentResourceName));
+			var xAssignment = XDocument.Parse(ReadResource(AssignmentResourceName));
 
 			// NOTE: Processing meta information
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value = fnolRequest.MobileFlowIndicator;
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/COMPANY_ID").Value = fnolRequest.ProfileId.Substring(0,3);
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/OFFICE_ID").Value = fnolRequest.ProfileId.Substring(0,7);
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/COMPANY_ID").Value = fnolRequest.ProfileId.Substring(0, 3);
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/OFFICE_ID").Value = fnolRequest.ProfileId.Substring(0, 7);
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/USER_ID").Value = fnolRequest.ProfileId;
 
 			// NOTE: Claim information
@@ -97,7 +103,6 @@ namespace GoFNOL.Services
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_CONTACT_EMAIL").Value = fnolRequest.Owner.Email;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_LAST_NAME").Value = fnolRequest.Owner.LastName;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_FIRST_NAME").Value = fnolRequest.Owner.FirstName;
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_PHONE_TYPE_1").Value = _FixedContactPhoneType;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_PHONE_NBR_1").Value = fnolRequest.Owner.PhoneNumber;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_EMAIL").Value = fnolRequest.Owner.Email;
 

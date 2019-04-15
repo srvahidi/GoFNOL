@@ -20,6 +20,7 @@ namespace GoFNOL.Controllers
 			}
 
 			var userProfileId = await ngpService.GetUserProfileIdAsync(subClaim.Value);
+			logger.LogInformation($"Profile id = {userProfileId} returned for user id = {subClaim.Value}");
 			var userData = new JObject
 			{
 				["profileId"] = userProfileId

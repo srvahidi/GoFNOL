@@ -11,21 +11,22 @@ namespace GoFNOL.Services
 {
 	public class NGPService : INGPService
 	{
-		private readonly IEnvironmentConfiguration envConfig;
+		private readonly IEnvironmentConfiguration _envConfig;
 
-		private readonly IHTTPService httpService;
+		private readonly IHTTPService _httpService;
 
-		private readonly ILogger<NGPService> logger;
+		private readonly ILogger<NGPService> _logger;
 
 		public NGPService(IEnvironmentConfiguration envConfig, IHTTPService httpService, ILogger<NGPService> logger)
 		{
-			this.envConfig = envConfig;
-			this.httpService = httpService;
-			this.logger = logger;
+			_envConfig = envConfig;
+			_httpService = httpService;
+			_logger = logger;
 		}
 
 		public async Task<string> GetUserProfileIdAsync(string userUid)
 		{
+			_logger.LogInformation($"Getting profileId for user = {userUid}");
 			var request = $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <soap12:Envelope xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:soap12=""http://www.w3.org/2003/05/soap-envelope"">
   <soap12:Body>
@@ -38,7 +39,8 @@ namespace GoFNOL.Services
 </soap12:Envelope>";
 			var requestContent = new StringContent(request);
 			requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/soap+xml");
-			var response = await httpService.PostAsync(new Uri(envConfig.NGPUsersEndpoint), requestContent);
+			var response = await _httpService.PostAsync(new Uri(_envConfig.NGPUsersEndpoint), requestContent);
+			_logger.LogInformation($"NGP response status = {response.StatusCode}");
 			var content = await response.Content.ReadAsStringAsync();
 			var xContent = XDocument.Parse(content);
 			XNamespace soapNs = "http://www.w3.org/2003/05/soap-envelope";
@@ -50,11 +52,11 @@ namespace GoFNOL.Services
 			var xRole = xRoles.Where(x => x.Element("role_type").Value == "Appraiser" && x.Element("role_logical_delete_flg").Value != "Y").ToArray();
 			if (xRole.Length == 0)
 			{
-				logger.LogError("Appraiser role was not found in NGP response");
+				_logger.LogError("Appraiser role was not found in NGP response");
 			}
 			else if (xRole.Length > 1)
 			{
-				logger.LogError("More than one appraiser role was found in NGP response");
+				_logger.LogError("More than one appraiser role was found in NGP response");
 			}
 
 			return xRole.Single().Element("ext_identity").Value;

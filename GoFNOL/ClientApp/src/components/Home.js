@@ -14,7 +14,9 @@ export class Home extends Component {
 
 	constructor(props) {
 		super(props)
-		this.api = props.api ? props.api : getApi()
+		const { api, environment } = props
+		this.api = api || getApi()
+		this.environment = environment
 		this.state = {
 			mobileFlowIndicator: 'D',
 			claimNumber: '',
@@ -28,7 +30,8 @@ export class Home extends Component {
 			vin: '',
 			lossType: 'COLL',
 			deductibleWaived: false,
-			deductible: ''
+			deductible: '',
+			isStayingInProgress : false
 		}
 	}
 
@@ -114,6 +117,15 @@ export class Home extends Component {
 							<input type="text" name="deductible" className="deductible-value" placeholder="Deductible" value={this.state.deductible} onChange={e => this.setState({ deductible: e.currentTarget.value })} />
 						</div>
 					</div>
+					{this.environment !== 'Int' && <div className="estimate-destination">
+						<label>Estimate Destination</label>
+						<div>
+							<span className="adxe-label">ADXE Worklist</span>
+							<input type="checkbox" className="estimate-destination-adxe" checked={this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: !this.state.isStayingInProgress }) }} />
+							<span className="review-pool-label">Review Pool</span>
+							<input type="checkbox" className="estimate-destination-review" checked={!this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: !this.state.isStayingInProgress }) }} />
+						</div>
+					</div>}
 					<button type="submit" className="create shadowed" disabled={this.state.inProgress}>Create</button>
 				</form>
 				{this.state.stopwatchSeconds > 0 && <span className="time-elapsed">{this.state.inProgress ? `Elapsed time: ${this.state.stopwatchSeconds} seconds.` : `GoFNOL took ${this.state.stopwatchSeconds} seconds to create the assignment.`}</span>}

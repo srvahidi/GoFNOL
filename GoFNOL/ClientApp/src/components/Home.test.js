@@ -1,9 +1,9 @@
 import React from 'react'
 import { shallow } from 'enzyme'
+
 import { Home } from './Home.js'
 
 describe('Home component', () => {
-
 	let fixture
 	let mockApi
 	let postCreateAssignmentResolve
@@ -110,6 +110,13 @@ describe('Home component', () => {
 			expect(deductible.find('label').text()).toBe('Deductible')
 			expect(deductible.find('.waive-label').text()).toBe('Waive')
 			expect(deductible.find('input.deductible-value').props().placeholder).toBe('Deductible')
+
+			const estimateDestination = form.find('.estimate-destination')
+			expect(estimateDestination.find('label').text()).toBe('Estimate Destination')
+			expect(estimateDestination.find('.adxe-label').text()).toBe('ADXE Worklist')
+			expect(estimateDestination.find('input.estimate-destination-adxe').props().checked).toBe(false)
+			expect(estimateDestination.find('.review-pool-label').text()).toBe('Review Pool')
+			expect(estimateDestination.find('input.estimate-destination-review').props().checked).toBe(true)
 		})
 
 		describe('clicking Create button without entered city value', () => {
@@ -142,6 +149,8 @@ describe('Home component', () => {
 
 			it('should make an Api call', () => {
 				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
+
+				// TODO: ajw - Apr. 24 2019; Ensure Api call passes new isStayingInProgress boolean value
 				expect(mockApi.postCreateAssignment.mock.calls[0][0]).toEqual({
 					profileId: '4774PE200001',
 					mobileFlowIndicator: 'D',
@@ -163,7 +172,7 @@ describe('Home component', () => {
 				})
 			})
 
-			it('should diable create button and display elapsed time', () => {
+			it('should disable create button and display elapsed time', () => {
 				expect(fixture.find('button.create').props().disabled).toBeTruthy()
 				jest.runOnlyPendingTimers()
 				expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')

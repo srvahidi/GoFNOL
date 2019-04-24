@@ -13,7 +13,7 @@ export default class App extends Component {
 				</form>
 			</header>
 			<div className="content">
-				<Route exact path='/' component={Home} />
+				<Route exact path='/' render={props => <Home {...props} environment={this.getEnvironmentName()} />} />
 			</div>
 		</React.Fragment>
 	}

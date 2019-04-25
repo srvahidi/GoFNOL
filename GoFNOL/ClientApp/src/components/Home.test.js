@@ -169,7 +169,7 @@ describe('Home component', () => {
 					vin: '0123456789ABCDEFG',
 					lossType: 'COLL',
 					deductible: '500',
-					isStayingInProgress: true
+					isStayingInProgress: false
 				})
 			})
 

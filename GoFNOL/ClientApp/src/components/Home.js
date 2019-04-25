@@ -122,9 +122,9 @@ export class Home extends Component {
 						<label>Estimate Destination</label>
 						<div>
 							<span className="adxe-label">ADXE Worklist</span>
-							<input type="radio" className="estimate-destination-adxe" checked={this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: false }) }} />
+							<input type="radio" className="estimate-destination-adxe" checked={this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: true }) }} />
 							<span className="review-pool-label">Review Pool</span>
-							<input type="radio" className="estimate-destination-review" checked={!this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: true }) }} />
+							<input type="radio" className="estimate-destination-review" checked={!this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: false }) }} />
 						</div>
 					</div>}
 					<button type="submit" className="create shadowed" disabled={this.state.inProgress}>Create</button>

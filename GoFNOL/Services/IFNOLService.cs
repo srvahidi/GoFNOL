@@ -5,8 +5,6 @@ namespace GoFNOL.Services
 {
 	public interface IFNOLService
 	{
-		string FormattedLossDate { get; }
-
 		Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest);
 	}
 }

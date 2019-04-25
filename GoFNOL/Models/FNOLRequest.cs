@@ -15,5 +15,7 @@
 		public Party Owner { get; set; }
 
 		public string ProfileId { get; set; }
+
+		public bool IsStayingInProgress { get; set; }
 	}
 }

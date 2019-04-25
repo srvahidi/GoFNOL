@@ -45,7 +45,8 @@ namespace GoFNOL.tests.Integration
 				},
 				["vin"] = "0123456789ABCDEFG",
 				["lossType"] = "COLL",
-				["deductible"] = "500"
+				["deductible"] = "500",
+				["isStayingInProgress"] = true
 			};
 			requestContent = new StringContent(jRequest.ToString());
 			requestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -67,9 +68,23 @@ namespace GoFNOL.tests.Integration
 			const string expectedEAIUsername = "eai user";
 			const string expectedEAIPassword = "eai pass";
 
+			mockConfig.SetupGet(c => c.A2EDataDiscoveryUri).Returns(new Uri("http://a2e.data"));
 			mockConfig.SetupGet(c => c.EAIEndpoint).Returns(expectedEndpoint);
 			mockConfig.SetupGet(c => c.EAIUsername).Returns(expectedEAIUsername);
 			mockConfig.SetupGet(c => c.EAIPassword).Returns(expectedEAIPassword);
+
+			var jA2EDataDiscoveryDoc = new JObject
+			{
+				["assignmentsInProgress"] = "http://a2e.data/api/assignmentsinprogress"
+			};
+			mockHTTPService.Setup(service => service.GetAsync(new Uri("http://a2e.data")))
+				.ReturnsAsync(new HttpResponseMessage
+				{
+					Content = new StringContent(jA2EDataDiscoveryDoc.ToString())
+				});
+
+			mockHTTPService.Setup(service => service.PutAsync(new Uri("http://a2e.data/api/assignmentsinprogress/123"), It.IsAny<HttpContent>()))
+				.ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
 
 			(Uri uri, HttpContent content)? actualEAI = null;
 			mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))

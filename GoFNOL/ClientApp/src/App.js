@@ -21,17 +21,24 @@ export default class App extends Component {
 	getEnvironmentName = () => {
 		const href = this.props.getWindowLocation().href
 		if (href.indexOf('-acceptance') !== -1) {
-			return 'Acceptance'
+			return Environment.Acceptance
 		}
 
 		if (href.indexOf('-int') !== -1) {
-			return 'Int'
+			return Environment.Int
 		}
 
 		if (href.indexOf('-demo') !== -1) {
-			return 'Demo'
+			return Environment.Demo
 		}
 
-		return 'Local'
+		return Environment.Local
 	}
+}
+
+export const Environment = {
+	Local: 'Local',
+	Acceptance: 'Acceptance',
+	Int: 'Int',
+	Demo: 'Demo'
 }

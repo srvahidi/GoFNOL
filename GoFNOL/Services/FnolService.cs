@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,6 +10,7 @@ using System.Xml.XPath;
 using GoFNOL.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GoFNOL.Services
 {
@@ -35,11 +37,6 @@ namespace GoFNOL.Services
 			_logger = logger;
 		}
 
-		/// <summary>
-		/// Returns the current date using Mountain timezone in the format "yyyy-MM-dd"
-		/// </summary>
-		public string FormattedLossDate => DateTime.UtcNow.ToString("yyyy-MM-dd");
-
 		public async Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest)
 		{
 			_logger.LogInformation($"Creating an assignment for request {JsonConvert.SerializeObject(fnolRequest, Formatting.None)}");
@@ -49,6 +46,11 @@ namespace GoFNOL.Services
 			var workAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value;
 			_logger.LogInformation($"New assignment waId = '{workAssignmentId}'");
 			if (string.IsNullOrEmpty(workAssignmentId)) throw new EAIException();
+			if (fnolRequest.IsStayingInProgress)
+			{
+				await SaveAssignmentAssignmentInProgress(workAssignmentId);
+			}
+
 			return new FNOLResponse(workAssignmentId);
 		}
 
@@ -91,7 +93,7 @@ namespace GoFNOL.Services
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/VEHICLE_VIN").Value = fnolRequest.VIN;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/LOSS_TYPE").Value = fnolRequest.LossType;
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/DEDUCTIBLE_AMT").Value = fnolRequest.Deductible;
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/LOSS_DATE").Value = FormattedLossDate;
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/LOSS_DATE").Value = DateTime.UtcNow.ToString("yyyy-MM-dd");
 
 			// NOTE: Owner information
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_FIRST_NAME").Value = fnolRequest.Owner.FirstName;
@@ -107,6 +109,21 @@ namespace GoFNOL.Services
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_EMAIL").Value = fnolRequest.Owner.Email;
 
 			return xAssignment;
+		}
+
+		private async Task SaveAssignmentAssignmentInProgress(string workAssignmentId)
+		{
+			try
+			{
+				var response = await _client.GetAsync(_environmentConfiguration.A2EDataDiscoveryUri);
+				var jDiscoveryDocument = JObject.Parse(await response.Content.ReadAsStringAsync());
+				var endpoint = jDiscoveryDocument["assignmentsInProgress"].Value<string>();
+				await _client.PutAsync(new Uri($"{endpoint}/{workAssignmentId}"), new StringContent(""));
+			}
+			catch (Exception x)
+			{
+				_logger.LogError(x, $"Failed to save 'In Progress' assignment destination for waid={workAssignmentId}");
+			}
 		}
 
 		private static string ReadResource(string name)

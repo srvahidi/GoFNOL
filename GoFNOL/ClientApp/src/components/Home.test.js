@@ -144,13 +144,13 @@ describe('Home component', () => {
 				form.find('.email input').simulate('change', { currentTarget: { value: 'a@b.c' } })
 				form.find('.vin input').simulate('change', { currentTarget: { value: '0123456789ABCDEFG' } })
 				form.find('.deductible input.deductible-value').simulate('change', { currentTarget: { value: '500' } })
+				form.find('.estimate-destination-review').simulate('change')
 				form.simulate('submit', { preventDefault: jest.fn() })
 			})
 
 			it('should make an Api call', () => {
 				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
 
-				// TODO: ajw - Apr. 24 2019; Ensure Api call passes new isStayingInProgress boolean value
 				expect(mockApi.postCreateAssignment.mock.calls[0][0]).toEqual({
 					profileId: '4774PE200001',
 					mobileFlowIndicator: 'D',
@@ -168,7 +168,8 @@ describe('Home component', () => {
 					},
 					vin: '0123456789ABCDEFG',
 					lossType: 'COLL',
-					deductible: '500'
+					deductible: '500',
+					isStayingInProgress: true
 				})
 			})
 

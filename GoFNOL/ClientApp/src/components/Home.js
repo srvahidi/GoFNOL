@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { getApi } from '../Api'
+import { Environment } from '../App'
 
 import './Home.css'
 
@@ -31,7 +32,7 @@ export class Home extends Component {
 			lossType: 'COLL',
 			deductibleWaived: false,
 			deductible: '',
-			isStayingInProgress : false
+			isStayingInProgress: false
 		}
 	}
 
@@ -65,7 +66,7 @@ export class Home extends Component {
 						<label>Mobile Flow Indicator</label>
 						<select onChange={e => this.setState({ mobileFlowIndicator: e.target.value })} value={this.state.mobileFlowIndicator}>
 							<option value={'D'}>Digital Garage Claims (D)</option>
-							<option value={'Y'}>{isStateFarm ? 'Pocket Estimate (Y)' : 'GoTime Driver (Y)' }</option>
+							<option value={'Y'}>{isStateFarm ? 'Pocket Estimate (Y)' : 'GoTime Driver (Y)'}</option>
 							<option value={'N'}>Not Mobile (N)</option>
 						</select>
 					</div>
@@ -117,13 +118,13 @@ export class Home extends Component {
 							<input type="text" name="deductible" className="deductible-value" placeholder="Deductible" value={this.state.deductible} onChange={e => this.setState({ deductible: e.currentTarget.value })} />
 						</div>
 					</div>
-					{this.environment !== 'Int' && <div className="estimate-destination">
+					{this.environment !== Environment.Int && <div className="estimate-destination">
 						<label>Estimate Destination</label>
 						<div>
 							<span className="adxe-label">ADXE Worklist</span>
-							<input type="checkbox" className="estimate-destination-adxe" checked={this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: !this.state.isStayingInProgress }) }} />
+							<input type="radio" className="estimate-destination-adxe" checked={this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: false }) }} />
 							<span className="review-pool-label">Review Pool</span>
-							<input type="checkbox" className="estimate-destination-review" checked={!this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: !this.state.isStayingInProgress }) }} />
+							<input type="radio" className="estimate-destination-review" checked={!this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: true }) }} />
 						</div>
 					</div>}
 					<button type="submit" className="create shadowed" disabled={this.state.inProgress}>Create</button>
@@ -158,7 +159,8 @@ export class Home extends Component {
 			},
 			vin: this.state.vin,
 			lossType: this.state.lossType,
-			deductible: this.state.deductibleWaived ? 'W' : this.state.deductible
+			deductible: this.state.deductibleWaived ? 'W' : this.state.deductible,
+			isStayingInProgress: this.state.isStayingInProgress
 		}
 
 		if (!request.owner.address.city) {

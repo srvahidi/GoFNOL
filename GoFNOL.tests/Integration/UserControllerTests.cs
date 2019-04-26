@@ -11,25 +11,32 @@ using Xunit;
 
 namespace GoFNOL.tests.Integration
 {
-	public class UserControllerTests
+	public class UserControllerTests : TestServerFixture
 	{
+		private Mock<INGPService> _mockNGPService;
+
+		protected override void RegisterServices(IServiceCollection customServices)
+		{
+			base.RegisterServices(customServices);
+			_mockNGPService = new Mock<INGPService>();
+			customServices.AddSingleton(_mockNGPService.Object);
+		}
+
 		[Fact]
 		public async Task UserDataController_WhenDataGetIsInvoked_ShouldReturnUserData()
 		{
 			// Setup
-			var mockNGPService = new Mock<INGPService>();
 			string actualName = null;
 			const string profileId = "profileid";
-			mockNGPService.Setup(s => s.GetUserProfileIdAsync(It.IsAny<string>()))
+			_mockNGPService.Setup(s => s.GetUserProfileIdAsync(It.IsAny<string>()))
 				.Callback<string>(r => actualName = r)
 				.ReturnsAsync(profileId);
-			var client = Helpers.CreateTestServer(collection => collection.AddSingleton(mockNGPService.Object)).CreateClient();
 
 			// Execute
-			var response = await client.GetAsync("/api/user/data");
+			var response = await Client.GetAsync("/api/user/data");
 
 			// Verify
-			mockNGPService.VerifyAll();
+			_mockNGPService.VerifyAll();
 			response.StatusCode.Should().Be(HttpStatusCode.OK);
 			response.Content.Headers.ContentType.MediaType.Should().Be("application/json");
 			actualName.Should().Be("pe2generic1");
@@ -51,7 +58,7 @@ namespace GoFNOL.tests.Integration
 			var actual = fixture.PostLogout();
 
 			// Verify
-			actual.Should().BeEquivalentTo(new SignOutResult(new[] { "Cookies", "oidc" }));
+			actual.Should().BeEquivalentTo(new SignOutResult(new[] {"Cookies", "oidc"}));
 		}
 	}
 }

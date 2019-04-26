@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +14,7 @@ namespace GoFNOL.tests.Unit
 		public void EnvironmentConfiguration_WhenCreated_ShouldGetValuesFromEnvironment()
 		{
 			// Setup
-			var environmentData = File.ReadAllText("Fixtures/env.json");
+			var environmentData = FixtureFiles.GetFixture("Fixtures/env.json");
 			var mockedConfigRoot = new Mock<IConfigurationRoot>();
 			mockedConfigRoot.Setup(cr => cr["VCAP_SERVICES"]).Returns(environmentData);
 			var environmentConfiguration = new EnvironmentConfiguration(mockedConfigRoot.Object);
@@ -41,7 +40,7 @@ namespace GoFNOL.tests.Unit
 		public void EnvironmentConfiguration_WhenA2EDataIsNotProvided_ShouldSetNull()
 		{
 			// Setup
-			var jEnvironmentData = JObject.Parse(File.ReadAllText("Fixtures/env.json"));
+			var jEnvironmentData = JObject.Parse(FixtureFiles.GetFixture("Fixtures/env.json"));
 			jEnvironmentData["user-provided"].First(e => e["name"].Value<string>() == "a2e-data").Remove();
 			var mockedConfigRoot = new Mock<IConfigurationRoot>();
 			mockedConfigRoot.Setup(cr => cr["VCAP_SERVICES"]).Returns(jEnvironmentData.ToString());

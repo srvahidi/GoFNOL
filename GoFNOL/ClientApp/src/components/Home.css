@@ -43,8 +43,9 @@
 	grid-template-columns: 10em 1fr;
 }
 
+.form .claim-number > .generate-claim-number,
 .form .deductible > div {
-	align-items: center;
+	align-items: baseline;
 	display: grid;
 	grid-gap: 1em;
 	grid-template-columns: auto auto 1fr;

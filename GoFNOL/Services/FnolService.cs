@@ -28,12 +28,19 @@ namespace GoFNOL.Services
 
 		private readonly IEnvironmentConfiguration _environmentConfiguration;
 
+		private readonly ClaimNumberService _claimNumberService;
+
 		private readonly ILogger<FNOLService> _logger;
 
-		public FNOLService(IHTTPService client, IEnvironmentConfiguration environmentConfiguration, ILogger<FNOLService> logger)
+		public FNOLService(
+			IHTTPService client,
+			IEnvironmentConfiguration environmentConfiguration,
+			ClaimNumberService claimNumberService,
+			ILogger<FNOLService> logger)
 		{
 			_client = client;
 			_environmentConfiguration = environmentConfiguration;
+			_claimNumberService = claimNumberService;
 			_logger = logger;
 		}
 
@@ -43,6 +50,8 @@ namespace GoFNOL.Services
 			var fnolData = SetAssignmentValues(fnolRequest);
 			var eaiResponseString = await ExecuteEAIRequest(fnolData);
 
+			var generatedClaimNumber = await _claimNumberService.GetNextClaimNumberAsync();
+
 			var workAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value;
 			_logger.LogInformation($"New assignment waId = '{workAssignmentId}'");
 			if (string.IsNullOrEmpty(workAssignmentId)) throw new EAIException();
@@ -51,7 +60,7 @@ namespace GoFNOL.Services
 				await SaveAssignmentAssignmentInProgress(workAssignmentId);
 			}
 
-			return new FNOLResponse(workAssignmentId);
+			return new FNOLResponse(workAssignmentId, string.IsNullOrEmpty(fnolRequest.ClaimNumber) ? string.Empty : fnolRequest.ClaimNumber);
 		}
 
 		private async Task<string> ExecuteEAIRequest(XDocument payload)

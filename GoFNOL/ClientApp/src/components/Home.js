@@ -32,7 +32,8 @@ export class Home extends Component {
 			lossType: 'COLL',
 			deductibleWaived: false,
 			deductible: '',
-			isStayingInProgress: false
+			isStayingInProgress: false,
+			autoGenerateClaim: false
 		}
 	}
 
@@ -72,7 +73,11 @@ export class Home extends Component {
 					</div>
 					<div className="claim-number">
 						<label>New Claim Number</label>
-						<input type="text" name="claim-number" placeholder="Claim Number" value={this.state.claimNumber} onChange={e => this.setState({ claimNumber: e.currentTarget.value })} onBlur={() => this.setState({ claimNumber: this.state.claimNumber.toUpperCase() })} />
+						<div className="generate-claim-number">
+							<span>Auto Generate</span>
+							<input type="checkbox" checked={this.state.autoGenerateClaim} className="auto-generate-claim" onChange={e => this.setState({ autoGenerateClaim: !this.state.autoGenerateClaim})} />
+							<input type="text" name="claim-number" placeholder="Claim Number" value={this.state.claimNumber} onChange={e => this.setState({ claimNumber: e.currentTarget.value })} onBlur={() => this.setState({ claimNumber: this.state.claimNumber.toUpperCase() })} />
+						</div>
 					</div>
 					<div className="first-name">
 						<label>First Name</label>
@@ -160,7 +165,8 @@ export class Home extends Component {
 			vin: this.state.vin,
 			lossType: this.state.lossType,
 			deductible: this.state.deductibleWaived ? 'W' : this.state.deductible,
-			isStayingInProgress: this.state.isStayingInProgress
+			isStayingInProgress: this.state.isStayingInProgress,
+			autoGenerateClaim: this.state.autoGenerateClaim
 		}
 
 		if (!request.owner.address.city) {

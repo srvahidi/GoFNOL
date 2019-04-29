@@ -54,7 +54,7 @@ describe('Home component', () => {
 			expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: 4774PE200001')
 		})
 
-		it('should render all inputs', () => {
+		it('should render all inputs (w/ Pocket Estimate)', () => {
 			const form = fixture.find('.form')
 
 			const mobileFlowIndicator = form.find('.mobile-flow-ind')
@@ -66,8 +66,12 @@ describe('Home component', () => {
 			expect(mobileFlowIndicatorOptions.at(2).text()).toBe('Not Mobile (N)')
 
 			const claimNumber = form.find('.claim-number')
-			expect(claimNumber.find('label').text()).toBe('New Claim Number')
-			expect(claimNumber.find('input').props().placeholder).toBe('Claim Number')
+			expect(claimNumber.find('label').at(0).text()).toBe('New Claim Number')
+			expect(claimNumber.find('input[type="text"]').props().placeholder).toBe('Claim Number')
+
+			const generateClaimNumber = claimNumber.find('.generate-claim-number')
+			expect(generateClaimNumber.find('span').text()).toBe('Auto Generate')
+			expect(generateClaimNumber.find('input.auto-generate-claim').props().checked).toBe(false)
 
 			const firstName = form.find('.first-name')
 			expect(firstName.find('label').text()).toBe('First Name')
@@ -134,7 +138,7 @@ describe('Home component', () => {
 		describe('filling out all inputs and clicking Create button', () => {
 			beforeEach(() => {
 				const form = fixture.find('.form')
-				form.find('.claim-number input').simulate('change', { currentTarget: { value: 'ABC-123' } })
+				form.find('.claim-number input[name="claim-number"]').simulate('change', { currentTarget: { value: 'ABC-123' } })
 				form.find('.first-name input').simulate('change', { currentTarget: { value: '1st name' } })
 				form.find('.last-name input').simulate('change', { currentTarget: { value: 'nst name' } })
 				form.find('.phone-number input').simulate('change', { currentTarget: { value: '(012) 345 67-89' } })
@@ -144,6 +148,7 @@ describe('Home component', () => {
 				form.find('.email input').simulate('change', { currentTarget: { value: 'a@b.c' } })
 				form.find('.vin input').simulate('change', { currentTarget: { value: '0123456789ABCDEFG' } })
 				form.find('.deductible input.deductible-value').simulate('change', { currentTarget: { value: '500' } })
+				form.find('.auto-generate-claim').simulate('change')
 				form.find('.estimate-destination-review').simulate('change')
 				form.simulate('submit', { preventDefault: jest.fn() })
 			})
@@ -169,7 +174,8 @@ describe('Home component', () => {
 					vin: '0123456789ABCDEFG',
 					lossType: 'COLL',
 					deductible: '500',
-					isStayingInProgress: false
+					isStayingInProgress: false,
+					autoGenerateClaim: true
 				})
 			})
 
@@ -245,15 +251,15 @@ describe('Home component', () => {
 			}
 		})
 
-		describe('entering lower cased chars as claim number and bluring input focus', () => {
+		describe('entering lower cased chars as claim number and blurring input focus', () => {
 			beforeEach(() => {
-				let form = fixture.find('.form')
-				form.find('.claim-number input').simulate('change', { currentTarget: { value: 'aBc-123-xy' } })
-				form.find('.claim-number input').simulate('blur')
+				fixture.find('.form .claim-number input[name="claim-number"]')
+					.simulate('change', { currentTarget: { value: 'aBc-123-xy' } })
+					.simulate('blur')
 			})
 
 			it('should uppercase claim number', () => {
-				expect(fixture.find('.form .claim-number input').props().value).toBe('ABC-123-XY')
+				expect(fixture.find('.form .claim-number input[name="claim-number"]').props().value).toBe('ABC-123-XY')
 			})
 		})
 
@@ -311,7 +317,7 @@ describe('Home component', () => {
 			expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: PROF123')
 		})
 
-		it('should render all inputs', () => {
+		it('should render all inputs (w/ GoTime Driver)', () => {
 			const form = fixture.find('.form')
 
 			const mobileFlowIndicator = form.find('.mobile-flow-ind')

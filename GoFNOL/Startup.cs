@@ -32,6 +32,8 @@ namespace GoFNOL
 			services.TryAddSingleton<IHTTPService, HTTPService>();
 			services.TryAddSingleton<IFNOLService, FNOLService>();
 			services.TryAddSingleton<INGPService, NGPService>();
+			services.TryAddScoped<IMongoService, MongoService>();
+			services.TryAddScoped<ClaimNumberService>();
 
 			JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 

@@ -15,6 +15,8 @@ namespace GoFNOL.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] FNOLRequest request, [FromServices] IFNOLService fnolService, [FromServices] ILogger<FNOLController> logger)
 		{
+			// NOTE: check request.autoGenerateClaim is set, to choose if we must generate
+			// NOTE: ensure request.ClaimNumber is set
 			try
 			{
 				var response = await fnolService.CreateAssignment(request);

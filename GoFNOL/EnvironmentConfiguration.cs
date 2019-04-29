@@ -18,6 +18,8 @@ namespace GoFNOL
 		string NGPUsersEndpoint { get; }
 
 		Uri A2EDataDiscoveryUri { get; }
+
+		string DbConnectionString { get; }
 	}
 
 	public class EnvironmentConfiguration : IEnvironmentConfiguration
@@ -40,6 +42,8 @@ namespace GoFNOL
 		public string ISEndpoint => jvcap.Value["user-provided"].First(s => s["name"].Value<string>() == "IS")["credentials"]["endpoint"].Value<string>();
 
 		public string NGPUsersEndpoint => jvcap.Value["user-provided"].First(s => s["name"].Value<string>() == "NGP")["credentials"]["endpoint"].Value<string>();
+
+		public string DbConnectionString => jvcap.Value["mongodb"].First()["credentials"]["uri"].Value<string>();
 
 		public Uri A2EDataDiscoveryUri
 		{

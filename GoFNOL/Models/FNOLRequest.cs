@@ -17,5 +17,7 @@
 		public string ProfileId { get; set; }
 
 		public bool IsStayingInProgress { get; set; }
+
+		public bool AutoGenerateClaim { get; set; }
 	}
 }

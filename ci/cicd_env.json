@@ -20,5 +20,12 @@
 			},
 			"name": "NGP"
 		}
+	],
+	"mongodb": [
+		{
+			"credentials": {
+				"uri": "mongodb://localhost/gofnol"
+			}
+		}
 	]
 }

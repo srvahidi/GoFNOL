@@ -13,7 +13,7 @@ namespace GoFNOL.tests
 		public override void Configure(IApplicationBuilder app)
 		{
 			app.UseMiddleware<TestAuthMiddleware>();
-			base.Configure(app, false);
+			Configure(app, false);
 		}
 	}
 }

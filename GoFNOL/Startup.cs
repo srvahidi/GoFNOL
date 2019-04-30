@@ -1,9 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using GoFNOL.Services;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +27,10 @@ namespace GoFNOL
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+			services.AddMvc(config =>
+			{
+				config.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+			}).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 			var environmentConfiguration = new EnvironmentConfiguration(configuration);
 			services.TryAddSingleton<IEnvironmentConfiguration>(environmentConfiguration);
@@ -36,23 +41,15 @@ namespace GoFNOL
 			JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 			services.AddAuthentication(options =>
-				{
-					options.DefaultScheme = "Cookies";
-					options.DefaultChallengeScheme = "oidc";
-				})
-				.AddCookie("Cookies")
-				.AddOpenIdConnect("oidc", options =>
-				{
-					options.SignInScheme = "Cookies";
+			{
+				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			}).AddJwtBearer(o =>
+			{
+				o.Audience = "gofnol.api";
+				o.Authority = environmentConfiguration.ISEndpoint;
+			});
 
-					options.Authority = environmentConfiguration.ISEndpoint;
-
-					options.ClientId = "gofnol";
-					options.ResponseType = "id_token";
-					options.SaveTokens = true;
-				});
-
-			// In production, the React files will be served from this directory
 			services.AddSpaStaticFiles(c => c.RootPath = "ClientApp/build");
 		}
 
@@ -75,16 +72,6 @@ namespace GoFNOL
 
 			app.UseMiddleware<HealthCheckMiddleware>();
 
-			if (hostingEnvironment.IsProduction())
-			{
-				app.UseAuthentication();
-			}
-			else
-			{
-				// Allow developers to skip IS and have always signed in user.
-				app.UseMiddleware<UserSpoofMiddleware>();
-			}
-
 			app.Use(async (context, next) =>
 			{
 				// In PCF all traffic beyond GoRouter goes over http. Need to make it look like it's https.
@@ -93,34 +80,22 @@ namespace GoFNOL
 					context.Request.Scheme = "https";
 				}
 
-				// Force authorization somehow finally in that weird SPA setup
-				if (hostingEnvironment.IsProduction() && !context.User.Identity.IsAuthenticated)
-				{
-					await context.ChallengeAsync();
-				}
-				else
-				{
-					await next.Invoke();
-				}
+				await next.Invoke();
 			});
 
 			app.UseStaticFiles();
 
 			app.UseSpaStaticFiles();
 
-			app.UseMvc(routes =>
-			{
-				routes.MapRoute(
-					name: "default",
-					template: "{controller}/{action=Index}/{id?}");
-			});
+			app.UseAuthentication();
+
+			app.UseMvc(routes => routes.MapRoute("default", "{controller}/{action=Index}/{id?}"));
 
 			if (useSpa)
 			{
 				app.UseSpa(spa =>
 				{
 					spa.Options.SourcePath = "ClientApp";
-
 					if (hostingEnvironment.IsDevelopment())
 					{
 						spa.UseReactDevelopmentServer(npmScript: "start");

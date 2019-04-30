@@ -1,11 +1,17 @@
 export class Api {
-	async getUserData() {
+
+	constructor(authService) {
+		this.authService = authService
+	}
+
+	async getUserData(userName) {
 		const requestOptions = {
 			method: 'GET',
-			credentials: 'same-origin'
+			credentials: 'same-origin',
+			headers: this.authService.getRequestHeaders()
 		}
 
-		const response = await fetch('/api/user/data', requestOptions)
+		const response = await fetch(`/api/user/${userName}`, requestOptions)
 		if (response.status === 200)
 			return await response.json()
 
@@ -17,6 +23,7 @@ export class Api {
 			method: 'POST',
 			credentials: 'same-origin',
 			headers: {
+				...this.authService.getRequestHeaders(),
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(request)
@@ -41,5 +48,3 @@ export class Api {
 		}
 	}
 }
-
-export const getApi = () => new Api()

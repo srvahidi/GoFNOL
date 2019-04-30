@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { getApi } from '../Api'
+
 import { Environment } from '../App'
 
 import './Home.css'
@@ -15,9 +15,6 @@ export class Home extends Component {
 
 	constructor(props) {
 		super(props)
-		const { api, environment } = props
-		this.api = api || getApi()
-		this.environment = environment
 		this.state = {
 			mobileFlowIndicator: 'D',
 			claimNumber: '',
@@ -37,8 +34,13 @@ export class Home extends Component {
 	}
 
 	async componentDidMount() {
+		if (!this.props.authService.isSignedIn()) {
+			this.props.authService.signIn()
+			return
+		}
+
 		try {
-			const userDataResponse = await this.api.getUserData()
+			const userDataResponse = await this.props.api.getUserData(this.props.authService.getUserName())
 			this.setState({ profileId: userDataResponse.profileId })
 		} catch (e) {
 			this.setState({ profileId: null })
@@ -46,6 +48,10 @@ export class Home extends Component {
 	}
 
 	render() {
+		if (!this.props.authService.isSignedIn()) {
+			return null
+		}
+
 		const { profileId } = this.state
 
 		if (typeof profileId === 'undefined') {
@@ -118,7 +124,7 @@ export class Home extends Component {
 							<input type="text" name="deductible" className="deductible-value" placeholder="Deductible" value={this.state.deductible} onChange={e => this.setState({ deductible: e.currentTarget.value })} />
 						</div>
 					</div>
-					{this.environment !== Environment.Int && <div className="estimate-destination">
+					{this.props.environment !== Environment.Int && <div className="estimate-destination">
 						<label>Estimate Destination</label>
 						<div>
 							<span className="adxe-label">ADXE Worklist</span>
@@ -182,7 +188,7 @@ export class Home extends Component {
 			})
 		}, 1000)
 		try {
-			const response = await this.api.postCreateAssignment(request)
+			const response = await this.props.api.postCreateAssignment(request)
 			this.setState({
 				inProgress: false,
 				workAssignmentId: response.workAssignmentId

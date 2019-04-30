@@ -7,8 +7,6 @@ namespace GoFNOL.tests
 {
 	public class TestAuthMiddleware
 	{
-		public const string Username = "pe2generic1";
-
 		private readonly RequestDelegate next;
 
 		public TestAuthMiddleware(RequestDelegate next)
@@ -18,11 +16,7 @@ namespace GoFNOL.tests
 
 		public async Task InvokeAsync(HttpContext context)
 		{
-			var claims = new List<Claim>
-			{
-				new Claim("sub", Username)
-			};
-			var identity = new ClaimsIdentity(claims, "TestAuthType");
+			var identity = new ClaimsIdentity(new List<Claim>(), "TestAuthType");
 			var claimsPrincipal = new ClaimsPrincipal(identity);
 			context.User = claimsPrincipal;
 			await next(context);

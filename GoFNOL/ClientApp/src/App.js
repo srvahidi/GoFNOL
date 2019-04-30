@@ -1,19 +1,25 @@
 import React, { Component } from 'react'
 import { Route } from 'react-router'
+
+import { AuthServiceInstance } from './authService'
+import { Api } from './Api'
+
 import { Home } from './components/Home'
+import { AuthCallback } from './components/AuthCallback'
 
 export default class App extends Component {
 
 	render() {
+		const api = new Api(AuthServiceInstance)
+
 		return <React.Fragment>
 			<header className="header shadowed">
 				<h3>GoFNOL - {this.getEnvironmentName()}</h3>
-				<form action="api/user/logout" method="post">
-					<button type="submit">Logout</button>
-				</form>
+				<button onClick={() => AuthServiceInstance.signOut()}>Logout</button>
 			</header>
 			<div className="content">
-				<Route exact path='/' render={props => <Home {...props} environment={this.getEnvironmentName()} />} />
+				<Route exact path='/' render={props => <Home {...props} api={api} authService={AuthServiceInstance} environment={this.getEnvironmentName()} />} />
+				<Route path='/auth-callback' render={() => <AuthCallback />} authService={AuthServiceInstance} />
 			</div>
 		</React.Fragment>
 	}

@@ -1,8 +1,8 @@
 ﻿using MongoDB.Driver;
 
-namespace GoFNOL.Services
+namespace GoFNOL.Persistence
 {
-	public interface IMongoService
+	public interface IMongoConnection
 	{
 		string Owner { get; set; }
 

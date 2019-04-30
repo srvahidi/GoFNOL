@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 
-namespace GoFNOL.Services
+namespace GoFNOL.Persistence
 {
-	public class MongoService : IMongoService
+	public class MongoConnection : IMongoConnection
 	{
 		protected readonly IMongoDatabase Database;
 
-		public MongoService(IEnvironmentConfiguration envConfig)
+		public string Owner { get; set; }
+
+		public MongoConnection(IEnvironmentConfiguration envConfig)
 		{
 			var mongoUrl = new MongoUrl(envConfig.DbConnectionString);
 			Database = new MongoClient(mongoUrl).GetDatabase(mongoUrl.DatabaseName);
 		}
-
-		public string Owner { get; set; }
 
 		public IMongoCollection<T> GetCollection<T>()
 		{

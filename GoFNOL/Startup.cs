@@ -1,4 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
+using GoFNOL.Outside.Repositories;
+using GoFNOL.Persistence;
 using GoFNOL.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -37,9 +39,9 @@ namespace GoFNOL
 			services.TryAddSingleton<IHTTPService, HTTPService>();
 			services.TryAddSingleton<IFNOLService, FNOLService>();
 			services.TryAddSingleton<INGPService, NGPService>();
-			services.TryAddScoped<IMongoService, MongoService>();
-			services.TryAddScoped<ClaimNumberService>();
-
+			services.TryAddScoped<IMongoConnection, MongoConnection>();
+			services.TryAddScoped<IClaimNumberCounterRepository, ClaimNumberCounterRepository>();
+			
 			JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 			services.AddAuthentication(options =>

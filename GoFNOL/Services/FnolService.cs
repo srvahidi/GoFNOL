@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using GoFNOL.Models;
+using GoFNOL.Outside.Repositories;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -28,19 +29,19 @@ namespace GoFNOL.Services
 
 		private readonly IEnvironmentConfiguration _environmentConfiguration;
 
-		private readonly ClaimNumberService _claimNumberService;
+		private readonly IClaimNumberCounterRepository _claimNumberCounterRepository;
 
 		private readonly ILogger<FNOLService> _logger;
 
 		public FNOLService(
 			IHTTPService client,
 			IEnvironmentConfiguration environmentConfiguration,
-			ClaimNumberService claimNumberService,
+			IClaimNumberCounterRepository claimNumberCounterRepository,
 			ILogger<FNOLService> logger)
 		{
 			_client = client;
 			_environmentConfiguration = environmentConfiguration;
-			_claimNumberService = claimNumberService;
+			_claimNumberCounterRepository = claimNumberCounterRepository;
 			_logger = logger;
 		}
 
@@ -50,7 +51,8 @@ namespace GoFNOL.Services
 			var fnolData = SetAssignmentValues(fnolRequest);
 			var eaiResponseString = await ExecuteEAIRequest(fnolData);
 
-			var generatedClaimNumber = await _claimNumberService.GetNextClaimNumberAsync();
+			//var generatedClaimNumber = await _claimNumberCounterRepository.IncrementCounter(fnolRequest);
+			//var newClaimNumber = $"14-{_mongoConnection.Owner.ToUpper()}-{(previousCounterValue + 1).ToString().PadLeft(5, '0')}";
 
 			var workAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value;
 			_logger.LogInformation($"New assignment waId = '{workAssignmentId}'");

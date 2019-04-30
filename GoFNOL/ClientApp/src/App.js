@@ -5,6 +5,7 @@ import { AuthServiceInstance } from './authService'
 import { Api } from './Api'
 
 import { Home } from './components/Home'
+import { AuthSilentCallback } from './components/AuthSilentCallback'
 import { AuthCallback } from './components/AuthCallback'
 
 export default class App extends Component {
@@ -20,6 +21,7 @@ export default class App extends Component {
 			<div className="content">
 				<Route exact path='/' render={props => <Home {...props} api={api} authService={AuthServiceInstance} environment={this.getEnvironmentName()} />} />
 				<Route path='/auth-callback' render={props => <AuthCallback {...props} authService={AuthServiceInstance} />} />
+				<Route path='/auth-silent-callback' render={props => <AuthSilentCallback {...props} authService={AuthServiceInstance} />} />
 			</div>
 		</React.Fragment>
 	}

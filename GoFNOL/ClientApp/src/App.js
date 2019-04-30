@@ -19,7 +19,7 @@ export default class App extends Component {
 			</header>
 			<div className="content">
 				<Route exact path='/' render={props => <Home {...props} api={api} authService={AuthServiceInstance} environment={this.getEnvironmentName()} />} />
-				<Route path='/auth-callback' render={() => <AuthCallback authService={AuthServiceInstance} />} />
+				<Route path='/auth-callback' render={props => <AuthCallback {...props} authService={AuthServiceInstance} />} />
 			</div>
 		</React.Fragment>
 	}

@@ -3,7 +3,25 @@ import { shallow } from 'enzyme'
 
 import { Home } from './Home.js'
 
-describe('Home component', () => {
+describe('Home component when not signed in', () => {
+	let fixture
+	let mockAuthService
+
+	beforeEach(() => {
+		mockAuthService = {
+			isSignedIn: () => false,
+			signIn: jest.fn()
+		}
+		fixture = shallow(<Home api={{}} authService={mockAuthService} />)
+	})
+
+	it('should initiate sign in and should render nothing', () => {
+		expect(mockAuthService.signIn).toHaveBeenCalledTimes(1)
+		expect(fixture.html()).toBe(null)
+	})
+})
+
+describe('Home component when signed in', () => {
 	let fixture
 	let mockApi
 	let postCreateAssignmentResolve
@@ -13,6 +31,10 @@ describe('Home component', () => {
 
 	beforeEach(() => {
 		jest.useFakeTimers()
+		const mockAuthService = {
+			isSignedIn: () => true,
+			getUserName: () => 'samantha'
+		}
 		mockApi = {
 			getUserData: jest.fn(() => new Promise((res, rej) => {
 				getUserDataResolve = res
@@ -24,11 +46,12 @@ describe('Home component', () => {
 			}))
 		}
 
-		fixture = shallow(<Home api={mockApi} />)
+		fixture = shallow(<Home api={mockApi} authService={mockAuthService} />)
 	})
 
 	it('should request user data and render "In Progress" message', () => {
 		expect(mockApi.getUserData).toHaveBeenCalledTimes(1)
+		expect(mockApi.getUserData).toHaveBeenCalledWith('samantha')
 		expect(fixture.find('.status-message').text()).toBe('Requesting NGP data. Please wait.')
 		expect(fixture.find('form').exists()).toBe(false)
 	})

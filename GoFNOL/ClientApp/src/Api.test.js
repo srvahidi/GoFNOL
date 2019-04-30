@@ -4,10 +4,16 @@ describe('Api tests', () => {
 
 	let fetch
 	let fixture
+	let mockAuthService
 
 	beforeEach(() => {
+		mockAuthService = {
+			getRequestHeaders: () => ({
+				testAuthHeader: 'some token'
+			})
+		}
 		fetch = window.fetch
-		fixture = new Api()
+		fixture = new Api(mockAuthService)
 	})
 
 	afterEach(() => {
@@ -28,12 +34,18 @@ describe('Api tests', () => {
 			}))
 			window.fetch = mockFetch
 
-			actual = fixture.getUserData()
+			actual = fixture.getUserData('samantha')
 		})
 
 		it('should get user data', () => {
 			expect(mockFetch).toHaveBeenCalledTimes(1)
-			expect(mockFetch).toHaveBeenCalledWith('/api/user/data', { method: 'GET', credentials: 'same-origin' })
+			expect(mockFetch).toHaveBeenCalledWith('/api/user/samantha', {
+				method: 'GET',
+				credentials: 'same-origin',
+				headers: {
+					testAuthHeader: 'some token'
+				}
+			})
 		})
 
 		describe('when successful response', () => {
@@ -91,6 +103,7 @@ describe('Api tests', () => {
 				method: 'POST',
 				credentials: 'same-origin',
 				headers: {
+					testAuthHeader: 'some token',
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({ prop: 'request data' })

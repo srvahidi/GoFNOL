@@ -15,10 +15,15 @@ namespace GoFNOL.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] FNOLRequest request, [FromServices] IFNOLService fnolService, [FromServices] ILogger<FNOLController> logger)
 		{
-			//Request.Headers.TryGetValue("org-id", out var orgId);
+			var orgId = (string) Request.Headers["org-id"];
+			if (string.IsNullOrEmpty(orgId))
+			{
+				return BadRequest();
+			}
+
 			try
 			{
-				var response = await fnolService.CreateAssignment(request);
+				var response = await fnolService.CreateAssignment(request, orgId);
 				return Json(response);
 			}
 			catch (EAIException x)

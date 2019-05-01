@@ -12,11 +12,9 @@ namespace GoFNOL.Outside.Repositories
 
 		private readonly ILogger<ClaimNumberCounterRepository> _logger;
 
-		public ClaimNumberCounterRepository(IMongoConnection mongoConnection,
-			ILogger<ClaimNumberCounterRepository> logger)
+		public ClaimNumberCounterRepository(IMongoConnection mongoConnection, ILogger<ClaimNumberCounterRepository> logger)
 		{
 			_collection = mongoConnection.GetCollection<ClaimNumberCounter>();
-
 			_logger = logger;
 		}
 
@@ -25,8 +23,12 @@ namespace GoFNOL.Outside.Repositories
 			var filter = new FilterDefinitionBuilder<ClaimNumberCounter>().Where(c => c.OrgId == orgId);
 			var update = new UpdateDefinitionBuilder<ClaimNumberCounter>().Inc(c => c.Value, 1);
 			var options = new FindOneAndUpdateOptions<ClaimNumberCounter>
-				{IsUpsert = true, ReturnDocument = ReturnDocument.After};
+			{
+				IsUpsert = true,
+				ReturnDocument = ReturnDocument.After
+			};
 			var counter = await _collection.FindOneAndUpdateAsync(filter, update, options);
+			_logger.LogInformation($"New claim number for org {orgId} = {counter.Value}");
 			return counter.Value;
 		}
 	}

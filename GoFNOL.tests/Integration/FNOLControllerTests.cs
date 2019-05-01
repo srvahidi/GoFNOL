@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Xml.XPath;
 using FluentAssertions;
+using GoFNOL.Outside.Repositories;
 using GoFNOL.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -15,13 +16,22 @@ namespace GoFNOL.tests.Integration
 {
 	public class FNOLControllerTests : TestServerFixture
 	{
+		private const string ExpectedEndpoint = "http://dum.my";
+
+		private const string ExpectedEAIUsername = "eai user";
+
+		private const string ExpectedEAIPassword = "eai pass";
+
 		private readonly HttpContent _requestContentClaimNumberProvided;
+
 		private readonly HttpContent _requestContentClaimNumberGenerated;
 
 		private Mock<IEnvironmentConfiguration> _mockConfig;
 
 		private Mock<IHTTPService> _mockHTTPService;
 
+		private Mock<IClaimNumberCounterRepository> _mockClaimNumberCounterRepository;
+		
 		public FNOLControllerTests()
 		{
 			_requestContentClaimNumberProvided = new StringContent(new JObject
@@ -48,6 +58,7 @@ namespace GoFNOL.tests.Integration
 				["isStayingInProgress"] = true
 			}.ToString());
 			_requestContentClaimNumberProvided.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+			_requestContentClaimNumberProvided.Headers.Add("org-id", "PGI");
 
 			_requestContentClaimNumberGenerated = new StringContent(new JObject
 			{
@@ -74,6 +85,11 @@ namespace GoFNOL.tests.Integration
 				["autoGenerateClaim"] = true
 			}.ToString());
 			_requestContentClaimNumberGenerated.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+			_requestContentClaimNumberGenerated.Headers.Add("org-id", "PGI");
+
+			_mockConfig.SetupGet(c => c.EAIEndpoint).Returns(ExpectedEndpoint);
+			_mockConfig.SetupGet(c => c.EAIUsername).Returns(ExpectedEAIUsername);
+			_mockConfig.SetupGet(c => c.EAIPassword).Returns(ExpectedEAIPassword);
 		}
 
 		protected override void RegisterServices(IServiceCollection customServices)
@@ -83,21 +99,16 @@ namespace GoFNOL.tests.Integration
 			customServices.AddSingleton(_mockConfig.Object);
 			_mockHTTPService = new Mock<IHTTPService>();
 			customServices.AddSingleton(_mockHTTPService.Object);
+			_mockClaimNumberCounterRepository = new Mock<IClaimNumberCounterRepository>();
+			customServices.AddScoped(s => _mockClaimNumberCounterRepository.Object);
 		}
 
 		[Fact]
 		public async Task FNOLController_WhenPostIsInvoked_ShouldSubmitToEAIAndReturnData()
 		{
 			// Setup
-			const string expectedEndpoint = "http://dum.my";
-			const string expectedEAIUsername = "eai user";
-			const string expectedEAIPassword = "eai pass";
-
 			_mockConfig.SetupGet(c => c.A2EDataDiscoveryUri).Returns(new Uri("http://a2e.data"));
-			_mockConfig.SetupGet(c => c.EAIEndpoint).Returns(expectedEndpoint);
-			_mockConfig.SetupGet(c => c.EAIUsername).Returns(expectedEAIUsername);
-			_mockConfig.SetupGet(c => c.EAIPassword).Returns(expectedEAIPassword);
-
+			
 			var jA2EDataDiscoveryDoc = new JObject
 			{
 				["assignmentsInProgress"] = "http://a2e.data/api/assignmentsinprogress"
@@ -133,11 +144,11 @@ namespace GoFNOL.tests.Integration
 				["claimNumber"] = "ABC-123"
 			});
 
-			actualEAI.Value.uri.AbsoluteUri.TrimEnd('/').Should().Be(expectedEndpoint);
+			actualEAI.Value.uri.AbsoluteUri.TrimEnd('/').Should().Be(ExpectedEndpoint);
 			var eaiContent = await actualEAI.Value.content.ReadAsStringAsync();
 			var eaiCredentials = Helpers.ParseCredentials(eaiContent);
-			eaiCredentials.username.Should().Be(expectedEAIUsername);
-			eaiCredentials.password.Should().Be(expectedEAIPassword);
+			eaiCredentials.username.Should().Be(ExpectedEAIUsername);
+			eaiCredentials.password.Should().Be(ExpectedEAIPassword);
 			var xAssignment = Helpers.ParseAssignment(eaiContent);
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value.Should().Be("D");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/USER_ID").Value.Should().Be("1234567890");
@@ -165,10 +176,6 @@ namespace GoFNOL.tests.Integration
 		public async Task FNOLController_WhenPostIsInvokedAndNoWorkAssignmentIdReturned_ShouldReturnErrorThatEAIFailed()
 		{
 			// Setup
-			_mockConfig.SetupGet(c => c.EAIEndpoint).Returns("http://dum.my");
-			_mockConfig.SetupGet(c => c.EAIUsername).Returns("eai user");
-			_mockConfig.SetupGet(c => c.EAIPassword).Returns("eai pass");
-
 			_mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
 				.ReturnsAsync(new HttpResponseMessage
 				{
@@ -187,10 +194,6 @@ namespace GoFNOL.tests.Integration
 		public async Task FNOLController_WhenPostIsInvokedAndHttpRequestExceptionThrown_ShouldReturnErrorThatNetworkFailed()
 		{
 			// Setup
-			_mockConfig.SetupGet(c => c.EAIEndpoint).Returns("http://dum.my");
-			_mockConfig.SetupGet(c => c.EAIUsername).Returns("eai user");
-			_mockConfig.SetupGet(c => c.EAIPassword).Returns("eai pass");
-
 			_mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
 				.Throws<HttpRequestException>();
 
@@ -206,9 +209,22 @@ namespace GoFNOL.tests.Integration
 		public async Task FNOLController_WhenPostIsInvokedAndExceptionThrown_ShouldReturnErrorThatAPIFailed()
 		{
 			// Setup
-			_mockConfig.SetupGet(c => c.EAIEndpoint).Returns("http://dum.my");
-			_mockConfig.SetupGet(c => c.EAIUsername).Returns("eai user");
-			_mockConfig.SetupGet(c => c.EAIPassword).Returns("eai pass");
+			var jRequest = new JObject();
+			var emptyRequestContent = new StringContent(jRequest.ToString());
+			emptyRequestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+			emptyRequestContent.Headers.Add("org-id", "PGI");
+
+			// Execute
+			var response = await Client.PostAsync("/api/fnol", emptyRequestContent);
+
+			// Verify
+			response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+		}
+
+		[Fact]
+		public async Task FNOLController_WhenPostIsInvokedWithoutOrgIdHeader_ShouldReturnBadRequest()
+		{
+			// Setup
 			var jRequest = new JObject();
 			var emptyRequestContent = new StringContent(jRequest.ToString());
 			emptyRequestContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -217,35 +233,15 @@ namespace GoFNOL.tests.Integration
 			var response = await Client.PostAsync("/api/fnol", emptyRequestContent);
 
 			// Verify
-			_mockHTTPService.VerifyAll();
-			response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+			response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 		}
 
 		[Fact]
 		public async Task FNOLController_WhenPostIsInvokedWithAutoGenerateTrue_ShouldGenerateClaimNumberAndSubmitToEAIAndReturnData()
 		{
 			// Setup
-			const string expectedEndpoint = "http://dum.my";
-			const string expectedEAIUsername = "eai user";
-			const string expectedEAIPassword = "eai pass";
-
 			_mockConfig.SetupGet(c => c.A2EDataDiscoveryUri).Returns(new Uri("http://a2e.data"));
-			_mockConfig.SetupGet(c => c.EAIEndpoint).Returns(expectedEndpoint);
-			_mockConfig.SetupGet(c => c.EAIUsername).Returns(expectedEAIUsername);
-			_mockConfig.SetupGet(c => c.EAIPassword).Returns(expectedEAIPassword);
-
-			//var jA2EDataDiscoveryDoc = new JObject
-			//{
-			//	["assignmentsInProgress"] = "http://a2e.data/api/assignmentsinprogress"
-			//};
-			//_mockHTTPService.Setup(service => service.GetAsync(new Uri("http://a2e.data")))
-			//	.ReturnsAsync(new HttpResponseMessage
-			//	{
-			//		Content = new StringContent(jA2EDataDiscoveryDoc.ToString())
-			//	});
-
-			//_mockHTTPService.Setup(service => service.PutAsync(new Uri("http://a2e.data/api/assignmentsinprogress/123"), It.IsAny<HttpContent>()))
-			//	.ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+			_mockClaimNumberCounterRepository.Setup(m => m.IncrementCounter("PGI")).ReturnsAsync(456);
 
 			(Uri uri, HttpContent content)? actualEAI = null;
 			_mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
@@ -266,17 +262,12 @@ namespace GoFNOL.tests.Integration
 			jResponse.ShouldBeEquivalentTo(new JObject
 			{
 				["workAssignmentId"] = "123",
-				["claimNumber"] = "14-PGIA-00001"
+				["claimNumber"] = "14-PGIA-00456"
 			});
 
-			actualEAI.Value.uri.AbsoluteUri.TrimEnd('/').Should().Be(expectedEndpoint);
 			var eaiContent = await actualEAI.Value.content.ReadAsStringAsync();
-			//var eaiCredentials = Helpers.ParseCredentials(eaiContent);
-			//eaiCredentials.username.Should().Be(expectedEAIUsername);
-			//eaiCredentials.password.Should().Be(expectedEAIPassword);
 			var xAssignment = Helpers.ParseAssignment(eaiContent);
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/CLAIM_NBR").Value.Should().Be("14-PGIA-00001");
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/CLAIM_NBR").Value.Should().Be("14-PGIA-00456");
 		}
-
 	}
 }

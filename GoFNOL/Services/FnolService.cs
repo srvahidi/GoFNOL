@@ -45,15 +45,18 @@ namespace GoFNOL.Services
 			_logger = logger;
 		}
 
-		public async Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest)
+		public async Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest, string orgId)
 		{
 			_logger.LogInformation($"Creating an assignment for request {JsonConvert.SerializeObject(fnolRequest, Formatting.None)}");
+
+			if (string.IsNullOrWhiteSpace(fnolRequest.ClaimNumber))
+			{
+				var generatedClaimNumberCount = await _claimNumberCounterRepository.IncrementCounter(orgId);
+				fnolRequest.ClaimNumber = $"14-{orgId}A-{generatedClaimNumberCount.ToString().PadLeft(5, '0')}";
+			}
+
 			var fnolData = SetAssignmentValues(fnolRequest);
 			var eaiResponseString = await ExecuteEAIRequest(fnolData);
-
-			//var generatedClaimNumber = await _claimNumberCounterRepository.IncrementCounter(fnolRequest);
-			//var newClaimNumber = $"14-{_mongoConnection.Owner.ToUpper()}-{(previousCounterValue + 1).ToString().PadLeft(5, '0')}";
-
 			var workAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value;
 			_logger.LogInformation($"New assignment waId = '{workAssignmentId}'");
 			if (string.IsNullOrEmpty(workAssignmentId)) throw new EAIException();
@@ -62,7 +65,7 @@ namespace GoFNOL.Services
 				await SaveAssignmentAssignmentInProgress(workAssignmentId);
 			}
 
-			return new FNOLResponse(workAssignmentId, string.IsNullOrEmpty(fnolRequest.ClaimNumber) ? string.Empty : fnolRequest.ClaimNumber);
+			return new FNOLResponse(workAssignmentId, fnolRequest.ClaimNumber);
 		}
 
 		private async Task<string> ExecuteEAIRequest(XDocument payload)

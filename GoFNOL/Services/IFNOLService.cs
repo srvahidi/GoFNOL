@@ -5,6 +5,6 @@ namespace GoFNOL.Services
 {
 	public interface IFNOLService
 	{
-		Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest);
+		Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest, string orgId);
 	}
 }

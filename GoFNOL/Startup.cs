@@ -1,4 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
+using GoFNOL.Outside.Repositories;
+using GoFNOL.Persistence;
 using GoFNOL.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +11,6 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace GoFNOL
 {
@@ -33,10 +34,12 @@ namespace GoFNOL
 			}).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
 			var environmentConfiguration = new EnvironmentConfiguration(configuration);
-			services.TryAddSingleton<IEnvironmentConfiguration>(environmentConfiguration);
-			services.TryAddSingleton<IHTTPService, HTTPService>();
-			services.TryAddSingleton<IFNOLService, FNOLService>();
-			services.TryAddSingleton<INGPService, NGPService>();
+			services.AddSingleton<IEnvironmentConfiguration>(environmentConfiguration);
+			services.AddSingleton<IHTTPService, HTTPService>();
+			services.AddScoped<IFNOLService, FNOLService>();
+			services.AddSingleton<INGPService, NGPService>();
+			services.AddScoped<IMongoConnection, MongoConnection>();
+			services.AddScoped<IClaimNumberCounterRepository, ClaimNumberCounterRepository>();
 
 			JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 

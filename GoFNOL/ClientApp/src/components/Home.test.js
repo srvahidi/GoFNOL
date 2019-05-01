@@ -77,7 +77,7 @@ describe('Home component when signed in', () => {
 			expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: 4774PE200001')
 		})
 
-		it('should render all inputs', () => {
+		it('should render all inputs (w/ Pocket Estimate)', () => {
 			const form = fixture.find('.form')
 
 			const mobileFlowIndicator = form.find('.mobile-flow-ind')
@@ -89,8 +89,12 @@ describe('Home component when signed in', () => {
 			expect(mobileFlowIndicatorOptions.at(2).text()).toBe('Not Mobile (N)')
 
 			const claimNumber = form.find('.claim-number')
-			expect(claimNumber.find('label').text()).toBe('New Claim Number')
-			expect(claimNumber.find('input').props().placeholder).toBe('Claim Number')
+			expect(claimNumber.find('label').at(0).text()).toBe('New Claim Number')
+			expect(claimNumber.find('input[type="text"]').props().placeholder).toBe('Claim Number')
+
+			const generateClaimNumber = claimNumber.find('.generate-claim-number')
+			expect(generateClaimNumber.find('span').text()).toBe('Auto Generate')
+			expect(generateClaimNumber.find('input.auto-generate-claim').props().checked).toBe(false)
 
 			const firstName = form.find('.first-name')
 			expect(firstName.find('label').text()).toBe('First Name')
@@ -154,103 +158,84 @@ describe('Home component when signed in', () => {
 			})
 		})
 
-		describe('filling out all inputs and clicking Create button', () => {
+		describe('selecting autogenerate claim number', () => {
 			beforeEach(() => {
-				const form = fixture.find('.form')
-				form.find('.claim-number input').simulate('change', { currentTarget: { value: 'ABC-123' } })
-				form.find('.first-name input').simulate('change', { currentTarget: { value: '1st name' } })
-				form.find('.last-name input').simulate('change', { currentTarget: { value: 'nst name' } })
-				form.find('.phone-number input').simulate('change', { currentTarget: { value: '(012) 345 67-89' } })
-				form.find('.zip-code input').simulate('change', { currentTarget: { value: '34567' } })
-				form.find('.city input').simulate('change', { currentTarget: { value: 'Cityville' } })
-				form.find('.state input').simulate('change', { currentTarget: { value: 'ST' } })
-				form.find('.email input').simulate('change', { currentTarget: { value: 'a@b.c' } })
-				form.find('.vin input').simulate('change', { currentTarget: { value: '0123456789ABCDEFG' } })
-				form.find('.deductible input.deductible-value').simulate('change', { currentTarget: { value: '500' } })
-				form.find('.estimate-destination-review').simulate('change')
-				form.simulate('submit', { preventDefault: jest.fn() })
+				fixture.find('.form .auto-generate-claim').simulate('change')
 			})
 
-			it('should make an Api call', () => {
-				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
-
-				expect(mockApi.postCreateAssignment.mock.calls[0][0]).toEqual({
-					profileId: '4774PE200001',
-					mobileFlowIndicator: 'D',
-					claimNumber: 'ABC-123',
-					owner: {
-						firstName: '1st name',
-						lastName: 'nst name',
-						phoneNumber: '(012) 345 67-89',
-						email: 'a@b.c',
-						address: {
-							city: 'Cityville',
-							zipCode: '34567',
-							state: 'ST'
-						}
-					},
-					vin: '0123456789ABCDEFG',
-					lossType: 'COLL',
-					deductible: '500',
-					isStayingInProgress: false
-				})
+			it('should disable claim number input', () => {
+				const input = fixture.find('.form .claim-number input[name="claim-number"]')
+				expect(input.prop('disabled')).toBe(true)
 			})
 
-			it('should disable create button and display elapsed time', () => {
-				expect(fixture.find('button.create').props().disabled).toBeTruthy()
-				jest.runOnlyPendingTimers()
-				expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
-				jest.runOnlyPendingTimers()
-				expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 2 seconds.')
-				jest.runOnlyPendingTimers()
-				jest.runOnlyPendingTimers()
-				expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 4 seconds.')
-			})
-
-			describe('when response contains work assignment id', () => {
+			describe('filling out all inputs and clicking Create button', () => {
 				beforeEach(() => {
-					jest.runOnlyPendingTimers()
-					jest.runOnlyPendingTimers()
-					jest.runOnlyPendingTimers()
-					postCreateAssignmentResolve({ workAssignmentId: 12345 })
+					const form = fixture.find('.form')
+					form.find('.claim-number input[name="claim-number"]').simulate('change', { currentTarget: { value: 'ABC-123' } })
+					form.find('.first-name input').simulate('change', { currentTarget: { value: '1st name' } })
+					form.find('.last-name input').simulate('change', { currentTarget: { value: 'nst name' } })
+					form.find('.phone-number input').simulate('change', { currentTarget: { value: '(012) 345 67-89' } })
+					form.find('.zip-code input').simulate('change', { currentTarget: { value: '34567' } })
+					form.find('.city input').simulate('change', { currentTarget: { value: 'Cityville' } })
+					form.find('.state input').simulate('change', { currentTarget: { value: 'ST' } })
+					form.find('.email input').simulate('change', { currentTarget: { value: 'a@b.c' } })
+					form.find('.vin input').simulate('change', { currentTarget: { value: '0123456789ABCDEFG' } })
+					form.find('.deductible input.deductible-value').simulate('change', { currentTarget: { value: '500' } })
+					form.find('.estimate-destination-review').simulate('change')
+					form.simulate('submit', { preventDefault: jest.fn() })
 				})
 
-				it('should render it and enable create button', () => {
-					expect(fixture.find('.work-assignment-id').text()).toBe('Work Assignment ID: \'12345\' added successfully!')
-					expect(fixture.find('.time-elapsed').text()).toBe('GoFNOL took 3 seconds to create the assignment.')
-				})
+				it('should make an Api call', () => {
+					expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
 
-				describe('clicking Create button again', () => {
-					beforeEach(() => {
-						fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
-						jest.runOnlyPendingTimers()
+					expect(mockApi.postCreateAssignment.mock.calls[0][0]).toEqual({
+						profileId: '4774PE200001',
+						mobileFlowIndicator: 'D',
+						claimNumber: 'ABC-123',
+						owner: {
+							firstName: '1st name',
+							lastName: 'nst name',
+							phoneNumber: '(012) 345 67-89',
+							email: 'a@b.c',
+							address: {
+								city: 'Cityville',
+								zipCode: '34567',
+								state: 'ST'
+							}
+						},
+						vin: '0123456789ABCDEFG',
+						lossType: 'COLL',
+						deductible: '500',
+						isStayingInProgress: false,
+						autoGenerateClaim: true
 					})
-
-					it('should hide previous output', () => {
-						expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
-						expect(fixture.find('.work-assignment-id').exists()).toBeFalsy()
-					})
 				})
-			})
 
-			const testCases = [
-				{ error: 'EAIFailure', message: 'Dependent services failed, please try again. If you continue to experience this error, please contact client services.' },
-				{ error: 'NetworkFailure', message: 'GoFNOL failed because it was unable to reach a dependent service, please try again. If you continue to experience this error, please contact client services.' },
-				{ error: 'APIFailure', message: 'The API layer encountered an error, please try again. If you continue to experience this error, please contact client services.' },
-				{ error: 'ClientFailure', message: 'The client app encountered an error, please try again. If you continue to experience this error, please contact client services.' }
-			]
+				it('should disable create button and display elapsed time', () => {
+					expect(fixture.find('button.create').props().disabled).toBeTruthy()
+					jest.runOnlyPendingTimers()
+					expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
+					jest.runOnlyPendingTimers()
+					expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 2 seconds.')
+					jest.runOnlyPendingTimers()
+					jest.runOnlyPendingTimers()
+					expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 4 seconds.')
+				})
 
-			for (let testCase of testCases) {
-				describe(`when response contains ${testCase.error} error`, () => {
+				describe('when response contains work assignment id', () => {
 					beforeEach(() => {
 						jest.runOnlyPendingTimers()
-						postCreateAssignmentReject(new Error(testCase.error))
+						jest.runOnlyPendingTimers()
+						jest.runOnlyPendingTimers()
+						postCreateAssignmentResolve({
+							claimNumber: 'abc-123',
+							workAssignmentId: '12345'
+						})
 					})
 
 					it('should render it and enable create button', () => {
-						expect(fixture.find('.error').text()).toBe(testCase.message)
-						expect(fixture.find('button.create').props().disabled).toBeFalsy()
-						expect(fixture.find('.time-elapsed').exists()).toBeFalsy()
+						expect(fixture.find('.work-assignment-id').text()).toBe('Work Assignment ID: \'12345\' added successfully!')
+						expect(fixture.find('.time-elapsed').text()).toBe('GoFNOL took 3 seconds to create claim number abc-123')
 					})
 
 					describe('clicking Create button again', () => {
@@ -259,24 +244,59 @@ describe('Home component when signed in', () => {
 							jest.runOnlyPendingTimers()
 						})
 
-						it('should hide error', () => {
-							expect(fixture.find('.error').exists()).toBeFalsy()
+						it('should hide previous output', () => {
 							expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
+							expect(fixture.find('.work-assignment-id').exists()).toBeFalsy()
 						})
 					})
 				})
-			}
+
+				const testCases = [
+					{ error: 'EAIFailure', message: 'Dependent services failed, please try again. If you continue to experience this error, please contact client services.' },
+					{ error: 'NetworkFailure', message: 'GoFNOL failed because it was unable to reach a dependent service, please try again. If you continue to experience this error, please contact client services.' },
+					{ error: 'APIFailure', message: 'The API layer encountered an error, please try again. If you continue to experience this error, please contact client services.' },
+					{ error: 'ClientFailure', message: 'The client app encountered an error, please try again. If you continue to experience this error, please contact client services.' }
+				]
+
+				for (let testCase of testCases) {
+					describe(`when response contains ${testCase.error} error`, () => {
+						beforeEach(() => {
+							jest.runOnlyPendingTimers()
+							postCreateAssignmentReject(new Error(testCase.error))
+						})
+
+						it('should render it and enable create button', () => {
+							expect(fixture.find('.error').text()).toBe(testCase.message)
+							expect(fixture.find('button.create').props().disabled).toBeFalsy()
+							expect(fixture.find('.time-elapsed').exists()).toBeFalsy()
+						})
+
+						describe('clicking Create button again', () => {
+							beforeEach(() => {
+								fixture.find('.form').simulate('submit', { preventDefault: jest.fn() })
+								jest.runOnlyPendingTimers()
+							})
+
+							it('should hide error', () => {
+								expect(fixture.find('.error').exists()).toBeFalsy()
+								expect(fixture.find('.time-elapsed').text()).toBe('Elapsed time: 1 seconds.')
+							})
+						})
+					})
+				}
+
+			})
 		})
 
-		describe('entering lower cased chars as claim number and bluring input focus', () => {
+		describe('entering lower cased chars as claim number and blurring input focus', () => {
 			beforeEach(() => {
-				let form = fixture.find('.form')
-				form.find('.claim-number input').simulate('change', { currentTarget: { value: 'aBc-123-xy' } })
-				form.find('.claim-number input').simulate('blur')
+				fixture.find('.form .claim-number input[name="claim-number"]')
+					.simulate('change', { currentTarget: { value: 'aBc-123-xy' } })
+					.simulate('blur')
 			})
 
 			it('should uppercase claim number', () => {
-				expect(fixture.find('.form .claim-number input').props().value).toBe('ABC-123-XY')
+				expect(fixture.find('.form .claim-number input[name="claim-number"]').props().value).toBe('ABC-123-XY')
 			})
 		})
 
@@ -334,7 +354,7 @@ describe('Home component when signed in', () => {
 			expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: PROF123')
 		})
 
-		it('should render all inputs', () => {
+		it('should render all inputs (w/ GoTime Driver)', () => {
 			const form = fixture.find('.form')
 
 			const mobileFlowIndicator = form.find('.mobile-flow-ind')

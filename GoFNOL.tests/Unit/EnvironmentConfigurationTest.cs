@@ -26,6 +26,7 @@ namespace GoFNOL.tests.Unit
 			var eaiUsername = environmentConfiguration.EAIUsername;
 			var eaiPassword = environmentConfiguration.EAIPassword;
 			var a2eDataDiscoveryUri = environmentConfiguration.A2EDataDiscoveryUri;
+			var dbConnectionString = environmentConfiguration.DbConnectionString;
 
 			// Verify
 			eaiEndpoint.Should().Be("http://eai.dummy");
@@ -34,6 +35,7 @@ namespace GoFNOL.tests.Unit
 			eaiUsername.Should().Be("dummyUsername");
 			eaiPassword.Should().Be("dummyPassword");
 			a2eDataDiscoveryUri.Should().Be(new Uri("http://a2e.data/discovery"));
+			dbConnectionString.Should().Be("db-connect-string");
 		}
 
 		[Fact]

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using GoFNOL.Models;
+using GoFNOL.Outside.Repositories;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -28,21 +29,34 @@ namespace GoFNOL.Services
 
 		private readonly IEnvironmentConfiguration _environmentConfiguration;
 
+		private readonly IClaimNumberCounterRepository _claimNumberCounterRepository;
+
 		private readonly ILogger<FNOLService> _logger;
 
-		public FNOLService(IHTTPService client, IEnvironmentConfiguration environmentConfiguration, ILogger<FNOLService> logger)
+		public FNOLService(
+			IHTTPService client,
+			IEnvironmentConfiguration environmentConfiguration,
+			IClaimNumberCounterRepository claimNumberCounterRepository,
+			ILogger<FNOLService> logger)
 		{
 			_client = client;
 			_environmentConfiguration = environmentConfiguration;
+			_claimNumberCounterRepository = claimNumberCounterRepository;
 			_logger = logger;
 		}
 
-		public async Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest)
+		public async Task<FNOLResponse> CreateAssignment(FNOLRequest fnolRequest, string orgId)
 		{
 			_logger.LogInformation($"Creating an assignment for request {JsonConvert.SerializeObject(fnolRequest, Formatting.None)}");
+
+			if (fnolRequest.AutoGenerateClaim)
+			{
+				var generatedClaimNumberCount = await _claimNumberCounterRepository.IncrementCounter(orgId);
+				fnolRequest.ClaimNumber = $"14-{orgId}A-{generatedClaimNumberCount.ToString().PadLeft(5, '0')}";
+			}
+
 			var fnolData = SetAssignmentValues(fnolRequest);
 			var eaiResponseString = await ExecuteEAIRequest(fnolData);
-
 			var workAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value;
 			_logger.LogInformation($"New assignment waId = '{workAssignmentId}'");
 			if (string.IsNullOrEmpty(workAssignmentId)) throw new EAIException();
@@ -51,7 +65,7 @@ namespace GoFNOL.Services
 				await SaveAssignmentAssignmentInProgress(workAssignmentId);
 			}
 
-			return new FNOLResponse(workAssignmentId);
+			return new FNOLResponse(workAssignmentId, fnolRequest.ClaimNumber);
 		}
 
 		private async Task<string> ExecuteEAIRequest(XDocument payload)

@@ -1,7 +1,7 @@
 import { UserManager } from 'oidc-client'
 
 class AuthService {
-	initialize = (isEndpoint) => {
+	initialize = async (isEndpoint) => {
 		const location = window.location
 		const redirectUri = `${location.protocol}//${location.host}/auth-callback`
 		const silentRedirectUri = `${location.protocol}//${location.host}/auth-silent-callback`
@@ -14,9 +14,10 @@ class AuthService {
 			scope: 'openid user.organization gofnol.api'
 		}
 		this.userManager = new UserManager(oidcConfig)
+		this.user = await this.userManager.getUser()
 	}
 
-	isSignedIn = () => !!this.user
+	isSignedIn = () => this.user && !this.user.expired
 
 	signIn = () => {
 		this.userManager.signinRedirect()

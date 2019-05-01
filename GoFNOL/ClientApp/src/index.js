@@ -13,8 +13,8 @@ const rootElement = document.getElementById('root')
 
 fetch('/api/config')
 	.then(r => r.json())
-	.then(c => {
-		AuthServiceInstance.initialize(c.isEndpoint)
+	.then(c => AuthServiceInstance.initialize(c.isEndpoint))
+	.then(() => {
 		ReactDOM.render(
 			<BrowserRouter basename={baseUrl}>
 				<App getWindowLocation={() => window.location} />

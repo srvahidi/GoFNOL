@@ -3,20 +3,19 @@ import { shallow } from 'enzyme'
 
 import { Home } from './Home.js'
 
+import * as authService from '../authService'
+jest.mock('../authService')
+
 describe('Home component when not signed in', () => {
 	let fixture
-	let mockAuthService
 
 	beforeEach(() => {
-		mockAuthService = {
-			isSignedIn: () => false,
-			signIn: jest.fn()
-		}
-		fixture = shallow(<Home api={{}} authService={mockAuthService} />)
+		authService.isSignedIn.mockReturnValue(false)
+		fixture = shallow(<Home api={{}} />)
 	})
 
 	it('should initiate sign in and should render nothing', () => {
-		expect(mockAuthService.signIn).toHaveBeenCalledTimes(1)
+		expect(authService.signIn).toHaveBeenCalledTimes(1)
 		expect(fixture.html()).toBe(null)
 	})
 })
@@ -31,10 +30,8 @@ describe('Home component when signed in', () => {
 
 	beforeEach(() => {
 		jest.useFakeTimers()
-		const mockAuthService = {
-			isSignedIn: () => true,
-			getUserName: () => 'samantha'
-		}
+		authService.isSignedIn.mockReturnValue(true)
+		authService.getUserName.mockReturnValue('samantha')
 		mockApi = {
 			getUserData: jest.fn(() => new Promise((res, rej) => {
 				getUserDataResolve = res
@@ -46,7 +43,7 @@ describe('Home component when signed in', () => {
 			}))
 		}
 
-		fixture = shallow(<Home api={mockApi} authService={mockAuthService} />)
+		fixture = shallow(<Home api={mockApi} />)
 	})
 
 	it('should request user data and render "In Progress" message', () => {

@@ -12,7 +12,8 @@ namespace GoFNOL.Controllers
 		{
 			var jConfig = new JObject
 			{
-				["isEndpoint"] = envConfig.ISEndpoint
+				["isEndpoint"] = envConfig.ISEndpoint,
+				["disableAuth"] = envConfig.DisableAuth
 			};
 
 			return Json(jConfig);

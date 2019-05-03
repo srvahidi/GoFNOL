@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { Route } from 'react-router'
 
-import { AuthServiceInstance } from './authService'
 import { Api } from './Api'
+import { signOut } from './authService'
 
 import { Home } from './components/Home'
 import { AuthSilentCallback } from './components/AuthSilentCallback'
@@ -11,17 +11,15 @@ import { AuthCallback } from './components/AuthCallback'
 export default class App extends Component {
 
 	render() {
-		const api = new Api(AuthServiceInstance)
-
 		return <React.Fragment>
 			<header className="header shadowed">
 				<h3>GoFNOL - {this.getEnvironmentName()}</h3>
-				<button onClick={() => AuthServiceInstance.signOut()}>Logout</button>
+				<button onClick={signOut}>Logout</button>
 			</header>
 			<div className="content">
-				<Route exact path='/' render={props => <Home {...props} api={api} authService={AuthServiceInstance} environment={this.getEnvironmentName()} />} />
-				<Route path='/auth-callback' render={props => <AuthCallback {...props} authService={AuthServiceInstance} />} />
-				<Route path='/auth-silent-callback' render={props => <AuthSilentCallback {...props} authService={AuthServiceInstance} />} />
+				<Route exact path='/' render={props => <Home {...props} api={new Api()} environment={this.getEnvironmentName()} />} />
+				<Route path='/auth-callback' render={props => <AuthCallback {...props} />} />
+				<Route path='/auth-silent-callback' render={props => <AuthSilentCallback {...props} />} />
 			</div>
 		</React.Fragment>
 	}

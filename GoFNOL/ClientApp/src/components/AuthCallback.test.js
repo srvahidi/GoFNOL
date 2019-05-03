@@ -3,19 +3,23 @@ import { shallow } from 'enzyme'
 
 import { AuthCallback } from './AuthCallback'
 
+import * as authService from '../authService'
+jest.mock('../authService')
+
 describe('AuthCallback component', () => {
 	let fixture
-	let mockAuthService
+	let mockHistory
 
 	beforeEach(() => {
-		mockAuthService = {
-			completeSignIn: jest.fn()
+		mockHistory = {
+			push: jest.fn()
 		}
-		fixture = shallow(<AuthCallback authService={mockAuthService} />)
+		fixture = shallow(<AuthCallback history={mockHistory} />)
 	})
 
 	it('should complete sign in and should render nothing', () => {
-		expect(mockAuthService.completeSignIn).toHaveBeenCalledTimes(1)
 		expect(fixture.html()).toBe(null)
+		expect(authService.completeSignIn).toHaveBeenCalledTimes(1)
+		expect(mockHistory.push).toHaveBeenCalledTimes(1)
 	})
 })

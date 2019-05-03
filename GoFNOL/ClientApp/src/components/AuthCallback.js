@@ -1,8 +1,10 @@
 import { Component } from 'react'
 
+import { completeSignIn } from '../authService'
+
 export class AuthCallback extends Component {
 	async componentDidMount() {
-		await this.props.authService.completeSignIn()
+		await completeSignIn()
 		this.props.history.push('/')
 	}
 

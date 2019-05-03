@@ -20,6 +20,8 @@ namespace GoFNOL
 		Uri A2EDataDiscoveryUri { get; }
 
 		string DbConnectionString { get; }
+
+		bool DisableAuth { get; }
 	}
 
 	public class EnvironmentConfiguration : IEnvironmentConfiguration
@@ -31,6 +33,7 @@ namespace GoFNOL
 		public EnvironmentConfiguration(IConfiguration configuration)
 		{
 			_jVcap = new Lazy<JObject>(() => JObject.Parse(configuration[VCAPKey]));
+			DisableAuth = string.Equals(configuration["DISABLE_AUTH"], bool.TrueString, StringComparison.InvariantCultureIgnoreCase);
 		}
 
 		public string EAIEndpoint => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "EAI")["credentials"]["endpoint"].Value<string>();
@@ -43,7 +46,7 @@ namespace GoFNOL
 
 		public string NGPUsersEndpoint => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "NGP")["credentials"]["endpoint"].Value<string>();
 
-		public string DbConnectionString => _jVcap.Value.Properties().First(p=>p.Name.Contains("mongodb")).Value[0]["credentials"]["uri"].Value<string>();
+		public string DbConnectionString => _jVcap.Value.Properties().First(p => p.Name.Contains("mongodb")).Value[0]["credentials"]["uri"].Value<string>();
 
 		public Uri A2EDataDiscoveryUri
 		{
@@ -53,5 +56,7 @@ namespace GoFNOL
 				return value != null ? new Uri(value) : null;
 			}
 		}
+
+		public bool DisableAuth { get; }
 	}
 }

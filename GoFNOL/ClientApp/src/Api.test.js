@@ -1,19 +1,19 @@
 import { Api } from './Api'
 
+import * as authService from './authService'
+jest.mock('./authService')
+
 describe('Api tests', () => {
 
 	let fetch
 	let fixture
-	let mockAuthService
 
 	beforeEach(() => {
-		mockAuthService = {
-			getRequestHeaders: () => ({
-				testAuthHeader: 'some token'
-			})
-		}
+		authService.getRequestHeaders.mockReturnValue({
+			testAuthHeader: 'some token'
+		})
 		fetch = window.fetch
-		fixture = new Api(mockAuthService)
+		fixture = new Api()
 	})
 
 	afterEach(() => {

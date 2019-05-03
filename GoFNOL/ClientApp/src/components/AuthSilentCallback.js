@@ -1,8 +1,10 @@
 import { Component } from 'react'
 
+import { completeSilentSignIn } from '../authService'
+
 export class AuthSilentCallback extends Component {
 	async componentDidMount() {
-		await this.props.authService.completeSilentSignIn()
+		await completeSilentSignIn()
 	}
 
 	render() {

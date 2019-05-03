@@ -6,14 +6,14 @@ namespace GoFNOL.tests
 {
 	public class TestStartup : Startup
 	{
-		public TestStartup(IConfiguration configuration, IHostingEnvironment env) : base(configuration, env)
+		public TestStartup(IConfiguration configuration) : base(configuration)
 		{
 		}
 
-		public override void Configure(IApplicationBuilder app)
+		public override void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
 			app.UseMiddleware<TestAuthMiddleware>();
-			Configure(app, false);
+			Configure(app, env, false);
 		}
 	}
 }

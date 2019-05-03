@@ -13,6 +13,7 @@ namespace GoFNOL.tests.Integration
 		{
 			// Setup
 			var isEndpoint = GetService<IEnvironmentConfiguration>().ISEndpoint;
+			var disableAuth = GetService<IEnvironmentConfiguration>().DisableAuth;
 
 			// Execute
 			var response = await Client.GetAsync("/api/config");
@@ -24,7 +25,8 @@ namespace GoFNOL.tests.Integration
 			var jContent = JObject.Parse(responseContent);
 			jContent.ShouldBeEquivalentTo(new JObject
 			{
-				["isEndpoint"] = isEndpoint
+				["isEndpoint"] = isEndpoint,
+				["disableAuth"] = disableAuth
 			});
 		}
 	}

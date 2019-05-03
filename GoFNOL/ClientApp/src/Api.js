@@ -1,14 +1,12 @@
-export class Api {
+import { getRequestHeaders } from './authService'
 
-	constructor(authService) {
-		this.authService = authService
-	}
+export class Api {
 
 	async getUserData(userName) {
 		const requestOptions = {
 			method: 'GET',
 			credentials: 'same-origin',
-			headers: this.authService.getRequestHeaders()
+			headers: getRequestHeaders()
 		}
 
 		const response = await fetch(`/api/user/${userName}`, requestOptions)
@@ -23,7 +21,7 @@ export class Api {
 			method: 'POST',
 			credentials: 'same-origin',
 			headers: {
-				...this.authService.getRequestHeaders(),
+				...getRequestHeaders(),
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(request)

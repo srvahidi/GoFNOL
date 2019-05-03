@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 
 import { Environment } from '../App'
+import { isSignedIn, signIn, getUserName } from '../authService'
 
 import './Home.css'
 
@@ -36,13 +37,13 @@ export class Home extends Component {
 	}
 
 	async componentDidMount() {
-		if (!this.props.authService.isSignedIn()) {
-			this.props.authService.signIn()
+		if (!isSignedIn()) {
+			signIn()
 			return
 		}
 
 		try {
-			const userDataResponse = await this.props.api.getUserData(this.props.authService.getUserName())
+			const userDataResponse = await this.props.api.getUserData(getUserName())
 			this.setState({ profileId: userDataResponse.profileId })
 		} catch (e) {
 			this.setState({ profileId: null })
@@ -50,7 +51,7 @@ export class Home extends Component {
 	}
 
 	render() {
-		if (!this.props.authService.isSignedIn()) {
+		if (!isSignedIn()) {
 			return null
 		}
 

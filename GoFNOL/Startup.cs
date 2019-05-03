@@ -16,53 +16,58 @@ namespace GoFNOL
 {
 	public class Startup
 	{
-		private readonly IHostingEnvironment hostingEnvironment;
+		private readonly IConfiguration _configuration;
 
-		private readonly IConfiguration configuration;
+		private IEnvironmentConfiguration _environmentConfiguration;
 
-		public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+		public Startup(IConfiguration configuration)
 		{
-			this.hostingEnvironment = hostingEnvironment;
-			this.configuration = configuration;
+			_configuration = configuration;
 		}
 
 		public void ConfigureServices(IServiceCollection services)
 		{
+			_environmentConfiguration = new EnvironmentConfiguration(_configuration);
+
 			services.AddMvc(config =>
 			{
-				config.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+				if (!_environmentConfiguration.DisableAuth)
+				{
+					config.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+				}
 			}).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-			var environmentConfiguration = new EnvironmentConfiguration(configuration);
-			services.AddSingleton<IEnvironmentConfiguration>(environmentConfiguration);
+			services.AddSingleton<IEnvironmentConfiguration>(_environmentConfiguration);
 			services.AddSingleton<IHTTPService, HTTPService>();
 			services.AddScoped<IFNOLService, FNOLService>();
 			services.AddSingleton<INGPService, NGPService>();
 			services.AddScoped<IMongoConnection, MongoConnection>();
 			services.AddScoped<IClaimNumberCounterRepository, ClaimNumberCounterRepository>();
 
-			JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-			services.AddAuthentication(options =>
+			if (!_environmentConfiguration.DisableAuth)
 			{
-				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-			}).AddJwtBearer(o =>
-			{
-				o.Audience = "gofnol.api";
-				o.Authority = environmentConfiguration.ISEndpoint;
-			});
+				JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+				services.AddAuthentication(options =>
+				{
+					options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+					options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+				}).AddJwtBearer(o =>
+				{
+					o.Audience = "gofnol.api";
+					o.Authority = _environmentConfiguration.ISEndpoint;
+				});
+			}
 
 			services.AddSpaStaticFiles(c => c.RootPath = "ClientApp/build");
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public virtual void Configure(IApplicationBuilder app)
+		public virtual void Configure(IApplicationBuilder app, IHostingEnvironment hostingEnvironment)
 		{
-			Configure(app, true);
+			Configure(app, hostingEnvironment, true);
 		}
 
-		protected void Configure(IApplicationBuilder app, bool useSpa)
+		protected void Configure(IApplicationBuilder app, IHostingEnvironment hostingEnvironment, bool useSpa)
 		{
 			if (hostingEnvironment.IsDevelopment())
 			{
@@ -74,17 +79,6 @@ namespace GoFNOL
 			}
 
 			app.UseMiddleware<HealthCheckMiddleware>();
-
-			app.Use(async (context, next) =>
-			{
-				// In PCF all traffic beyond GoRouter goes over http. Need to make it look like it's https.
-				if (hostingEnvironment.IsProduction())
-				{
-					context.Request.Scheme = "https";
-				}
-
-				await next.Invoke();
-			});
 
 			app.UseStaticFiles();
 

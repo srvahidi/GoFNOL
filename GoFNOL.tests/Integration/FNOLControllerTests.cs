@@ -1,8 +1,11 @@
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Schema;
 using System.Xml.XPath;
 using FluentAssertions;
 using GoFNOL.Outside.Repositories;
@@ -11,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using FluentAssertionsServices = FluentAssertions.Common.Services;
 
 namespace GoFNOL.tests.Integration
 {
@@ -32,6 +36,8 @@ namespace GoFNOL.tests.Integration
 
 		private Mock<IClaimNumberCounterRepository> _mockClaimNumberCounterRepository;
 
+		private readonly XmlSchemaSet _schemaSet;
+
 		public FNOLControllerTests()
 		{
 			_requestContentClaimNumberProvided = new StringContent(new JObject
@@ -43,7 +49,7 @@ namespace GoFNOL.tests.Integration
 				{
 					["firstName"] = "1st name",
 					["lastName"] = "nst name",
-					["phoneNumber"] = "(012) 345 67-89",
+					["phoneNumber"] = "(012)345-6789",
 					["email"] = "a@b.c",
 					["address"] = new JObject
 					{
@@ -70,7 +76,7 @@ namespace GoFNOL.tests.Integration
 				{
 					["firstName"] = "1st name",
 					["lastName"] = "nst name",
-					["phoneNumber"] = "(012) 345 67-89",
+					["phoneNumber"] = "(012)345-6789",
 					["email"] = "a@b.c",
 					["address"] = new JObject
 					{
@@ -91,6 +97,9 @@ namespace GoFNOL.tests.Integration
 			_mockConfig.SetupGet(c => c.EAIEndpoint).Returns(ExpectedEndpoint);
 			_mockConfig.SetupGet(c => c.EAIUsername).Returns(ExpectedEAIUsername);
 			_mockConfig.SetupGet(c => c.EAIPassword).Returns(ExpectedEAIPassword);
+
+			_schemaSet = new XmlSchemaSet();
+			_schemaSet.Add("", XmlReader.Create(new StringReader(FixtureFiles.GetFixture("Fixtures/fnol.xsd"))));
 		}
 
 		protected override void RegisterServices(IServiceCollection customServices)
@@ -151,6 +160,7 @@ namespace GoFNOL.tests.Integration
 			eaiCredentials.username.Should().Be(ExpectedEAIUsername);
 			eaiCredentials.password.Should().Be(ExpectedEAIPassword);
 			var xAssignment = Helpers.ParseAssignment(eaiContent);
+			xAssignment.Validate(_schemaSet, (sender, args) => FluentAssertionsServices.ThrowException(args.Message));
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/MOBILE_FLOW_IND").Value.Should().Be("D");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/USER_ID").Value.Should().Be("1234567890");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/ASSIGNED_TO/COMPANY_ID").Value.Should().Be("123");
@@ -158,7 +168,7 @@ namespace GoFNOL.tests.Integration
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/CLAIM_NBR").Value.Should().Be("ABC-123");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_FIRST_NAME").Value.Should().Be("1st name");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_LAST_NAME").Value.Should().Be("nst name");
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_CONTACT_PHONE_NBR_3").Value.Should().Be("(012) 345 67-89");
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_CONTACT_PHONE_NBR_3").Value.Should().Be("(012)345-6789");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_POSTAL_CODE").Value.Should().Be("34567");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_CITY").Value.Should().Be("Cityville");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/OWNER_STATE").Value.Should().Be("ST");
@@ -168,7 +178,7 @@ namespace GoFNOL.tests.Integration
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/DEDUCTIBLE_AMT").Value.Should().Be("500");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_LAST_NAME").Value.Should().Be("nst name");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_FIRST_NAME").Value.Should().Be("1st name");
-			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_PHONE_NBR_1").Value.Should().Be("(012) 345 67-89");
+			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_PHONE_NBR_1").Value.Should().Be("(012)345-6789");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/ALTERNATE_CONTACT_EMAIL").Value.Should().Be("a@b.c");
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/LOSS_DATE").Value.Should().Be(DateTime.UtcNow.ToString("yyyy-MM-dd"));
 		}

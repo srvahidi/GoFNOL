@@ -1,0 +1,1202 @@
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Sanjay Jain (ADP) -->
+<!-- Last edit: 07/24/09 -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="ADP_FNOL_ASGN_INPUT">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:annotation>
+					<xs:appinfo>
+						<SchemaVersion>1.1</SchemaVersion>
+						<SchemaBuildNumber>18</SchemaBuildNumber>
+					</xs:appinfo>
+					<xs:documentation>This schema is for 'EAI INTERNAL ONLY', based on Audatex EAI FNOL/Assignment Data Dictionary.</xs:documentation>
+				</xs:annotation>
+				<xs:element name="MESSAGE_TYPE" type="MessageTypeType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Type of Message with codes as indicated ADD: Add Request
+CHG: Change Request CAN: Cancel Request SUP: Supplement Request</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="SENDER_TRANSACTION_ID" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Unique transaction id sent by the Sender</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="50"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="ADP_TRANSACTION_ID" type="IntegerOrBlankType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>ADP Transaction ID is the key returned with a successful ADD assignment request. For Message types-- Change (CHG), CAN (Cancel) and SUP (Supplement) this key is required. For internal reference ADP Transaction ID is the Work Assignment PK.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="CLIENT_PASSTHRU_DATA" type="xs:anyType" minOccurs="0"/>
+				<xs:element name="ASSIGNED_TO" type="AssignedToType"/>
+				<xs:element name="CLAIMREP" type="ClaimRepType" minOccurs="0"/>
+				<xs:element name="ESTIMATE_REVIEWER" type="ESTIMATE_REVIEWERType" minOccurs="0"/>
+				<xs:element name="CLAIM" type="ClaimType"/>
+				<xs:element name="MessageID" type="xs:string" minOccurs="0"/>
+				<xs:element name="APPLICATION_INFO" type="ApplicationInfoType" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="version" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:decimal">
+						<xs:enumeration value="1.0"/>
+						<xs:enumeration value="1.1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- Main Complex Types -->
+	<xs:complexType name="ClaimType">
+		<xs:sequence>
+			<xs:element name="FNOL_DATETIME_TZ" type="TimeZoneType" minOccurs="0"/>
+			<xs:element name="DAMAGED_OBJECT_TYPE" type="DamagedObjectType"/>
+			<xs:element name="WAIVER_OF_DEPRECIATION_FLG" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ASSIGNMENT_CREATOR_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ASSIGNMENT_CREATOR_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ASSIGNMENT_CREATOR_MIDDLE_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ASSIGNMENT_CREATOR_EMAIL" type="EmailType" minOccurs="0"/>
+			<xs:element name="ASSIGNMENT_TYPE" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AGENT_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AGENT_MIDDLE_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AGENT_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AGENT_CONTACT_PHONE_TYPE_1" type="PhoneType" minOccurs="0"/>
+			<xs:element name="AGENT_CONTACT_PHONE_NBR_1" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="AGENT_CONTACT_PHONE_TYPE_2" type="PhoneType" minOccurs="0"/>
+			<xs:element name="AGENT_CONTACT_PHONE_NBR_2" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="AGENT_CONTACT_PHONE_TYPE_3" type="PhoneType" minOccurs="0"/>
+			<xs:element name="AGENT_CONTACT_PHONE_NBR_3" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="AGENT_CONTACT_EMAIL" type="EmailType" minOccurs="0"/>
+			<xs:element name="ACCOUNTING_NBR" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="17"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIM_NBR">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIMANT_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIMANT_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIMANT_MIDDLE_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIMANT_COMPANY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIMANT_ADDRESS_1" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIMANT_ADDRESS_2" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIMANT_CITY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIMANT_STATE" type="ProvinceCodeType" minOccurs="0"/>
+			<xs:element name="CLAIMANT_POSTAL_CODE" type="AllZipFormats" minOccurs="0"/>
+			<xs:element name="CLAIMANT_POLICY_NBR" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="25"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIMANT_INSURANCE_COMPANY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLAIMANT_CONTACT_PHONE_TYPE_1" type="PhoneType" minOccurs="0"/>
+			<xs:element name="CLAIMANT_CONTACT_PHONE_NBR_1" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="CLAIMANT_CONTACT_PHONE_TYPE_2" type="PhoneType" minOccurs="0"/>
+			<xs:element name="CLAIMANT_CONTACT_PHONE_NBR_2" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="CLAIMANT_CONTACT_PHONE_TYPE_3" type="PhoneType" minOccurs="0"/>
+			<xs:element name="CLAIMANT_CONTACT_PHONE_NBR_3" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="CLAIMANT_CONTACT_EMAIL" type="EmailType" minOccurs="0"/>
+			<xs:element name="DEDUCTIBLE_AMT" type="DeductibleType" minOccurs="0"/>
+			<xs:element name="DEDUCTIBLE_PCT" type="PercentType" minOccurs="0"/>
+			<xs:element name="DISPATCHER_NOTES" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SCHEDULE_TEXT_LINE" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2500"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSURED_POLICY_NBR" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSURED_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSURED_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSURED_MIDDLE_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSURED_CONTACT_PHONE_TYPE_1" type="PhoneType" minOccurs="0"/>
+			<xs:element name="INSURED_CONTACT_PHONE_NBR_1" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="INSURED_CONTACT_PHONE_TYPE_2" type="PhoneType" minOccurs="0"/>
+			<xs:element name="INSURED_CONTACT_PHONE_NBR_2" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="INSURED_CONTACT_PHONE_TYPE_3" type="PhoneType" minOccurs="0"/>
+			<xs:element name="INSURED_CONTACT_PHONE_NBR_3" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="INSURED_CONTACT_EMAIL" type="EmailType" minOccurs="0"/>
+			<xs:element name="LOSS_TYPE" type="LossType"/>
+			<xs:element name="LOSS_DATE" type="DateOnlyType" minOccurs="0"/>
+			<xs:element name="LOSS_REPORTED_DATE" type="DateOnlyType" minOccurs="0"/>
+			<xs:element name="LOSS_PAYEE_COMPANY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="LOSS_TZ" type="TimeZoneType" minOccurs="0"/>
+			<xs:element name="OWNER_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OWNER_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OWNER_MIDDLE_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OWNER_COMPANY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OWNER_ADDRESS_1" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OWNER_ADDRESS_2" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OWNER_CITY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OWNER_STATE" type="ProvinceCodeType" minOccurs="0"/>
+			<xs:element name="OWNER_POSTAL_CODE" type="AllZipFormats" minOccurs="0"/>
+			<xs:element name="OWNER_CONTACT_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OWNER_CONTACT_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OWNER_CONTACT_MIDDLE_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OWNER_CONTACT_PHONE_TYPE_1" type="PhoneType" minOccurs="0"/>
+			<xs:element name="OWNER_CONTACT_PHONE_NBR_1" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="OWNER_CONTACT_PHONE_TYPE_2" type="PhoneType" minOccurs="0"/>
+			<xs:element name="OWNER_CONTACT_PHONE_NBR_2" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="OWNER_CONTACT_PHONE_TYPE_3" type="PhoneType" minOccurs="0"/>
+			<xs:element name="OWNER_CONTACT_PHONE_NBR_3" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="OWNER_CONTACT_EMAIL" type="EmailType" minOccurs="0"/>
+			<xs:element name="ALTERNATE_CONTACT_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ALTERNATE_CONTACT_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ALTERNATE_CONTACT_PHONE_TYPE_1" type="PhoneType" minOccurs="0"/>
+			<xs:element name="ALTERNATE_CONTACT_PHONE_NBR_1" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="ALTERNATE_CONTACT_PHONE_TYPE_2" type="PhoneType" minOccurs="0"/>
+			<xs:element name="ALTERNATE_CONTACT_PHONE_NBR_2" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="ALTERNATE_CONTACT_PHONE_TYPE_3" type="PhoneType" minOccurs="0"/>
+			<xs:element name="ALTERNATE_CONTACT_PHONE_NBR_3" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="ALTERNATE_CONTACT_EMAIL" type="EmailType" minOccurs="0"/>
+			<xs:element name="ALTERNATE_CONTACT_PREFERENCE" type="PhoneType" minOccurs="0"/>
+			<xs:element name="REPAIR_FACILITY_COMPANY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="REPAIR_FACILITY_DESCRIPTION" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="80"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="REPAIR_FACILITY_ADDRESS_1" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="REPAIR_FACILITY_ADDRESS_2" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="REPAIR_FACILITY_CITY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="REPAIR_FACILITY_STATE" type="ProvinceCodeType" minOccurs="0"/>
+			<xs:element name="REPAIR_FACILITY_POSTAL_CODE" type="AllZipFormats" minOccurs="0"/>
+			<xs:element name="REPAIR_FACILITY_CONTACT_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="REPAIR_FACILITY_CONTACT_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="REPAIR_FACILITY_CONTACT_MIDDLE_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="REPAIR_FACILITY_CONTACT_PHONE_TYPE_1" type="PhoneType" minOccurs="0"/>
+			<xs:element name="REPAIR_FACILITY_CONTACT_PHONE_NBR_1" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="REPAIR_FACILITY_ORGANIZATION_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="80"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_VALUATION_AMT" type="ValuationAmtType" minOccurs="0"/>
+			<xs:element name="VEHICLE_VIN" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="17"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_YEAR" type="GYearType" minOccurs="0"/>
+			<xs:element name="VEHICLE_MAKE" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_DESCRIPTION" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_ODOMETER" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="15"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_COLOR" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="80"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LICENSE_PLATE_NBR" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LICENSE_PLATE_STATE" type="ProvinceCodeType" minOccurs="0"/>
+			<xs:element name="VEHICLE_DRIVEABLE_IND" type="YesNoType"/>
+			<xs:element name="VEHICLE_PERMISSION_TO_MOVE" type="YesNoOrBlankType" minOccurs="0"/>
+			<xs:element name="VEHICLE_ID" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Unique identifier for the Vehicle in Client system. Can be numeric or alphanumeric</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CONDITION" type="ConditionType" minOccurs="0"/>
+			<xs:element name="PRIMARY_IMPACT_POINT" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SECONDARY_IMPACT_POINT" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSPECTION_CODE" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSPECTION_DATETIME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSPECTION_LOCATION_DESCRIPTION" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="80"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_COMPANY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_DESCRIPTION" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="80"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_ADDRESS_1" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_ADDRESS_2" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_CITY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_STATE" type="ProvinceCodeType" minOccurs="0"/>
+			<xs:element name="VEHICLE_LOCATION_POSTAL_CODE" type="AllZipFormats" minOccurs="0"/>
+			<xs:element name="VEHICLE_LOCATION_GEOCODE_LAT" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_GEOCODE_LONG" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_CONTACT_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_CONTACT_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_CONTACT_MIDDLE_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="VEHICLE_LOCATION_CONTACT_PHONE_TYPE_1" type="PhoneType" minOccurs="0"/>
+			<xs:element name="VEHICLE_LOCATION_CONTACT_PHONE_NBR_1" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="VEHICLE_LOCATION_CONTACT_PHONE_TYPE_2" type="PhoneType" minOccurs="0"/>
+			<xs:element name="VEHICLE_LOCATION_CONTACT_PHONE_NBR_2" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="VEHICLE_LOCATION_CONTACT_PHONE_TYPE_3" type="PhoneType" minOccurs="0"/>
+			<xs:element name="VEHICLE_LOCATION_CONTACT_PHONE_NBR_3" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="VEHICLE_LOCATION_CONTACT_EMAIL" type="EmailType" minOccurs="0"/>
+			<xs:element name="NOTIFICATION_EMAIL" type="EmailType" minOccurs="0"/>
+			<xs:element name="ESTIMATOR_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATOR_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATOR_MIDDLE_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATOR_COMPANY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATOR_ADDRESS_1" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATOR_ADDRESS_2" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATOR_CITY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATOR_STATE" type="ProvinceCodeType" minOccurs="0"/>
+			<xs:element name="ESTIMATOR_POSTAL_CODE" type="AllZipFormats" minOccurs="0"/>
+			<xs:element name="ESTIMATOR_CONTACT_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATOR_CONTACT_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATOR_CONTACT_MIDDLE_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATOR_CONTACT_PHONE_TYPE_1" type="PhoneType" minOccurs="0"/>
+			<xs:element name="ESTIMATOR_CONTACT_PHONE_NBR_1" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="ESTIMATOR_CONTACT_PHONE_TYPE_2" type="PhoneType" minOccurs="0"/>
+			<xs:element name="ESTIMATOR_CONTACT_PHONE_NBR_2" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="ESTIMATOR_CONTACT_PHONE_TYPE_3" type="PhoneType" minOccurs="0"/>
+			<xs:element name="ESTIMATOR_CONTACT_PHONE_NBR_3" type="PhoneNumberType" minOccurs="0"/>
+			<xs:element name="ESTIMATOR_CONTACT_EMAIL" type="EmailType" minOccurs="0"/>
+			<xs:element name="ESTIMATE_REMARKS_1" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATE_REMARKS_2" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATE_REMARKS_3" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATE_REMARKS_4" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATE_REMARKS_5" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATE_REMARKS_6" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ESTIMATE_REMARKS_7" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DEDUCTIBLE_REDUCTION_AMT" type="MoneyType" minOccurs="0"/>
+			<xs:element name="REPLACEMENT_COST_POLICY_IND" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FILE_NBR" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="34"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CATASTROPHE_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="STORM_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="36"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSURANCE_COMPANY_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="HEADER_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+      <xs:element name="INSURANCE_COMPANY_ADDRESS_1" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+						<xs:element name="INSURANCE_COMPANY_ADDRESS_2" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="55"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+						<xs:element name="INSURANCE_COMPANY_CITY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+						<xs:element name="INSURANCE_COMPANY_STATE" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+						<xs:element name="INSURANCE_COMPANY_POSTAL_CODE" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="15"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSURANCE_COMPANY_CONTACT_LAST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="60"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSURANCE_COMPANY_CONTACT_FIRST_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INSURANCE_COMPANY_CONTACT_PHONE_TYPE_1" type="PhoneType" minOccurs="0"/>
+			<xs:element name="INSURANCE_COMPANY_CONTACT_PHONE_NBR_1" type="PhoneNumberType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AssignedToType">
+		<xs:sequence>
+			<xs:element name="COMPANY_ID">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="REGION_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OFFICE_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="USER_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="15"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PARTNER_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="CLIENT_DEFINED_IND" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="GENERIC_ID_WORKFLOW_IND" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="COMPBID_WORKFLOW_IND" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TASK_TYPE" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="80"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TASK_PRIORITY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TASK_SEVERITY" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="SERVICE_WINDOW" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="MOBILE_FLOW_IND" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="APPRAISAL_TYPE" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="80"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DISPATCH_TO" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClaimRepType">
+		<xs:sequence minOccurs="0">
+			<xs:element name="COMPANY_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OFFICE_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="USER_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ESTIMATE_REVIEWERType">
+		<xs:sequence minOccurs="0">
+			<xs:annotation>
+				<xs:documentation>This node added newly in the Build number 14 for the pool assessor</xs:documentation>
+			</xs:annotation>
+			<xs:element name="COMPANY_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OFFICE_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="USER_ID" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ApplicationInfoType">
+		<xs:sequence>
+			<xs:annotation>
+				<xs:documentation>Application Info is used by the processing application.
+APPLICATION_NAME: Name of the application generating this xml.
+APPLICATION_VERSION: Version of the application generating this xml.
+PROCESSING_CODE: A code that specifies which Audatex service is used to process 
+this request. (PROCESSING_CODE is for Audatex Internal Use Only).</xs:documentation>
+			</xs:annotation>
+			<xs:element name="APPLICATION_NAME" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="APPLICATION_VERSION" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PROCESSING_CODE" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="WEBSERVICE_CODE" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- End Main Complex Types-->
+	<xs:simpleType name="BlankType">
+		<xs:restriction base="xs:string">
+			<xs:length value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ConditionType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="EXCL"/>
+			<xs:enumeration value="GOOD"/>
+			<xs:enumeration value="FAIR"/>
+			<xs:enumeration value="POOR"/>
+			<xs:enumeration value=""/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MoneyType">
+		<xs:union memberTypes="MoneyTypeBase BlankType"/>
+	</xs:simpleType>
+	<xs:simpleType name="MoneyTypeBase">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+			<xs:totalDigits value="7"/>
+			<xs:minInclusive value="0.00"/>
+			<xs:maxInclusive value="99999.99"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ValuationAmtType">
+		<xs:union memberTypes="ValuationAmtTypeBase BlankType"/>
+	</xs:simpleType>
+	<xs:simpleType name="ValuationAmtTypeBase">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+			<xs:totalDigits value="12"/>
+			<xs:minInclusive value="0.00"/>
+			<xs:maxInclusive value="9999999999.99"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PercentType">
+		<xs:union memberTypes="PercentTypeBase BlankType"/>
+	</xs:simpleType>
+	<xs:simpleType name="PercentTypeBase">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+			<xs:totalDigits value="4"/>
+			<xs:minInclusive value="0.00"/>
+			<xs:maxInclusive value="99.99"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- Custom Simple Types-->
+	<xs:simpleType name="AllZipFormats">
+		<xs:union memberTypes="CAZipCode USZipCode5 USZipCode9 BlankType"/>
+	</xs:simpleType>
+	<xs:simpleType name="CAZipCode">
+		<xs:restriction base="xs:string">
+			<xs:length value="7"/>
+			<xs:pattern value="[a-zA-Z]\d[a-zA-Z]\s\d[a-zA-Z]\d"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PhoneType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="WP"/>
+			<xs:enumeration value="W2"/>
+			<xs:enumeration value="HP"/>
+			<xs:enumeration value="H2"/>
+			<xs:enumeration value="CP"/>
+			<xs:enumeration value="FX"/>
+			<xs:enumeration value="BN"/>
+			<xs:enumeration value=""/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PhoneNumberType">
+		<xs:union memberTypes="PhoneNumberNoExt PhoneNumberExt BlankType"/>
+	</xs:simpleType>
+	<xs:simpleType name="PhoneNumberNoExt">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\(\d{3}\)\d{3}-\d{4}x?"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PhoneNumberExt">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\(\d{3}\)\d{3}-\d{4}x\d{1,10}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EmailType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="PostalCodeType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="60"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TimeZoneType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="AST"/>
+			<xs:enumeration value="ADT"/>
+			<xs:enumeration value="BST"/>
+			<xs:enumeration value="BDT"/>
+			<xs:enumeration value="CST"/>
+			<xs:enumeration value="CDT"/>
+			<xs:enumeration value="EST"/>
+			<xs:enumeration value="EDT"/>
+			<xs:enumeration value="GMT"/>
+			<xs:enumeration value="HST"/>
+			<xs:enumeration value="HDT"/>
+			<xs:enumeration value="MST"/>
+			<xs:enumeration value="MDT"/>
+			<xs:enumeration value="NST"/>
+			<xs:enumeration value="NDT"/>
+			<xs:enumeration value="PST"/>
+			<xs:enumeration value="PDT"/>
+			<xs:enumeration value="YST"/>
+			<xs:enumeration value="YDT"/>
+			<xs:enumeration value=""/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LossType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="COLL"/>
+			<xs:enumeration value="COMP"/>
+			<xs:enumeration value="COFR"/>
+			<xs:enumeration value="COFL"/>
+			<xs:enumeration value="COHL"/>
+			<xs:enumeration value="COOC"/>
+			<xs:enumeration value="COTF"/>
+			<xs:enumeration value="COVM"/>
+			<xs:enumeration value="LIAB"/>
+			<xs:enumeration value="OTHR"/>
+			<xs:enumeration value="UNK"/>
+			<xs:enumeration value="NONE"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MessageTypeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ADD"/>
+			<xs:enumeration value="CHG"/>
+			<xs:enumeration value="CAN"/>
+			<xs:enumeration value="SUP"/>
+			<xs:enumeration value="REASSIGN"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DamagedObjectType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="VEH"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DeductibleType">
+		<xs:union memberTypes="DeductibleEnum MoneyTypeBase"/>
+	</xs:simpleType>
+	<xs:simpleType name="DeductibleEnum">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="N"/>
+			<xs:enumeration value="W"/>
+			<xs:enumeration value="U"/>
+			<xs:enumeration value=""/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="YesNoType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y"/>
+			<xs:enumeration value="N"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="YesNoOrBlankType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y"/>
+			<xs:enumeration value="N"/>
+			<xs:enumeration value=""/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ProvinceCodeTypeBase">
+		<xs:restriction base="xs:string">
+			<xs:length value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ProvinceCodeType">
+		<xs:union memberTypes="ProvinceCodeTypeBase BlankType"/>
+	</xs:simpleType>
+	<xs:simpleType name="DateOnlyType">
+		<xs:union memberTypes="xs:date BlankType"/>
+	</xs:simpleType>
+	<xs:simpleType name="GYearType">
+		<xs:union memberTypes="xs:gYear BlankType"/>
+	</xs:simpleType>
+	<xs:simpleType name="IntegerOrBlankType">
+		<xs:union memberTypes="xs:integer BlankType"/>
+	</xs:simpleType>
+	<xs:simpleType name="USZipCode5">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d{5}-?"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="USZipCode9">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d{5}-\d{4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

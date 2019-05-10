@@ -114,8 +114,8 @@ describe('Home component when signed in', () => {
 			expect(city.find('input').props().placeholder).toBe('City')
 
 			const state = form.find('.state')
-			expect(state.find('label').text()).toBe('State')
-			expect(state.find('input').props().placeholder).toBe('State')
+			expect(state.find('label').text()).toBe('State/Province')
+			expect(state.find('input').props().placeholder).toBe('State/Province')
 
 			const email = form.find('.email')
 			expect(email.find('label').text()).toBe('Email')

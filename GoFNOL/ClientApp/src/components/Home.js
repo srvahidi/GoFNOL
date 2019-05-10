@@ -110,8 +110,8 @@ export class Home extends Component {
 						<input type="text" name="city" placeholder="City" value={this.state.city} onChange={e => this.setState({ city: e.currentTarget.value })} />
 					</div>
 					<div className="state">
-						<label>State</label>
-						<input type="text" name="state" placeholder="State" value={this.state.state} onChange={e => this.setState({ state: e.currentTarget.value })} />
+						<label>State/Province</label>
+						<input type="text" name="state" placeholder="State/Province" value={this.state.state} onChange={e => this.setState({ state: e.currentTarget.value })} />
 					</div>
 					<div className="email">
 						<label>Email</label>

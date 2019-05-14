@@ -2,7 +2,7 @@
 	"user-provided": [
 		{
 			"credentials": {
-				"endpoint": "http://sys-arch-svr12.pdlab.adp.com/wsproxy/ws_proxy.asmx",
+				"url": "http://sys-arch-svr12.pdlab.adp.com/wsproxy/ws_proxy.asmx",
 				"password": "e85taweb",
 				"username": "password"
 			},
@@ -10,13 +10,13 @@
 		},
 		{
 			"credentials": {
-				"endpoint": "https://is.nowhere"
+				"url": "https://is.nowhere"
 			},
 			"name": "IS"
 		},
 		{
 			"credentials": {
-				"endpoint": "http://ngp-w2k8-appb.pdlab.adp.com/WsApp/WsApp.asmx"
+				"url": "http://ngp-w2k8-appb.pdlab.adp.com/WsApp/WsApp.asmx"
 			},
 			"name": "NGP"
 		}

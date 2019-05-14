@@ -36,15 +36,15 @@ namespace GoFNOL
 			DisableAuth = string.Equals(configuration["DISABLE_AUTH"], bool.TrueString, StringComparison.InvariantCultureIgnoreCase);
 		}
 
-		public string EAIEndpoint => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "EAI")["credentials"]["endpoint"].Value<string>();
+		public string EAIEndpoint => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "EAI")["credentials"]["url"].Value<string>();
 
 		public string EAIUsername => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "EAI")["credentials"]["username"].Value<string>();
 
 		public string EAIPassword => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "EAI")["credentials"]["password"].Value<string>();
 
-		public string ISEndpoint => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "IS")["credentials"]["endpoint"].Value<string>();
+		public string ISEndpoint => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "IS")["credentials"]["url"].Value<string>();
 
-		public string NGPUsersEndpoint => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "NGP")["credentials"]["endpoint"].Value<string>();
+		public string NGPUsersEndpoint => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "NGP")["credentials"]["url"].Value<string>();
 
 		public string DbConnectionString => _jVcap.Value.Properties().First(p => p.Name.Contains("mongodb")).Value[0]["credentials"]["uri"].Value<string>();
 
@@ -52,7 +52,7 @@ namespace GoFNOL
 		{
 			get
 			{
-				var value = _jVcap.Value["user-provided"].FirstOrDefault(s => s["name"].Value<string>() == "a2e-data")?["credentials"]["DiscoveryUri"].Value<string>();
+				var value = _jVcap.Value["user-provided"].FirstOrDefault(s => s["name"].Value<string>() == "a2e-data")?["credentials"]["url"].Value<string>();
 				return value != null ? new Uri(value) : null;
 			}
 		}

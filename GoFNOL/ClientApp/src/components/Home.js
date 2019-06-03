@@ -119,7 +119,7 @@ export class Home extends Component {
 					</div>
 					<div className="vin">
 						<label>VIN</label>
-						<input type="text" name="vin" placeholder="VIN" value={this.state.vin} onChange={e => this.setState({ vin: e.currentTarget.value })} />
+						<input type="text" name="vin" placeholder="VIN" value={this.state.vin} onChange={e => this.setState({ vin: e.currentTarget.value })} onBlur={() => this.setState({ vin: this.state.vin.toUpperCase() })} />
 					</div>
 					<div className="loss-type">
 						<label>Loss Type</label>

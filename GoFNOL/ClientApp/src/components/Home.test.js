@@ -297,6 +297,17 @@ describe('Home component when signed in', () => {
 			})
 		})
 
+		describe('entering lower cased chars as VIN and blurring input focus', () => {
+			beforeEach(() => {
+				fixture.find('.form .vin input[name="vin"]')
+					.simulate('change', { currentTarget: { value: '0123456789abcdefg' } })
+					.simulate('blur')
+			})
+
+			it('should uppercase VIN', () => {
+				expect(fixture.find('.form .vin input[name="vin"]').props().value).toBe('0123456789ABCDEFG')
+			})
+		})
 
 		describe('filling out all required fields', () => {
 			beforeEach(() => {

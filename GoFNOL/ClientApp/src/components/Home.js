@@ -99,7 +99,7 @@ export class Home extends Component {
 					</div>
 					<div className="phone-number">
 						<label>Phone number</label>
-						<input type="text" name="phone-number" placeholder="Phone number" value={this.state.phoneNumber} onChange={e => this.setState({ phoneNumber: e.currentTarget.value })} />
+						<input type="text" name="phone-number" placeholder="Digits Only" value={this.state.phoneNumber} onChange={e => this.setState({ phoneNumber: e.currentTarget.value.replace(/\D/g,'') }) } />
 					</div>
 					<div className="zip-code">
 						<label>ZIP Code</label>
@@ -164,7 +164,7 @@ export class Home extends Component {
 			owner: {
 				firstName: this.state.firstName,
 				lastName: this.state.lastName,
-				phoneNumber: this.state.phoneNumber,
+				phoneNumber: '(' + this.state.phoneNumber.slice(0, 3) + ')' + this.state.phoneNumber.slice(3, 6) + '-' + this.state.phoneNumber.slice(6),
 				email: this.state.email,
 				address: {
 					city: this.state.city,
@@ -181,6 +181,11 @@ export class Home extends Component {
 
 		if (!request.owner.address.city) {
 			this.setState({ errorMessage: 'City is a required field. Please update and resubmit.' })
+			return
+		}
+
+		if (this.state.phoneNumber && this.state.phoneNumber.length !== 10) {
+			this.setState({ errorMessage: 'Phone number must be 10 digits. Please update and resubmit.' })
 			return
 		}
 

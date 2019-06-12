@@ -74,7 +74,7 @@ describe('Home component when signed in', () => {
 			expect(fixture.find('.profile-label').text()).toBe('Create Claim for Profile: 4774PE200001')
 		})
 
-		it('should render all inputs (w/ Pocket Estimate)', () => {
+		it('should render all inputs (w/ State Farm branding "Pocket Estimate")', () => {
 			const form = fixture.find('.form')
 
 			const mobileFlowIndicator = form.find('.mobile-flow-ind')
@@ -103,7 +103,7 @@ describe('Home component when signed in', () => {
 
 			const phoneNumber = form.find('.phone-number')
 			expect(phoneNumber.find('label').text()).toBe('Phone number')
-			expect(phoneNumber.find('input').props().placeholder).toBe('Phone number')
+			expect(phoneNumber.find('input').props().placeholder).toBe('Digits Only')
 
 			const zipCode = form.find('.zip-code')
 			expect(zipCode.find('label').text()).toBe('ZIP Code')
@@ -155,6 +155,20 @@ describe('Home component when signed in', () => {
 			})
 		})
 
+		describe('clicking Create button with invalid length phone number', () => {
+			beforeEach(() => {
+				const form = fixture.find('.form')
+				fixture.find('.form .phone-number input').simulate('change', { currentTarget: { value: '012345678' } })
+				fixture.find('.form .city input').simulate('change', { currentTarget: { value: 'Cityville' } })
+				form.simulate('submit', { preventDefault: jest.fn() })
+			})
+
+			it('should NOT make an Api call and should display error message', () => {
+				expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(0)
+				expect(fixture.find('.error').text()).toBe('Phone number must be 10 digits. Please update and resubmit.')
+			})
+		})
+
 		describe('selecting autogenerate claim number', () => {
 			beforeEach(() => {
 				fixture.find('.form .auto-generate-claim').simulate('change')
@@ -192,7 +206,7 @@ describe('Home component when signed in', () => {
 						owner: {
 							firstName: '1st name',
 							lastName: 'nst name',
-							phoneNumber: '(012) 345 67-89',
+							phoneNumber: '(012)345-6789',
 							email: 'a@b.c',
 							address: {
 								city: 'Cityville',
@@ -347,6 +361,29 @@ describe('Home component when signed in', () => {
 				it('should make an Api call', () => {
 					expect(mockApi.postCreateAssignment).toHaveBeenCalledTimes(1)
 					expect(mockApi.postCreateAssignment.mock.calls[0][0].mobileFlowIndicator).toBe('N')
+				})
+			})
+		})
+
+		describe('phone number tests', () => {
+			describe('entering valid phone number', () => {
+				beforeEach(() => {
+					fixture.find('.form .phone-number input').simulate('change', { currentTarget: { value: '0123456789' } })
+				})
+
+				it('should be valid', () => {
+					expect(fixture.find('.form .phone-number input').props().value).toBe('0123456789')
+				})
+			})
+
+			describe('entering invalid phone number', () => {
+				beforeEach(() => {
+					fixture.find('.form .phone-number input').simulate('change', { currentTarget: { value: '()-)a9' } })
+					fixture.update()
+				})
+
+				it('should drop non numeric', () => {
+					expect(fixture.find('.form .phone-number input').props().value).toBe('9')
 				})
 			})
 		})

@@ -80,6 +80,8 @@ namespace GoFNOL
 
 			app.UseMiddleware<HealthCheckMiddleware>();
 
+			app.UseMiddleware<VersionMiddleware>();
+
 			app.UseStaticFiles();
 
 			app.UseSpaStaticFiles();

@@ -29,11 +29,11 @@ describe('App component in acceptance environment', () => {
 describe('App component in int environment', () => {
 	let fixture
 	beforeEach(() => {
-		fixture = shallow(<App getWindowLocation={() => ({ href: 'http://gofnol-int.domain' })} />)
+		fixture = shallow(<App getWindowLocation={() => ({ href: 'http://gofnol-pcpm.domain' })} />)
 	})
 
 	it('should render int as environment name', () => {
-		expect(fixture.find('h3').text()).toBe('GoFNOL - Int')
+		expect(fixture.find('h3').text()).toBe('GoFNOL - PCPM')
 	})
 })
 

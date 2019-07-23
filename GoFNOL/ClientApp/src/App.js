@@ -30,8 +30,8 @@ export default class App extends Component {
 			return Environment.Acceptance
 		}
 
-		if (href.indexOf('-int') !== -1) {
-			return Environment.Int
+		if (href.indexOf('-pcpm') !== -1) {
+			return Environment.Pcpm
 		}
 
 		if (href.indexOf('-demo') !== -1) {
@@ -45,6 +45,6 @@ export default class App extends Component {
 export const Environment = {
 	Local: 'Local',
 	Acceptance: 'Acceptance',
-	Int: 'Int',
+	Pcpm: 'PCPM',
 	Demo: 'Demo'
 }

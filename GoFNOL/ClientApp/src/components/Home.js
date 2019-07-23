@@ -133,7 +133,7 @@ export class Home extends Component {
 							<input type="text" name="deductible" className="deductible-value" placeholder="Deductible" value={this.state.deductible} onChange={e => this.setState({ deductible: e.currentTarget.value })} />
 						</div>
 					</div>
-					{this.props.environment !== Environment.Int && <div className="estimate-destination">
+					{this.props.environment !== Environment.Pcpm && <div className="estimate-destination">
 						<label>Estimate Destination</label>
 						<div>
 							<span className="adxe-label">ADXE Worklist</span>

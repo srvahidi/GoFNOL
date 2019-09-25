@@ -59,6 +59,8 @@ namespace GoFNOL
 			}
 
 			services.AddSpaStaticFiles(c => c.RootPath = "ClientApp/build");
+
+			services.AddSwaggerGen(c => c.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info {Title = "GoFNOL", Version = "v1"}));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -89,6 +91,10 @@ namespace GoFNOL
 			app.UseAuthentication();
 
 			app.UseMvc(routes => routes.MapRoute("default", "{controller}/{action=Index}/{id?}"));
+
+			app.UseSwagger();
+
+			app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GoFNOL"));
 
 			if (useSpa)
 			{

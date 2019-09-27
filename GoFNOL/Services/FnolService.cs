@@ -60,10 +60,6 @@ namespace GoFNOL.Services
 			var workAssignmentId = Regex.Match(eaiResponseString, @"ADP_TRANSACTION_ID&gt;(\w+)&lt;/ADP_TRANSACTION_ID").Groups[1].Value;
 			_logger.LogInformation($"New assignment waId = '{workAssignmentId}'");
 			if (string.IsNullOrEmpty(workAssignmentId)) throw new EAIException();
-			if (fnolRequest.IsStayingInProgress)
-			{
-				await SaveAssignmentAssignmentInProgress(workAssignmentId);
-			}
 
 			return new FNOLResponse(workAssignmentId, fnolRequest.ClaimNumber);
 		}
@@ -125,21 +121,6 @@ namespace GoFNOL.Services
 			xAssignment.XPathSelectElement("//ADP_FNOL_ASGN_INPUT/CLAIM/VEHICLE_LOCATION_STATE").Value = fnolRequest.Owner.Address.State;
 
 			return xAssignment;
-		}
-
-		private async Task SaveAssignmentAssignmentInProgress(string workAssignmentId)
-		{
-			try
-			{
-				var response = await _client.GetAsync(_environmentConfiguration.A2EDataDiscoveryUri);
-				var jDiscoveryDocument = JObject.Parse(await response.Content.ReadAsStringAsync());
-				var endpoint = jDiscoveryDocument["assignmentsInProgress"].Value<string>();
-				await _client.PutAsync(new Uri($"{endpoint}/{workAssignmentId}"), new StringContent(""));
-			}
-			catch (Exception x)
-			{
-				_logger.LogError(x, $"Failed to save 'In Progress' assignment destination for waid={workAssignmentId}");
-			}
 		}
 
 		private static string ReadResource(string name)

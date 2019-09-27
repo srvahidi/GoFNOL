@@ -134,13 +134,6 @@ describe('Home component when signed in', () => {
 			expect(deductible.find('label').text()).toBe('Deductible')
 			expect(deductible.find('.waive-label').text()).toBe('Waive')
 			expect(deductible.find('input.deductible-value').props().placeholder).toBe('Deductible')
-
-			const estimateDestination = form.find('.estimate-destination')
-			expect(estimateDestination.find('label').text()).toBe('Estimate Destination')
-			expect(estimateDestination.find('.adxe-label').text()).toBe('ADXE Worklist')
-			expect(estimateDestination.find('input.estimate-destination-adxe').props().checked).toBe(false)
-			expect(estimateDestination.find('.review-pool-label').text()).toBe('Review Pool')
-			expect(estimateDestination.find('input.estimate-destination-review').props().checked).toBe(true)
 		})
 
 		describe('clicking Create button without entered city value', () => {
@@ -192,7 +185,6 @@ describe('Home component when signed in', () => {
 					form.find('.email input').simulate('change', { currentTarget: { value: 'a@b.c' } })
 					form.find('.vin input').simulate('change', { currentTarget: { value: '0123456789ABCDEFG' } })
 					form.find('.deductible input.deductible-value').simulate('change', { currentTarget: { value: '500' } })
-					form.find('.estimate-destination-review').simulate('change')
 					form.simulate('submit', { preventDefault: jest.fn() })
 				})
 
@@ -217,7 +209,6 @@ describe('Home component when signed in', () => {
 						vin: '0123456789ABCDEFG',
 						lossType: 'COLL',
 						deductible: '500',
-						isStayingInProgress: false,
 						autoGenerateClaim: true
 					})
 				})

@@ -36,8 +36,7 @@
 .form .email,
 .form .vin,
 .form .loss-type,
-.form .deductible,
-.form .estimate-destination {
+.form .deductible {
 	align-items: baseline;
 	display: grid;
 	grid-template-columns: 10em 1fr;
@@ -50,14 +49,6 @@
 	grid-gap: 1em;
 	grid-template-columns: auto auto 1fr;
 	justify-content: start;
-}
-
-.form .estimate-destination > div {
-	align-items: center;
-	display: grid;
-	grid-gap: 1em;
-	grid-template-columns: auto 1fr auto 1fr;
-	justify-content: space-evenly;
 }
 
 .form .deductible .deductible-waive {

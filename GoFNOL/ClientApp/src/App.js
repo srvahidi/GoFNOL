@@ -17,7 +17,7 @@ export default class App extends Component {
 				<button onClick={signOut}>Logout</button>
 			</header>
 			<div className="content">
-				<Route exact path='/' render={props => <Home {...props} api={new Api()} environment={this.getEnvironmentName()} />} />
+				<Route exact path='/' render={props => <Home {...props} api={new Api()} />} />
 				<Route path='/auth-callback' render={props => <AuthCallback {...props} />} />
 				<Route path='/auth-silent-callback' render={props => <AuthSilentCallback {...props} />} />
 			</div>

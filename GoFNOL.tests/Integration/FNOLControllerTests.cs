@@ -61,7 +61,6 @@ namespace GoFNOL.tests.Integration
 				["vin"] = "0123456789ABCDEFG",
 				["lossType"] = "COLL",
 				["deductible"] = "500",
-				["isStayingInProgress"] = true,
 				["autoGenerateClaim"] = false
 			}.ToString());
 			_requestContentClaimNumberProvided.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -88,7 +87,6 @@ namespace GoFNOL.tests.Integration
 				["vin"] = "0123456789ABCDEFG",
 				["lossType"] = "COLL",
 				["deductible"] = "500",
-				["isStayingInProgress"] = false,
 				["autoGenerateClaim"] = true
 			}.ToString());
 			_requestContentClaimNumberGenerated.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -117,21 +115,6 @@ namespace GoFNOL.tests.Integration
 		public async Task FNOLController_WhenPostIsInvoked_ShouldSubmitToEAIAndReturnData()
 		{
 			// Setup
-			_mockConfig.SetupGet(c => c.A2EDataDiscoveryUri).Returns(new Uri("http://a2e.data"));
-
-			var jA2EDataDiscoveryDoc = new JObject
-			{
-				["assignmentsInProgress"] = "http://a2e.data/api/assignmentsinprogress"
-			};
-			_mockHTTPService.Setup(service => service.GetAsync(new Uri("http://a2e.data")))
-				.ReturnsAsync(new HttpResponseMessage
-				{
-					Content = new StringContent(jA2EDataDiscoveryDoc.ToString())
-				});
-
-			_mockHTTPService.Setup(service => service.PutAsync(new Uri("http://a2e.data/api/assignmentsinprogress/123"), It.IsAny<HttpContent>()))
-				.ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
-
 			(Uri uri, HttpContent content)? actualEAI = null;
 			_mockHTTPService.Setup(service => service.PostAsync(It.IsAny<Uri>(), It.IsAny<HttpContent>()))
 				.Callback<Uri, HttpContent>((uri, content) => actualEAI = (uri, content))
@@ -253,7 +236,6 @@ namespace GoFNOL.tests.Integration
 		public async Task FNOLController_WhenPostIsInvokedWithAutoGenerateTrue_ShouldGenerateClaimNumberAndSubmitToEAIAndReturnData()
 		{
 			// Setup
-			_mockConfig.SetupGet(c => c.A2EDataDiscoveryUri).Returns(new Uri("http://a2e.data"));
 			_mockClaimNumberCounterRepository.Setup(m => m.IncrementCounter("PGI")).ReturnsAsync(456);
 
 			(Uri uri, HttpContent content)? actualEAI = null;

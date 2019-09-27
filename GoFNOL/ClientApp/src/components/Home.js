@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 
-import { Environment } from '../App'
 import { isSignedIn, signIn, getUserName } from '../authService'
 
 import './Home.css'
@@ -30,7 +29,6 @@ export class Home extends Component {
 			lossType: 'COLL',
 			deductibleWaived: false,
 			deductible: '',
-			isStayingInProgress: false,
 			autoGenerateClaim: false,
 			createdClaimNumber: ''
 		}
@@ -133,15 +131,6 @@ export class Home extends Component {
 							<input type="text" name="deductible" className="deductible-value" placeholder="Deductible" value={this.state.deductible} onChange={e => this.setState({ deductible: e.currentTarget.value })} />
 						</div>
 					</div>
-					{this.props.environment !== Environment.Pcpm && <div className="estimate-destination">
-						<label>Estimate Destination</label>
-						<div>
-							<span className="adxe-label">ADXE Worklist</span>
-							<input type="radio" className="estimate-destination-adxe" checked={this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: true }) }} />
-							<span className="review-pool-label">Review Pool</span>
-							<input type="radio" className="estimate-destination-review" checked={!this.state.isStayingInProgress} onChange={() => { this.setState({ isStayingInProgress: false }) }} />
-						</div>
-					</div>}
 					<button type="submit" className="create shadowed" disabled={this.state.inProgress}>Create</button>
 				</form>
 				{this.state.stopwatchSeconds > 0 && <span className="time-elapsed">{this.state.inProgress ? `Elapsed time: ${this.state.stopwatchSeconds} seconds.` : `GoFNOL took ${this.state.stopwatchSeconds} seconds to create claim number ${this.state.createdClaimNumber}`}</span>}
@@ -175,7 +164,6 @@ export class Home extends Component {
 			vin: this.state.vin,
 			lossType: this.state.lossType,
 			deductible: this.state.deductibleWaived ? 'W' : this.state.deductible,
-			isStayingInProgress: this.state.isStayingInProgress,
 			autoGenerateClaim: this.state.autoGenerateClaim
 		}
 

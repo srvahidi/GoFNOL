@@ -17,8 +17,6 @@ namespace GoFNOL
 
 		string NGPUsersEndpoint { get; }
 
-		Uri A2EDataDiscoveryUri { get; }
-
 		string DbConnectionString { get; }
 
 		bool DisableAuth { get; }
@@ -47,15 +45,6 @@ namespace GoFNOL
 		public string NGPUsersEndpoint => _jVcap.Value["user-provided"].First(s => s["name"].Value<string>() == "NGP")["credentials"]["url"].Value<string>();
 
 		public string DbConnectionString => _jVcap.Value.Properties().First(p => p.Name.Contains("mongodb")).Value[0]["credentials"]["uri"].Value<string>();
-
-		public Uri A2EDataDiscoveryUri
-		{
-			get
-			{
-				var value = _jVcap.Value["user-provided"].FirstOrDefault(s => s["name"].Value<string>() == "a2e-data")?["credentials"]["url"].Value<string>();
-				return value != null ? new Uri(value) : null;
-			}
-		}
 
 		public bool DisableAuth { get; }
 	}

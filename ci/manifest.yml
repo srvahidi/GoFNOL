@@ -3,7 +3,7 @@ applications:
 - name: GoFNOL-blue
   memory: 256M
   buildpacks:
-    - newrelic_dotnet_core_buildpack
+    - newrelic_dotnet_core_buildpack_latest
     - sol-dotnet_core_buildpack-latest
   routes:
   - route: gofnol-[ENV]-blue.[DOMAIN]

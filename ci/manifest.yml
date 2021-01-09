@@ -3,8 +3,12 @@ applications:
 - name: GoFNOL-blue
   memory: 256M
   buildpacks:
-    - newrelic_dotnet_core_buildpack_latest
-    - sol-dotnet_core_buildpack-latest
+    - dotnet_core_buildpack
+  env :
+    CORECLR_ENABLE_PROFILING: 1
+    CORECLR_PROFILER_PATH_64: "/home/vcap/app/contrast/runtimes/linux-x64/native/ContrastProfiler.so"
+    CORECLR_PROFILER: "{8B2CE134-0948-48CA-A4B2-80DDAD9F5791}"
+    CONTRAST_CONFIG_PATH: "/home/vcap/app/contrast/contrast_security-qa.yaml"
   routes:
   - route: gofnol-[ENV]-blue.[DOMAIN]
   services:

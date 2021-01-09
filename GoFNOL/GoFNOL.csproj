@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Contrast.SensorsNetCore" Version="1.5.20" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.2.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.9.1" />
@@ -26,6 +27,12 @@
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
     <Content Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="contrast\contrast_security-qa.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

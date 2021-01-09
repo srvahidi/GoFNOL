@@ -1,0 +1,11 @@
+api: 
+  url: https://app.contrastsecurity.com
+  api_key: 2hZpK601Bw1Sit7N3eNzgAnZvRJOTG54
+  service_key: WMYRA8LVP7HPXR8B
+  user_name: agent_e543df57-6a19-4324-8531-cfb376796dff@Solera
+application:
+  name: RMS-Audatex-GoFNOL
+  code: Audatex-GoFNOL
+server:
+  # name: <serverName>
+  environment: qa

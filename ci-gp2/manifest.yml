@@ -3,7 +3,7 @@ applications:
 - name: GoFNOL-blue
   memory: 256M
   buildpacks:
-    - sol-dotnet_core_buildpack-latest
+    - dotnet_core_buildpack
   env :
     CORECLR_ENABLE_PROFILING: 1
     CORECLR_PROFILER_PATH_64: "/home/vcap/app/contrast/runtimes/linux-x64/native/ContrastProfiler.so"

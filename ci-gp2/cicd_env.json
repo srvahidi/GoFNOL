@@ -1,0 +1,31 @@
+{
+	"user-provided": [
+		{
+			"credentials": {
+				"url": "http://sys-arch-svr12.pdlab.adp.com/wsproxy/ws_proxy.asmx",
+				"password": "e85taweb",
+				"username": "password"
+			},
+			"name": "EAI"
+		},
+		{
+			"credentials": {
+				"url": "https://is.nowhere"
+			},
+			"name": "IS"
+		},
+		{
+			"credentials": {
+				"url": "http://ngp-w2k8-appb.pdlab.adp.com/WsApp/WsApp.asmx"
+			},
+			"name": "NGP"
+		}
+	],
+	"mongodb": [
+		{
+			"credentials": {
+				"uri": "mongodb://localhost/gofnol"
+			}
+		}
+	]
+}

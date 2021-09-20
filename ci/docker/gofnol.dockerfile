@@ -4,4 +4,4 @@ ENV ASPNETCORE_URLS=http://+:8080
 WORKDIR /app
 COPY GoFNOL-binaries/app/ ./
 
-ENTRYPOINT ["dotnet", "gofnol.dll"]
+ENTRYPOINT ["dotnet", "GoFNOL.dll"]

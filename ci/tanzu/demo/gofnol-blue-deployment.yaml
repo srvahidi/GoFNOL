@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    service: gofnol-blue
+  name: gofnol-blue
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      service: gofnol-blue
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        network/default: "true"
+        service: gofnol-blue
+        solera-vertical: rms
+        solera-env: cae
+        solera-org: a2e
+        solera-ingress: enabled
+    spec:
+      containers:
+        - env:
+            - name: CONTRAST_CONFIG_PATH
+              value: /home/vcap/app/contrast/contrast_security-qa.yaml
+            - name: CORECLR_ENABLE_PROFILING
+              value: "1"
+            - name: CORECLR_PROFILER
+              value: '{8B2CE134-0948-48CA-A4B2-80DDAD9F5791}'
+            - name: CORECLR_PROFILER_PATH_64
+              value: /home/vcap/app/contrast/runtimes/linux-x64/native/ContrastProfiler.so
+            - name: NEW_RELIC_APP_NAME
+              value: gofnol-demo
+            - name: NEW_RELIC_LABELS
+              value: Environment:CAE;Vertical:RMS Solutions;Theme:Insurance PL Claims;Product:GOFNOL
+            - name: NEW_RELIC_LICENSE_KEY
+              value: e575f6ebb7f8821308cbea10b3817a8bcbe0NRAL
+            - name: CORECLR_ENABLE_PROFILING
+              value: "1"
+            - name: CORECLR_NEWRELIC_HOME
+              value: /app/newrelic-netcore20-agent
+            - name: CORECLR_PROFILER_PATH
+              value: /app/newrelic-netcore20-agent/libNewRelicProfiler.so
+            - name: CORECLR_PROFILER
+              value: "{36032161-FFC0-4B61-B559-F6C5D41BAE5A}"
+            - name: VCAP_SERVICES
+              valueFrom:
+                secretKeyRef:
+                  name: vcap-gofnol
+                  key: vcap
+          image: feeds.axadmin.net/docker/rms/automated_appraisal_engine/gofnol:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 10
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 10
+          name: gofnol-blue
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: 250000Ki
+      restartPolicy: Always
+      serviceAccountName: default
+status: {}

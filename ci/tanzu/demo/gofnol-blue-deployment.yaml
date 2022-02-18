@@ -28,14 +28,6 @@ spec:
     spec:
       containers:
         - env:
-            - name: CONTRAST_CONFIG_PATH
-              value: /home/vcap/app/contrast/contrast_security-qa.yaml
-            - name: CORECLR_ENABLE_PROFILING
-              value: "1"
-            - name: CORECLR_PROFILER
-              value: '{8B2CE134-0948-48CA-A4B2-80DDAD9F5791}'
-            - name: CORECLR_PROFILER_PATH_64
-              value: /home/vcap/app/contrast/runtimes/linux-x64/native/ContrastProfiler.so
             - name: NEW_RELIC_APP_NAME
               value: gofnol-demo
             - name: NEW_RELIC_LABELS

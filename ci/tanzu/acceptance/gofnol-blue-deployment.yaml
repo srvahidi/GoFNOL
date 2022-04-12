@@ -25,6 +25,8 @@ spec:
         solera-env: dev
         solera-org: a2e
         solera-ingress: enabled
+        solera-dev-support: DL-VehicleClaims-NA-Eng-Squad-TeamLightning
+        solera-qa-support: DL-NA-QA-Leads
     spec:
       containers:
         - env:
@@ -61,8 +63,12 @@ spec:
           ports:
             - containerPort: 8080
           resources:
+            requests:
+              memory: 50Mi
+              cpu: 10m
             limits:
-              memory: 250000Ki
+              memory: 75Mi
+              cpu: 15m
       restartPolicy: Always
       serviceAccountName: default
 status: {}

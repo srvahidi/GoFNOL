@@ -68,7 +68,7 @@ spec:
               cpu: 2m
             limits:
               memory: 65Mi
-              cpu: 5m
+              cpu: 250m
       restartPolicy: Always
       serviceAccountName: default
 status: {}

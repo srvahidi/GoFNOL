@@ -64,11 +64,11 @@ spec:
             - containerPort: 8080
           resources:
             requests:
-              memory: 50Mi
-              cpu: 10m
+              memory: 40Mi
+              cpu: 2m
             limits:
-              memory: 75Mi
-              cpu: 15m
+              memory: 65Mi
+              cpu: 5m
       restartPolicy: Always
       serviceAccountName: default
 status: {}

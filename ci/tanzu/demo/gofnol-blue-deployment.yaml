@@ -62,7 +62,7 @@ spec:
           name: gofnol-blue
           ports:
             - containerPort: 8080
-         resources:
+          resources:
             requests:
               memory: 75Mi
               cpu: 10m

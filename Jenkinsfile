@@ -118,7 +118,7 @@ try {
 				}
 				if(env.CHANGE_ID ) {
                 stage ("sonar-scan"){
-                container('maven') {
+                container('custom1') {
                     //sonarScan(credentialsIdSonar)
 					sh "echo "SONAR SCANNING""
 					}

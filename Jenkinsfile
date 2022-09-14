@@ -156,7 +156,6 @@ try {
                     kubectlDeploy(VAULT_INSTANCE,VAULT_SECRETS_PATH,deploynamespace,pathToYML)
 					
 					}
-
 					}
 				}				
 			}

@@ -40,7 +40,11 @@ try {
                 container('jnlp') {
                   milestone()
                   try{
+				  if(env.CHANGE_ID ) {
+				  	checkout scm
+				  }else{
                      git branch: "${env.BRANCH_NAME}", credentialsId: "HSSoleraNABB", url: "https://bitbucket.org/SoleraNA/${repoName}.git"
+					 }
                   }                
                   catch(e) {
                        currentBuild.result = "ABORTED"

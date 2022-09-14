@@ -124,7 +124,7 @@ try {
                 stage ("sonar-scan"){
                 container('custom1') {
                     //sonarScan(credentialsIdSonar)
-					sh "echo "SONAR SCANNING""
+					sh "echo 'SONAR SCANNING'"
 					}
                     }
 					}

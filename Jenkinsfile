@@ -40,7 +40,7 @@ try {
                 container('jnlp') {
                   milestone()
                   try{
-                     checkout scm
+                     git branch: "${env.BRANCH_NAME}", credentialsId: "HSSoleraNABB", url: "https://bitbucket.org/SoleraNA/${repoName}.git"
                   }                
                   catch(e) {
                        currentBuild.result = "ABORTED"
@@ -119,7 +119,8 @@ try {
 				if(env.CHANGE_ID ) {
                 stage ("sonar-scan"){
                 container('maven') {
-                    sonarScan(credentialsIdSonar)
+                    //sonarScan(credentialsIdSonar)
+					sh "echo "SONAR SCANNING""
 					}
                     }
 					}

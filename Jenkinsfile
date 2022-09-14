@@ -40,11 +40,7 @@ try {
                 container('jnlp') {
                   milestone()
                   try{
-				  if(env.CHANGE_ID ) {
 				  	checkout scm
-				  }else{
-                     git branch: "${env.BRANCH_NAME}", credentialsId: "HSSoleraNABB", url: "https://bitbucket.org/SoleraNA/${repoName}.git"
-					 }
                   }                
                   catch(e) {
                        currentBuild.result = "ABORTED"
@@ -149,7 +145,7 @@ try {
 				stage("docker-build"){
 				container('docker') {
 				def imageVersion = readFile('GoFNOL-binaries/app/version.txt').trim()
-				dockerrms(dockerRegistry,credentialsIdDocker,imageName,imageVersion,Dockerfile,DockerfilePath)
+				//dockerrms(dockerRegistry,credentialsIdDocker,imageName,imageVersion,Dockerfile,DockerfilePath)
 					
 					}
 					}
@@ -157,7 +153,7 @@ try {
 				if(branchName =~ /(master|jenkins_migration)/) {				
 				stage("kubectl-deploy-acceptance"){
                 container('helm'){				
-                    kubectlDeploy(VAULT_INSTANCE,VAULT_SECRETS_PATH,deploynamespace,pathToYML)
+                    //kubectlDeploy(VAULT_INSTANCE,VAULT_SECRETS_PATH,deploynamespace,pathToYML)
 					
 					}
 					}

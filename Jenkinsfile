@@ -40,7 +40,7 @@ try {
                 container('jnlp') {
                   milestone()
                   try{
-                     git branch: "${env.BRANCH_NAME}", credentialsId: "HSSoleraNABB", url: "https://bitbucket.org/SoleraNA/${repoName}.git"
+				  	checkout scm
                   }                
                   catch(e) {
                        currentBuild.result = "ABORTED"
@@ -118,9 +118,9 @@ try {
 				}
 				if(env.CHANGE_ID ) {
                 stage ("sonar-scan"){
-                container('maven') {
+                container('custom1') {
                     //sonarScan(credentialsIdSonar)
-					sh "echo "SONAR SCANNING""
+					sh "echo 'SONAR SCANNING'"
 					}
                     }
 					}
@@ -145,7 +145,7 @@ try {
 				stage("docker-build"){
 				container('docker') {
 				def imageVersion = readFile('GoFNOL-binaries/app/version.txt').trim()
-				dockerrms(dockerRegistry,credentialsIdDocker,imageName,imageVersion,Dockerfile,DockerfilePath)
+				//dockerrms(dockerRegistry,credentialsIdDocker,imageName,imageVersion,Dockerfile,DockerfilePath)
 					
 					}
 					}
@@ -153,10 +153,9 @@ try {
 				if(branchName =~ /(master|jenkins_migration)/) {				
 				stage("kubectl-deploy-acceptance"){
                 container('helm'){				
-                    kubectlDeploy(VAULT_INSTANCE,VAULT_SECRETS_PATH,deploynamespace,pathToYML)
+                    //kubectlDeploy(VAULT_INSTANCE,VAULT_SECRETS_PATH,deploynamespace,pathToYML)
 					
 					}
-
 					}
 				}				
 			}

@@ -59,7 +59,7 @@ try {
 						  # cd ./GoFNOL-git
 						  CI=false dotnet publish ./GoFNOL/GoFNOL.csproj -c Release -o ${output_directory}/app
 						  # format the version so that we can use lexicographic search to find the latest
-						  version=$(git describe --always | awk -F- '{printf "%s-%04d-%s", $1, $2, $3}')
+						  version=$(git describe --always --tags | awk -F- '{printf "%s-%04d-%s", $1, $2, $3}')
 						  echo $version > ${output_directory}/app/version.txt
 						  cp ./ci/manifest.yml ${output_directory}/manifest.yml
 						  tar -xvf "./ci/docker/binfiles/newrelic-netcore20-agent_8.21.34.0_amd64.tar.gz" -C ${output_directory}/app

@@ -149,7 +149,7 @@ try {
 				stage("docker-build"){
 				container('docker') {
 				def imageVersion = readFile('GoFNOL-binaries/app/version.txt').trim()
-				//dockerrms(dockerRegistry,credentialsIdDocker,imageName,imageVersion,Dockerfile,DockerfilePath)
+				dockerrms(dockerRegistry,credentialsIdDocker,imageName,imageVersion,Dockerfile,DockerfilePath)
 					
 					}
 					}
@@ -157,7 +157,7 @@ try {
 				if(branchName =~ /(master|jenkins_migration)/) {				
 				stage("kubectl-deploy-acceptance"){
                 container('helm'){				
-                    //kubectlDeploy(VAULT_INSTANCE,VAULT_SECRETS_PATH,deploynamespace,pathToYML)
+                    kubectlDeploy(VAULT_INSTANCE,VAULT_SECRETS_PATH,deploynamespace,pathToYML)
 					
 					}
 					}

@@ -27,7 +27,7 @@ def VAULT_SECRETS_PATH_Teams = 'secret/hari_test'
 //Jenkins workspace
 workingdir = "/home/jenkins"
 
-def images = [jnlp:"jenkins/inbound-agent:4.7-1", custom1:"feeds.axadmin.net/docker/rms/automated_appraisal_engine/gofnol-sdk-image:latest", cust1podCpuLmt:"1", cust1podMemLmt:"2Gi", custom2:"feeds.axadmin.net/docker/rms/automated_appraisal_engine/gofnol-node-image:latest",cust2podCpuLmt:"1", cust2podMemLmt:"2Gi", custom3:"feeds.axadmin.net/docker/debian",custom4:"feeds.axadmin.net/docker/rms/automated_appraisal_engine/gofnol-utility-image",docker:"docker:20-dind", helm:"feeds.axadmin.net/docker/scm/helm:3.9.0-scm"]
+def images = [jnlp:"jenkins/inbound-agent:4.7-1", custom1:"feeds.axadmin.net/docker/rms/automated_appraisal_engine/gofnol-sdk-image:latest_scm", cust1podCpuLmt:"1", cust1podMemLmt:"2Gi", custom2:"feeds.axadmin.net/docker/rms/automated_appraisal_engine/gofnol-node-image:latest",cust2podCpuLmt:"1", cust2podMemLmt:"2Gi", custom3:"feeds.axadmin.net/docker/debian",custom4:"feeds.axadmin.net/docker/rms/automated_appraisal_engine/gofnol-utility-image",docker:"docker:20-dind", helm:"feeds.axadmin.net/docker/scm/helm:3.9.0-scm"]
 properties([disableConcurrentBuilds(),buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '20'))])
 try {
     nodeTemplate = new PodTemplates(cloudId, namespace, label, images, workingdir, this)
@@ -123,8 +123,20 @@ try {
 				if(env.CHANGE_ID ) {
                 stage ("sonar-scan"){
                 container('custom1') {
-                    //sonarScan(credentialsIdSonar)
-					sh "echo 'SONAR SCANNING'"
+                   dir("GoFNOL"){
+                       withSonarQubeEnv(credentialsId: 'fb8faa9d-5af4-4f0e-aaef-eb23dc53ac0a') {
+					sh '''dotnet tool install --global dotnet-sonarscanner
+					      dotnet tool install --tool-path ../tools dotnet-sonarscanner --version 1.0.0
+					      export PATH="$PATH:/root/.dotnet/tools"
+						  dotnet sonarscanner begin  /k:gofnol   /n:gofnol  /v:jenkins  /d:sonar.cs.opencover.reportsPaths=\"coverage.opencover.xml\" 
+                          output_directory=${PWD}/../GoFNOL-binaries
+						  CI=false dotnet publish ./GoFNOL.csproj -c Release -o ${output_directory}/app
+                          dotnet sonarscanner end  '''
+                       }
+                    timeout(time: 1, unit: 'HOURS') {
+                          waitForQualityGate abortPipeline: true
+                        }
+					}
 					}
                     }
 					}
